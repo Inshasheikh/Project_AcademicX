@@ -1,0 +1,1845 @@
+Group	Screens	Pages
+A - Public Screens	6 screens	Landing, About, Contact, FAQ, Privacy Policy, Terms
+B - Authentication Screens	5 screens	Login, Signup, Forgot Password, OTP Verification, Reset Password
+C - Student Screens	12 screens	Dashboard, Profile, Skill Diagnostic, Results, Job Matches, Job Detail, Applications, Application Status, AI Coach, Resume Upload, Portfolio, Settings
+D - Recruiter Screens	9 screens	Dashboard, Post Job, My Jobs, Job Detail (Recruiter), Candidate Matches, Candidate Profile, Shortlist, Interview Schedule, Offer Letter
+E - Faculty Screens	7 screens	Dashboard, FDP List, FDP Detail, Apply FDP, Industrial Immersion, Mentorship, Research Collaboration
+F - Admin/Institute Screens	8 screens	Dashboard, User Management, Verification Queue, Analytics, Reports, NAAC/NIRF, Settings, College Profile
+G - Utility/Error Screens	4 screens	404, 500, Maintenance, Coming Soon
+
+
+
+
+
+A - Public Screens	 	Landing, About, Contact, FAQ, Privacy Policy, Terms
+
+B - Authentication Screens	 	Login, Signup, Forgot Password, OTP Verification, Reset Password
+
+C - Student Screens	 	Dashboard, Profile, Skill Diagnostic, Results, Job Matches, Job Detail, Applications, Application Status, AI Coach, Resume Upload, Portfolio, Settings
+
+D - Recruiter Screens	 	Dashboard, Post Job, My Jobs, Job Detail (Recruiter), Candidate Matches, Candidate Profile, Shortlist, Interview Schedule, Offer Letter
+
+E - Faculty Screens	 	Dashboard, FDP List, FDP Detail, Apply FDP, Industrial Immersion, Mentorship, Research Collaboration
+
+F - Admin/Institute Screens	 	Dashboard, User Management, Verification Queue, Analytics, Reports, NAAC/NIRF, Settings, College Profile 
+
+G - Utility/Error Screens	 	404, 500, Maintenance, Coming Soon
+
+
+
+
+
+ 
+
+📋 INDEX / TABLE OF CONTENTS
+Group	Screens	Pages
+A - Public Screens	6 screens	Landing, About, Contact, FAQ, Privacy Policy, Terms
+B - Authentication Screens	5 screens	Login, Signup, Forgot Password, OTP Verification, Reset Password
+C - Student Screens	12 screens	Dashboard, Profile, Skill Diagnostic, Results, Job Matches, Job Detail, Applications, Application Status, AI Coach, Resume Upload, Portfolio, Settings
+D - Recruiter Screens	9 screens	Dashboard, Post Job, My Jobs, Job Detail (Recruiter), Candidate Matches, Candidate Profile, Shortlist, Interview Schedule, Offer Letter
+E - Faculty Screens	7 screens	Dashboard, FDP List, FDP Detail, Apply FDP, Industrial Immersion, Mentorship, Research Collaboration
+F - Admin/Institute Screens	8 screens	Dashboard, User Management, Verification Queue, Analytics, Reports, NAAC/NIRF, Settings, College Profile
+G - Utility/Error Screens	4 screens	404, 500, Maintenance, Coming Soon
+TOTAL	51 SCREENS	
+GROUP A: PUBLIC SCREENS (6 Screens)
+Screen A1: Landing / Home Page
+Purpose: First impression of the platform. Attract users and explain what the platform does.
+
+Content:
+
+Top Navigation Bar: Logo (REDDOT), Home, About, Contact, Login, Register buttons
+
+Hero Section:
+
+Big headline: "Bridge the Academia-Industry Gap"
+
+Sub-headline: "AI-powered skill mapping, internships, and placements for students, faculty, and industries"
+
+CTA Buttons: "Get Started as Student" | "Join as Recruiter" | "Explore for Faculty"
+
+Stats Counter:
+
+5,868+ Colleges | 30+ Lakh Students | 75,000+ Companies | 48+ Lakh Internships
+
+Features Section (3 cards):
+
+🎓 For Students: AI skill matching, career roadmap, verified portfolio
+
+🏢 For Recruiters: Pre-evaluated candidates, 40% faster hiring
+
+👨‍🏫 For Faculty: Industrial immersion, FDP programmes, research collaboration
+
+How It Works (3 steps):
+
+Step 1: Sign Up & Create Profile
+
+Step 2: AI Skill Diagnostic & Gap Analysis
+
+Step 3: Get Matched to Jobs/Internships/FDPs
+
+Trust Badges: AICTE, NEP 2020, Skill India, DigiLocker, APAAR
+
+Footer: About, Contact, Privacy Policy, Terms, Social Media links
+
+Screen A2: About Us
+Purpose: Tell the story of REDDOT and the problem you're solving.
+
+Content:
+
+Our Mission: "To democratize career opportunities and bridge the academia-industry gap through AI-powered automation."
+
+Our Vision: "Every student job-ready, every faculty industry-connected, every recruiter finding the perfect match."
+
+The Problem: Academia-industry gap explained in simple terms
+
+Our Solution: REDDOT platform overview (3 stakeholders, AI matching, verification)
+
+Team Section: Team REDDOT members with photos, roles, and LinkedIn links
+
+Timeline / Journey: How the idea evolved
+
+Contact Info: Email, Phone, Address (if applicable)
+
+Screen A3: Contact Us
+Purpose: Let users reach out to the team for support or inquiries.
+
+Content:
+
+Contact Form:
+
+Full Name (text input)
+
+Email Address (email input)
+
+Subject (dropdown: General Inquiry, Technical Support, Partnership, Bug Report, Other)
+
+Message (textarea)
+
+Submit Button
+
+Contact Information:
+
+Email: support@reddot.in
+
+Phone: +91-XXXXX-XXXXX
+
+Address: (if applicable)
+
+Social Media Links: LinkedIn, Twitter/X, GitHub, Instagram
+
+Office Hours: Mon-Fri, 9 AM - 6 PM IST
+
+FAQ Quick Links: Common questions with direct links to FAQ page
+
+Screen A4: FAQ / Help Center
+Purpose: Answer common questions without users needing to contact support.
+
+Content:
+
+Search Bar: Search for topics/questions
+
+Categories:
+
+For Students
+
+For Recruiters
+
+For Faculty
+
+For Administrators
+
+Technical Support
+
+Verification & APAAR
+
+FAQ Questions (with expandable answers):
+
+Category	Questions
+Students	How do I create my profile? How does AI matching work? What is APAAR ID? How do I verify my credentials?
+Recruiters	How do I post a job? How does AI candidate matching work? How do I shortlist candidates?
+Faculty	What is FDP? How do I apply for industrial immersion? What is AICTE IFP?
+Verification	What is APAAR ID? How do I link DigiLocker? How does verification work?
+Technical	Is my data secure? What browsers are supported? Mobile app available?
+Screen A5: Privacy Policy
+Purpose: Legal compliance and user trust — what data we collect and how we use it.
+
+Content:
+
+Introduction: We value your privacy
+
+Data We Collect: Personal info, Academic records (via APAAR), Usage data, Cookies
+
+How We Use Data: Matching, Analytics, Notifications, Improvement
+
+Data Sharing: With recruiters (only with consent), With institutions (for reporting)
+
+Data Security: AES-256 encryption, Role-based access, DPDP Act compliance
+
+User Rights: Access, Correction, Deletion, Withdraw consent
+
+Cookie Policy: What cookies we use
+
+Contact: privacy@reddot.in
+
+Last Updated: Date
+
+Screen A6: Terms of Service
+Purpose: Legal agreement between platform and users.
+
+Content:
+
+Acceptance of Terms: By using our platform, you agree
+
+User Accounts: Registration, Roles, Responsibility
+
+User Conduct: What is acceptable, what is prohibited
+
+Content Ownership: Who owns what
+
+Intellectual Property: Platform IP rights
+
+Disclaimer: No guarantees on placements
+
+Limitation of Liability: Platform not responsible for...
+
+Termination: Account suspension/termination
+
+Governing Law: Indian law
+
+Contact: terms@reddot.in
+
+GROUP B: AUTHENTICATION SCREENS (5 Screens)
+Screen B1: Login Page
+Purpose: Allow registered users to access their accounts.
+
+Content:
+
+Platform Logo (Top center)
+
+Welcome Message: "Welcome back to REDDOT"
+
+Email Address Field (with icon)
+
+Password Field (with show/hide toggle)
+
+Remember Me checkbox
+
+Sign In Button (primary CTA)
+
+Forgot Password? link
+
+Divider: "Or continue with"
+
+DigiLocker Login button (for APAAR verification)
+
+Register Link: "Don't have an account? Sign Up"
+
+Role Selector: Small tabs for Student / Faculty / Recruiter / Admin (auto-fills role)
+
+Error Messages: Invalid credentials, account locked, etc.
+
+Screen B2: Sign Up / Register Page
+Purpose: Allow new users to create an account.
+
+Content:
+
+Platform Logo (Top center)
+
+Headline: "Create Your REDDOT Account"
+
+Progress Indicator: Step 1 of 3
+
+Step 1 - Basic Info:
+
+Full Name (text)
+
+Email Address (email)
+
+Phone Number (optional)
+
+Password (with strength indicator)
+
+Confirm Password
+
+Step 2 - Role Selection:
+
+Student: College, Branch, Year, APAAR ID (optional)
+
+Recruiter: Company Name, Industry, Designation
+
+Faculty: College, Department, Experience
+
+Admin: Institution Name, Designation
+
+Step 3 - Verification:
+
+"Verify via DigiLocker" button (for students)
+
+"Verify via Email" OTP
+
+Terms & Conditions checkbox (with link)
+
+Create Account button
+
+Login Link: "Already have an account? Sign In"
+
+Screen B3: Forgot Password
+Purpose: Allow users to reset their password.
+
+Content:
+
+Platform Logo
+
+Headline: "Forgot Your Password?"
+
+Subtitle: "Enter your email address and we'll send you a verification code"
+
+Email Address Field
+
+Send OTP Button
+
+Back to Login link
+
+Screen B4: OTP Verification
+Purpose: Verify user's identity via OTP.
+
+Content:
+
+Platform Logo
+
+Headline: "Verify Your Identity"
+
+Subtitle: "We've sent a 6-digit code to your email"
+
+6 OTP Fields (single digit each, auto-focus next)
+
+Verify OTP Button
+
+Resend Code link (with timer)
+
+Back to Login link
+
+Screen B5: Reset Password
+Purpose: Set a new password after OTP verification.
+
+Content:
+
+Platform Logo
+
+Headline: "Create New Password"
+
+New Password Field (with strength indicator)
+
+Confirm New Password Field
+
+Reset Password Button
+
+Back to Login link
+
+GROUP C: STUDENT SCREENS (12 Screens)
+Screen C1: Student Dashboard (Home)
+Purpose: Central hub for all student activities.
+
+Content:
+
+Header:
+
+Logo
+
+Welcome message: "Good Morning, Tayba!"
+
+✅ Verified via DigiLocker badge
+
+Profile avatar (clickable → goes to profile)
+
+Notification bell
+
+Stats Cards (Row of 4):
+
+Placement Probability: 78%
+
+Applications: 12
+
+Shortlisted: 4
+
+Offers: 2
+
+Quick Action Buttons:
+
+🔍 Find Jobs
+
+📊 Take Skill Diagnostic
+
+👤 View Profile
+
+🎯 AI Career Coach
+
+Recent AI Job Matches (List of 3-5):
+
+Job Title | Company | Match % | Apply Button
+
+Skill Progress (Mini graph/bars):
+
+Python 85% | ML 70% | React 60%
+
+Upcoming Deadlines / Interview Schedule
+
+Latest Notifications
+
+Screen C2: Student Profile
+Purpose: View and edit personal and academic information.
+
+Content:
+
+Profile Photo (upload option)
+
+Personal Info:
+
+Full Name, Email, Phone, Date of Birth, Gender
+
+College, Branch, Year of Study, Roll Number
+
+APAAR ID Section:
+
+APAAR ID: 1234-5678-9012
+
+Verification Status: ✅ Verified via DigiLocker
+
+"Verify Now" button (if not verified)
+
+Academic Records (Fetched from DigiLocker):
+
+Semester-wise marks
+
+Degree certificates
+
+Other certifications
+
+Skills Section:
+
+Self-reported skills (add/remove)
+
+AI-extracted skills (from resume)
+
+Resume:
+
+Upload resume button
+
+Current resume preview (if uploaded)
+
+Portfolio:
+
+Projects (add, edit, delete)
+
+GitHub/LinkedIn links
+
+Edit Profile button
+
+Screen C3: Skill Diagnostic
+Purpose: Assess student's current skills through adaptive questionnaire.
+
+Content:
+
+Header: "Skill Diagnostic"
+
+Progress Bar: Question 5 of 15
+
+Timer: Time remaining (for timed test)
+
+Question Display:
+
+Question text
+
+Options (MCQ / Multi-select / Fill-in-the-blank)
+
+Difficulty indicator (Easy/Medium/Hard)
+
+Navigation: Previous, Next, Submit
+
+Current Question Indicator: "Question 5 of 15"
+
+Submit Button (enabled after all questions answered)
+
+Skip Question (optional, with penalty explanation)
+
+Screen C4: Skill Gap Analysis / Results
+Purpose: Show diagnostic results and gap analysis against industry benchmarks.
+
+Content:
+
+Overall Score: 72/100 (with gauge/circle chart)
+
+Industry Benchmark: 78/100
+
+Skill-Wise Breakdown (Bar chart):
+
+Python: 85% (vs Industry: 90%)
+
+ML: 70% (vs Industry: 85%)
+
+React: 60% (vs Industry: 75%)
+
+SQL: 75% (vs Industry: 80%)
+
+Cloud: 40% (vs Industry: 70%) ← RED (Gap)
+
+Strengths Section: Python, SQL, Data Visualization
+
+Gap Section (⚠️ warning icon):
+
+Deep Learning
+
+Cloud Computing
+
+Docker/Kubernetes
+
+Learning Roadmap:
+
+Week 1-2: Deep Learning Specialization (Coursera)
+
+Week 3-4: AWS Certified Cloud Practitioner
+
+Week 5-6: Docker & Kubernetes Fundamentals
+
+Recommended Courses (with "Start" buttons):
+
+Deep Learning (Andrew Ng) - Coursera
+
+AWS Cloud Practitioner - AWS Training
+
+Docker Mastery - Udemy
+
+Action Buttons:
+
+📄 Download Report (PDF)
+
+📤 Share with Mentor
+
+🔄 Retake Diagnostic
+
+Screen C5: AI Job Matches
+Purpose: Display all jobs/internships matched to the student.
+
+Content:
+
+Header: "AI Job Matches (24 found)"
+
+Filter Bar:
+
+🔍 Search jobs...
+
+Location dropdown: All, Bengaluru, Hyderabad, Remote, etc.
+
+Job Type: All, Internship, Full-time, Part-time
+
+Match Score: Slider (50% - 100%)
+
+Matching Results (List view):
+
+Each card shows:
+
+Company Logo
+
+Job Title
+
+Company Name
+
+Location
+
+Job Type badge (Internship/Full-time)
+
+Match Score (percentage with color: Green >80%, Yellow 60-80%, Red <60%)
+
+Salary/Stipend info
+
+"Apply Now" button
+
+Save/Heart icon (favorite)
+
+Pagination: 10 results per page
+
+Sort Options: Match Score (High-Low), Newest, Salary
+
+Screen C6: Job / Internship Detail
+Purpose: Show complete details of a specific job.
+
+Content:
+
+Back Button: ← Back to matches
+
+Job Header:
+
+Company Logo (large)
+
+Job Title
+
+Company Name
+
+Location
+
+Job Type (Internship/Full-time)
+
+Posted Date
+
+Match Score (Prominent display):
+
+Your Match: 92%
+
+Breakdown: Python (95%), ML (88%), React (85%)
+
+Job Description:
+
+Full description (formatted)
+
+Responsibilities
+
+Qualifications required
+
+Required Skills (Tags):
+
+Python, TensorFlow, PyTorch, SQL
+
+Benefits/Perks:
+
+Stipend/Salary: ₹50,000/month
+
+Accommodation provided
+
+Certificate, LOR
+
+How to Apply:
+
+Apply Now button (primary CTA)
+
+Application Deadline
+
+Number of openings
+
+Actions:
+
+💾 Save to Favorites
+
+📤 Share on LinkedIn/WhatsApp
+
+📝 Report this job
+
+Similar Jobs: 3 recommendations
+
+Screen C7: My Applications
+Purpose: Track all applications submitted by the student.
+
+Content:
+
+Header: "My Applications (12)"
+
+Tabs: All | Applied | Shortlisted | Interview | Offered | Rejected
+
+Application Cards (List view):
+
+Company Logo
+
+Job Title
+
+Company Name
+
+Applied Date
+
+Status badge (Applied/Shortlisted/Rejected/Offered)
+
+Status color: Green (Offered), Yellow (Shortlisted/Interview), Blue (Applied), Red (Rejected)
+
+Next Step: "Update" or "Contact Recruiter"
+
+Withdraw button (if pending)
+
+Filters: Sort by status, date applied, company name
+
+Total Applications Stats: Applied: 12 | Shortlisted: 4 | Offered: 2
+
+Screen C8: Application Status Detail
+Purpose: Deep dive into a single application's status.
+
+Content:
+
+Back Button: ← Back to My Applications
+
+Application ID: #APP-2026-001
+
+Job Info: Job Title, Company, Location
+
+Application Timeline (Vertical progress bar):
+
+✅ Application Submitted (Date)
+
+⏳ Application Reviewed (Date)
+
+⏳ Shortlisted (Date)
+
+⏳ Interview Scheduled (Date)
+
+⏳ Offer Extended (Date)
+
+Current Stage: "Shortlisted - Awaiting Interview"
+
+Recruiter Message (if any)
+
+Next Action:
+
+"Schedule Interview" button (if recruiter initiated)
+
+"Send Follow-up" button
+
+Application PDF: Download button
+
+Chat with Recruiter: Message button
+
+Withdraw Application button
+
+Screen C9: AI Career Coach
+Purpose: Help students prepare for careers through AI-powered tools.
+
+Content:
+
+Header: "🎯 AI Career Coach"
+
+Three Tabs:
+
+Mock Interview
+Resume Optimizer
+Career Roadmap
+Tab 1 - Mock Interview:
+
+Select Job Role dropdown
+
+Select Interview Type: Technical, HR, General
+
+Start Interview button
+
+Question display (AI-generated)
+
+Record answer (mic icon)
+
+Submit Answer button
+
+AI Feedback: Strengths, Improvement areas, Score
+
+History: Past interviews and scores
+
+Tab 2 - Resume Optimizer:
+
+Upload Resume button
+
+AI Analysis Results:
+
+Format: Good/Needs Improvement
+
+Skills found: List
+
+Missing Keywords: List
+
+Suggested improvements (bullet points)
+
+ATS Compatibility Score
+
+Optimized Resume Preview
+
+Download Optimized Resume button
+
+Tab 3 - Career Roadmap:
+
+Target Role input
+
+Current Skills (from profile)
+
+Gap Analysis
+
+Step-by-step learning path with timeline
+
+Course recommendations
+
+Project recommendations
+
+Screen C10: Resume Upload / Management
+Purpose: Upload, view, and manage resume.
+
+Content:
+
+Header: "Resume Management"
+
+Current Resume (if uploaded):
+
+File name: Tayba_Resume.pdf
+
+Upload Date
+
+File Size
+
+Preview button
+
+Delete button
+
+Upload New Resume:
+
+Drag-and-drop area
+
+Supported formats: PDF, DOC, DOCX
+
+File size limit: 5MB
+
+Upload button
+
+AI Extraction Results:
+
+Skills extracted from resume: Python, ML, React, SQL
+
+Experience: 2 years
+
+Education: B.Tech CSE
+
+Resume Tips: ATS-friendly tips
+
+Screen C11: Digital Portfolio
+Purpose: Showcase student's achievements and projects.
+
+Content:
+
+Profile Header: Name, College, Verified Badge
+
+Tabs: Projects | Achievements | Certifications | Feedback
+
+Tab 1 - Projects:
+
+Add Project button
+
+Project Cards: Title, Description, Tech Stack, GitHub Link, Live Demo Link
+
+Edit/Delete options
+
+Tab 2 - Achievements:
+
+Academic achievements (semester ranks, awards)
+
+Extra-curricular achievements
+
+Add/Edit/Delete options
+
+Tab 3 - Certifications:
+
+Fetched from DigiLocker (verified)
+
+Manual upload option (pending verification)
+
+Certification cards: Name, Issuer, Date, Verified badge
+
+Tab 4 - Feedback:
+
+Mentor feedback
+
+Industry feedback
+
+Peer feedback
+
+Screen C12: Student Settings
+Purpose: Manage account settings and preferences.
+
+Content:
+
+Profile Settings:
+
+Edit personal info
+
+Change password
+
+Change email
+
+Notification Preferences:
+
+Email notifications (toggle)
+
+WhatsApp notifications (toggle)
+
+Application updates
+
+Job recommendations
+
+Privacy Settings:
+
+Profile visibility: Public/Private/Recruiter-only
+
+Show/hide contact info
+
+Data Export: Download all data (GDPR/DPDP)
+
+Account Deletion: Delete account (with confirmation)
+
+Language: Select preferred language (English/Hindi/Regional)
+
+GROUP D: RECRUITER SCREENS (9 Screens)
+Screen D1: Recruiter Dashboard
+Purpose: Central hub for all recruiter activities.
+
+Content:
+
+Header:
+
+Logo
+
+Welcome: "Welcome, Google HR Team!"
+
+Company Name: Google
+
+Notification bell
+
+Profile avatar
+
+Stats Cards (Row of 4):
+
+Active Jobs: 5
+
+Total Applications: 48
+
+Shortlisted: 12
+
+Hired: 3
+
+Quick Action Buttons:
+
+📝 Post New Job
+
+👥 View Candidates
+
+📊 Analytics
+
+Recent Applications (Table):
+
+Job | Applicant | Match Score | Status | Action
+
+AI Recommended Candidates:
+
+Name | Skills | Match % | View Profile button
+
+Pending Actions:
+
+Resumes to review
+
+Interviews to schedule
+
+Quick Approve (Hyper-automation):
+
+WhatsApp/Telegram approve demo button
+
+Screen D2: Post a New Job
+Purpose: Create and publish a new job/internship posting.
+
+Content:
+
+Header: "Post a New Job"
+
+Progress: Step 1 of 3
+
+Step 1 - Basic Details:
+
+Job Title (text)
+
+Company Name (auto-filled)
+
+Location (text + dropdown)
+
+Job Type: Internship / Full-time / Part-time / Contract
+
+Category/Sector (dropdown)
+
+Step 2 - Job Description:
+
+Description (rich text editor)
+
+Responsibilities (bullet points)
+
+Required Qualifications
+
+Step 3 - Requirements & Perks:
+
+Required Skills (comma separated + tags)
+
+Preferred Skills (optional)
+
+Minimum Experience (dropdown: Fresher/1-3 Years/3-5 Years/5+ Years)
+
+Salary/Stipend Range
+
+Number of Openings
+
+Application Deadline (date picker)
+
+Work Mode: Remote/Hybrid/On-site
+
+Preview Job button
+
+Post Job & Get AI Matches button (primary CTA)
+
+Save as Draft button
+
+Screen D3: My Jobs
+Purpose: View and manage all posted jobs.
+
+Content:
+
+Header: "My Job Postings (12)"
+
+Tabs: Active | Expired | Draft | Closed
+
+Job Cards (List/Grid):
+
+Job Title
+
+Company (auto-filled)
+
+Status badge: Active/Expired/Draft/Closed
+
+Posted Date
+
+Applications Count
+
+Shortlisted Count
+
+Hired Count
+
+Actions:
+
+Edit button
+
+Close/Repost button
+
+View Applications button
+
+View Analytics button
+
+Search & Filter: Title search, Status filter, Date filter
+
+Screen D4: Job Detail (Recruiter View)
+Purpose: View full details of a specific job posting.
+
+Content:
+
+Back Button: ← Back to My Jobs
+
+Job Header: Title, Company, Location, Status
+
+Job Details: Full description, requirements, perks
+
+Statistics:
+
+Total Views: 450
+
+Total Applications: 48
+
+Shortlisted: 12
+
+Hired: 3
+
+Applicant List (Table):
+
+Name | College | Match Score | Application Date | Status | Action
+
+Actions:
+
+Edit Job
+
+Close/Repost
+
+Delete
+
+AI Match Summary: Top 5 candidates with match scores
+
+Export button: Download applications as CSV
+
+Screen D5: Candidate Matches (AI Shortlist)
+Purpose: View AI-recommended candidates for a specific job.
+
+Content:
+
+Header: "AI Candidate Matches for 'AI/ML Intern' (45)"
+
+Filter:
+
+Match Score slider
+
+College filter
+
+Skills filter
+
+Candidate Cards:
+
+Candidate Photo
+
+Name
+
+College
+
+Skills (tags)
+
+Match Score (with color)
+
+Match Breakdown: Skill Match 90%, Experience 85%, Education 80%
+
+Actions: View Profile | Shortlist | Reject | Message
+
+Bulk Actions: Select multiple → Shortlist/Reject
+
+Export button: Download shortlisted candidates
+
+Screen D6: Candidate Profile (Recruiter View)
+Purpose: View full student profile from recruiter's perspective.
+
+Content:
+
+Back Button: ← Back to Matches
+
+Student Header:
+
+Photo
+
+Name, College, Branch, Year
+
+✅ Verified via DigiLocker badge
+
+Resume Preview: PDF viewer
+
+Skills (Tags): Python, ML, React, SQL
+
+Projects: List of projects with descriptions
+
+Match Breakdown (Detailed):
+
+Overall Match: 92%
+
+Skills: 95%
+
+Experience: 85%
+
+Education: 90%
+
+Projects: 80%
+
+Academics: GPA, percentage, key subjects
+
+Portfolio: Links to GitHub, LinkedIn, etc.
+
+Recruiter Actions:
+
+💚 Shortlist Candidate
+
+❌ Reject Candidate
+
+📅 Schedule Interview
+
+💬 Send Message
+
+📨 Send Offer Letter
+
+Notes: Private notes for recruiter
+
+Screen D7: Shortlist Management
+Purpose: Manage shortlisted candidates.
+
+Content:
+
+Header: "Shortlisted Candidates (12)"
+
+Job Filter: Select job to view shortlisted candidates for that job
+
+Candidate Cards:
+
+Photo | Name | College | Match Score
+
+Status: Pending / Interview Scheduled / Offer Extended / Hired
+
+Next Action: Schedule Interview / Send Offer / View Notes
+
+Actions: Move to Reject, Move to Hire, Add Notes
+
+Export button
+
+Screen D8: Interview Schedule
+Purpose: Schedule interviews with shortlisted candidates.
+
+Content:
+
+Header: "Schedule Interview"
+
+Candidate Info: Name, College, Job Applied
+
+Interview Details:
+
+Date (date picker)
+
+Time (time picker)
+
+Mode: Virtual/In-person/Phone
+
+Duration: 30 min / 45 min / 60 min
+
+Interview Type: Technical / HR / General
+
+Interview Panel: Add panel members (email)
+
+Notes for Candidate: Message field
+
+Send Invite button (email + calendar invite)
+
+Calendar View: Existing interviews
+
+Screen D9: Offer Letter Management
+Purpose: Send and manage offer letters.
+
+Content:
+
+Header: "Send Offer Letter"
+
+Candidate Info: Name, College, Job Applied
+
+Offer Details:
+
+Job Title
+
+Salary/Stipend
+
+Joining Date
+
+Location
+
+Reporting Manager
+
+Offer Letter Template (Rich text editor):
+
+Generate from template
+
+Customize message
+
+Attachments: Add PDF, etc.
+
+Send Offer button (with confirmation)
+
+Offer Status: Pending / Accepted / Rejected / Expired
+
+History: Previous offers sent to this candidate
+
+GROUP E: FACULTY SCREENS (7 Screens)
+Screen E1: Faculty Dashboard
+Purpose: Central hub for faculty activities.
+
+Content:
+
+Header:
+
+Logo
+
+Welcome: "Welcome, Prof. Sharma!"
+
+Institution: AIIA
+
+Notification bell
+
+Stats Cards:
+
+FDPs Applied: 3
+
+Active Industrial Immersion: 1
+
+Mentored Students: 45
+
+Research Collaborations: 2
+
+Quick Actions:
+
+🔍 Explore FDPs
+
+👨‍🏫 View Mentored Students
+
+🔬 Research Collaborations
+
+FDP Recommendations:
+
+FDP Title | Industry Partner | Duration | Apply button
+
+Student Mentorship:
+
+Recent feedback requests
+
+Student progress updates
+
+Upcoming Deadlines: FDP applications, Research project submissions
+
+Screen E2: FDP Opportunities (List)
+Purpose: Display all available Faculty Development Programmes.
+
+Content:
+
+Header: "FDP & Industrial Immersion Opportunities"
+
+Filter: Type (FDP / Industry Fellowship / Research), Industry, Duration
+
+Program Cards:
+
+Programme Name
+
+Industry Partner
+
+Duration
+
+Stipend (if applicable)
+
+Application Deadline
+
+Eligibility criteria (brief)
+
+Apply button
+
+Industry Fellowship Programme (IFP) Highlight:
+
+350 positions available
+
+₹1 lakh/month stipend
+
+1-year full-time industry immersion
+
+"Learn More" button
+
+Screen E3: FDP Detail
+Purpose: View full details of a specific FDP.
+
+Content:
+
+Back Button: ← Back to FDP List
+
+Program Header:
+
+Title
+
+Industry Partner
+
+Duration
+
+Stipend
+
+Description: Full program description
+
+Eligibility Criteria:
+
+Qualifications
+
+Experience
+
+Research area
+
+Objectives: What you'll learn/gain
+
+Deliverables: Expected outcomes
+
+Application Process:
+
+Steps to apply
+
+Documents required
+
+Apply Now button
+
+Similar Programs: Recommendations
+
+Screen E4: Apply for FDP
+Purpose: Submit application for FDP/Industrial Immersion.
+
+Content:
+
+Header: "Apply for [Program Name]"
+
+Application Form:
+
+Personal Details: Name, Email, Phone, Institution
+
+Department, Designation, Years of Experience
+
+Research Area / Specialization
+
+Motivation Statement (textarea)
+
+Previous FDP/Industry experience (textarea)
+
+How will this benefit your teaching/research? (textarea)
+
+Document Upload:
+
+CV/Resume (PDF)
+
+Research Papers (PDF)
+
+Recommendation Letter (PDF)
+
+Current Institution ID Card
+
+Terms & Conditions checkbox
+
+Submit Application button
+
+Save as Draft button
+
+Screen E5: Industrial Immersion Tracking
+Purpose: Track ongoing industrial immersion programs.
+
+Content:
+
+Header: "My Industrial Immersion"
+
+Current Immersion (if active):
+
+Programme Name
+
+Industry Partner
+
+Start Date
+
+End Date
+
+Duration: 6 months completed / 12 months total
+
+Progress Tracker (Timeline):
+
+Month 1: Onboarding completed ✅
+
+Month 2: Project assigned ✅
+
+Month 3: Mid-review ✅
+
+Month 4: In Progress ⏳
+
+Milestones: List of completed and pending milestones
+
+Mentor Feedback: Industry mentor feedback
+
+Report Submission: Upload progress reports
+
+Completion Certificate: Download (if completed)
+
+Screen E6: Student Mentorship Dashboard
+Purpose: Manage and track mentored students.
+
+Content:
+
+Header: "My Mentees (45)"
+
+Search & Filter: Name, Branch, Year, Skill gap
+
+Student Cards:
+
+Photo | Name | Branch | Year
+
+Placement Probability: 78%
+
+Skill Gap: Deep Learning, Cloud
+
+Recent Activity: Applied to 3 jobs
+
+Actions: View Profile, Add Feedback, Schedule Meeting
+
+Feedback History: All feedback given to students
+
+Bulk Actions: Message multiple students
+
+Screen E7: Research Collaboration
+Purpose: Find and manage research collaborations with industry.
+
+Content:
+
+Header: "Research Collaborations"
+
+Collaboration Opportunities (List):
+
+Project Title
+
+Industry Partner
+
+Duration
+
+Funding
+
+Research Area
+
+Express Interest button
+
+Ongoing Collaborations:
+
+Project details
+
+Progress
+
+Team members
+
+Research Papers: Upload and share papers
+
+Funding Opportunities: List of grants available
+
+GROUP F: ADMIN/INSTITUTE SCREENS (8 Screens)
+Screen F1: Admin Dashboard
+Purpose: Central hub for system administration.
+
+Content:
+
+Header:
+
+Logo
+
+Welcome: "Welcome, Admin!"
+
+Institution Name
+
+Stats Cards (Row of 4):
+
+Total Students: 1,234
+
+Total Recruiters: 56
+
+Total Jobs: 128
+
+Total Applications: 2,450
+
+Quick Actions:
+
+👤 Manage Users
+
+✅ Verify Students
+
+📊 Generate Reports
+
+⚙️ System Settings
+
+Recent Activity:
+
+New registrations
+
+New job posts
+
+Recent applications
+
+Pending Actions:
+
+12 pending verifications
+
+5 new job posts to approve
+
+Analytics Chart: Placement trend (line chart)
+
+Alerts: System health, API status
+
+Screen F2: User Management
+Purpose: Manage all platform users (Students, Faculty, Recruiters).
+
+Content:
+
+Header: "User Management (1,290 users)"
+
+Search: Name, Email, Role, Status
+
+Filters: Role (All/Student/Faculty/Recruiter/Admin), Status (Active/Inactive/Pending), Institution
+
+User Table:
+
+Profile | Name | Email | Role | Institution | Status | Verified | Actions
+
+Actions: Edit, Disable, Verify, Delete
+
+Bulk Actions: Select multiple → Disable/Verify/Delete
+
+Add User button (manual entry)
+
+Export button (CSV/Excel)
+
+Screen F3: Verification Queue
+Purpose: Review and approve pending verification requests.
+
+Content:
+
+Header: "Verification Queue (12 pending)"
+
+Requests (List):
+
+Student Name
+
+APAAR ID
+
+College
+
+Documents Uploaded (view)
+
+Status: Pending/Verified/Rejected
+
+Submitted Date
+
+Actions:
+
+✅ Approve (with optional comment)
+
+❌ Reject (with reason)
+
+📄 View Documents (DigiLocker data)
+
+Bulk Approve button
+
+Filter: Date range, Institution, Status
+
+Screen F4: Analytics & Insights
+Purpose: View platform-wide analytics.
+
+Content:
+
+Header: "Analytics & Insights"
+
+Filter: Institution, Department, Date Range
+
+Charts:
+
+Placement Trend (Line chart): Monthly placement % over time
+Skill Gap Heatmap (Bar chart): Top skills with gaps across college
+Industry Engagement (Pie chart): Active industries distribution
+Application Funnel (Funnel chart): Views → Applications → Shortlist → Offers
+Student Performance (Histogram): Score distribution
+Key Metrics:
+
+Overall Placement Rate: 62%
+
+Average Placement Probability: 72%
+
+Industry Satisfaction Score: 4.2/5
+
+Average Time to Hire: 12 days
+
+Screen F5: Reports
+Purpose: Generate and download reports.
+
+Content:
+
+Header: "Reports"
+
+Report Templates:
+
+Placement Summary Report
+Skill Gap Analysis Report
+Industry Engagement Report
+Student Progression Report
+NAAC/NIRF Report
+Custom Report Builder:
+
+Select Data: Placements/Skills/Engagement/All
+
+Date Range
+
+Format: PDF/Excel
+
+Generate Report button
+
+Saved Reports: History of generated reports with download option
+
+Screen F6: NAAC/NIRF Report Generator
+Purpose: Auto-generate NAAC/NIRF compliance reports.
+
+Content:
+
+Header: "NAAC/NIRF Report Generator"
+
+NAAC Criteria:
+
+Criteria 1: Curricular Aspects (Data pre-filled)
+
+Criteria 2: Teaching-Learning and Evaluation
+
+Criteria 3: Research, Innovations, and Extension
+
+Criteria 4: Infrastructure and Learning Resources
+
+Criteria 5: Student Support and Progression
+
+Criteria 6: Governance, Leadership, and Management
+
+Criteria 7: Institutional Values and Best Practices
+
+Data Sources: Pulls data from platform automatically
+
+Progress: Data completeness percentage
+
+Generate NAAC Report button
+
+Generate NIRF Report button
+
+Screen F7: System Settings
+Purpose: Configure system-wide settings.
+
+Content:
+
+Institution Profile:
+
+Name, Address, Contact, Logo
+
+Affiliation details
+
+Placement Parameters:
+
+Minimum internship duration (semesters)
+
+Placement target percentage
+
+Industry partnership criteria
+
+API Integrations:
+
+DigiLocker: Status (Connected/Disconnected)
+
+APAAR: Status
+
+n8n: Status (for automation)
+
+Notification Templates:
+
+Email templates (edit)
+
+SMS templates
+
+Role Permissions: What each role can access
+
+Security Settings:
+
+Password policy
+
+Session timeout
+
+2FA toggle
+
+Screen F8: College / Institute Profile
+Purpose: View and edit institution-specific details.
+
+Content:
+
+Header: "Institute Profile"
+
+College Details:
+
+Name, Code, Address, Contact
+
+Principal/Director name
+
+Established Year
+
+Accreditation status
+
+NAAC/NIRF grades
+
+Department List:
+
+Add/Edit/Delete departments
+
+Head of Department
+
+Student count per department
+
+T&P Cell Details:
+
+Placement Officer name, contact
+
+Placement statistics
+
+Industry Partnerships: List of partner companies
+
+Student Demographics: Charts showing student distribution
+
+GROUP G: UTILITY / ERROR SCREENS (4 Screens)
+Screen G1: 404 Not Found
+Purpose: Show when a page is not found.
+
+Content:
+
+Illustration: Fun 404 graphic
+
+Message: "Oops! Page not found"
+
+Sub-message: "The page you're looking for doesn't exist or has been moved."
+
+Buttons: Go Home | Go Back
+
+Search Bar: Search for what you're looking for
+
+Screen G2: 500 Server Error
+Purpose: Show when server encounters an error.
+
+Content:
+
+Message: "Something went wrong"
+
+Sub-message: "We're working on fixing it. Please try again later."
+
+Buttons: Try Again | Go Home
+
+Error Reference: Error ID (for support)
+
+Screen G3: Under Maintenance
+Purpose: Show when platform is down for maintenance.
+
+Content:
+
+Message: "We'll be back soon!"
+
+Sub-message: "We're performing some upgrades to serve you better."
+
+Estimated Time: "Expected downtime: 2 hours"
+
+Social Links: Follow for updates
+
+Contact: support@reddot.in
+
+Screen G4: Coming Soon
+Purpose: Show for features not yet available.
+
+Content:
+
+Feature Name: "Mobile App"
+
+Message: "Coming Soon!"
+
+Sub-message: "We're building something amazing for you."
+
+Notify Me button (email signup)
+
+Estimated Release: "Q1 2027"
+
+📊 COMPLETE SUMMARY TABLE
+Group	Screens	MVP (Hackathon)	Full Product
+A - Public	6	2 (Landing, About)	6
+B - Authentication	5	3 (Login, Signup, Forgot)	5
+C - Student	12	7	12
+D - Recruiter	9	5	9
+E - Faculty	7	1	7
+F - Admin	8	3	8
+G - Utility	4	2	4
+TOTAL	51	23	51
+✅ MVP PRIORITY LIST (23 Screens for SIH)
+Priority	Screen Code	Screen Name
+P0	A1	Landing Page
+P0	B1	Login Page
+P0	B2	Sign Up Page
+P0	C1	Student Dashboard
+P0	C2	Student Profile
+P0	C5	AI Job Matches
+P0	C6	Job Detail
+P0	C7	My Applications
+P0	D1	Recruiter Dashboard
+P0	D2	Post a New Job
+P0	D5	Candidate Matches
+P0	D6	Candidate Profile
+P1	C3	Skill Diagnostic
+P1	C4	Skill Gap Analysis
+P1	F1	Admin Dashboard
+P1	F2	User Management
+P1	F3	Verification Queue
+P2	C9	AI Career Coach
+P2	E1	Faculty Dashboard
+P2	G1	404 Not Found
+P2	G2	500 Server Error
+P3	A2	About Us
+P3	A4	FAQ

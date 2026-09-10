@@ -1,0 +1,30 @@
+# ==============================================================================
+# Django Backend .gitignore
+# ==============================================================================
+
+# Environment files with sensitive credentials
+.env
+.env.*
+*.env
+!.env.example
+
+# Database
+*.sqlite3
+*.db
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# Logs
+*.log
+
+# Media files uploaded by users
+media/
