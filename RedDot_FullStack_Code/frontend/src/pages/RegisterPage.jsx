@@ -122,15 +122,16 @@ export default function RegisterPage({ setActiveRole, setActiveTab }) {
       if (res.success) {
         setOtpSent(true);
         setCountdown(res.retry_after || 60);
+        const codeHint = (res.demo_code || res.demo_otp) ? ` [Verification Code: ${res.demo_code || res.demo_otp}]` : '';
         if (res.message) {
-          setSuccessMsg(res.message);
+          setSuccessMsg(res.message + codeHint);
         } else if (type === 'email') {
-          setSuccessMsg(`6-digit OTP dispatched to ${target} via Email.`);
+          setSuccessMsg(`6-digit OTP dispatched to ${target} via Email.${codeHint}`);
         } else {
-          setSuccessMsg(`6-digit OTP dispatched to +91 ${target} via Fast2SMS.`);
+          setSuccessMsg(`6-digit OTP dispatched to +91 ${target} via Fast2SMS.${codeHint}`);
         }
         if (res.demo_code || res.demo_otp) {
-          console.log(`[REDDOT Register OTP] Code for ${target}:`, res.demo_code || res.demo_otp);
+          setOtpCode(res.demo_code || res.demo_otp);
         }
       } else {
         setErrorMsg(res.error || res.message || 'Failed to dispatch OTP.');
