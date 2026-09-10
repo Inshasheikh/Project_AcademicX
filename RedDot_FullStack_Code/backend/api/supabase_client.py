@@ -1,6 +1,11 @@
 import os
 from datetime import datetime, timezone
-from supabase import create_client, Client
+
+try:
+    from supabase import create_client, Client
+except ImportError:
+    create_client = None
+    Client = object
 
 # Official Supabase Credentials for REDDOT Project
 SUPABASE_URL = os.environ.get('SUPABASE_URL', 'https://hznhvqxwzswxwzusonsz.supabase.co')
