@@ -1,5 +1,18 @@
 // REDDOT API Service with seamless Backend Integration & Offline Fallback for Demos
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8001/api';
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '');
+  }
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://127.0.0.1:8000/api';
+    }
+  }
+  return 'https://project-academicx.onrender.com/api';
+};
+
+export const BASE_URL = getApiBaseUrl();
 
 import { supabase } from './supabase';
 export { supabase };
@@ -8,10 +21,14 @@ export { supabase };
 // Authentication & Custom OTP Services
 // ----------------------------------------------------
 
-export const sendOtpApi = async ({ identifier, email, type = 'email', purpose = 'login' }) => {
-  const target = identifier || email;
-  const isEmail = (target && target.includes('@')) || type === 'email';
-  const cleanType = isEmail ? 'email' : 'phone';
+export const sendOtpApi = async ({ identifier, email, phone, type, purpose = 'login' }) => {
+  const target = String(identifier || phone || email || '').trim();
+  const digitsOnly = target.replace(/\D/g, '');
+  const hasAt = target.includes('@');
+  const isPhone = !hasAt && digitsOnly.length >= 10;
+  const cleanType = isPhone ? 'phone' : (type || (hasAt ? 'email' : 'phone'));
+
+  console.log(`[API sendOtpApi] Target: "${target}", Resolved Type: "${cleanType}", Endpoint: ${BASE_URL}/auth/send-otp/`);
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 20000);
@@ -22,7 +39,8 @@ export const sendOtpApi = async ({ identifier, email, type = 'email', purpose = 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         identifier: target,
-        email: target,
+        email: isPhone ? '' : target,
+        phone: isPhone ? digitsOnly : '',
         type: cleanType,
         purpose
       }),
@@ -32,7 +50,9 @@ export const sendOtpApi = async ({ identifier, email, type = 'email', purpose = 
 
     const contentType = res.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
-      return await res.json();
+      const data = await res.json();
+      console.log(`[API sendOtpApi Response]`, data);
+      return data;
     }
     return {
       success: false,
@@ -42,6 +62,7 @@ export const sendOtpApi = async ({ identifier, email, type = 'email', purpose = 
     };
   } catch (err) {
     clearTimeout(timeoutId);
+    console.error(`[API sendOtpApi Error]`, err);
     if (err.name === 'AbortError') {
       return { success: false, error: 'Request timed out. The backend might be waking up from sleep, please try again.' };
     }
@@ -49,11 +70,13 @@ export const sendOtpApi = async ({ identifier, email, type = 'email', purpose = 
   }
 };
 
-export const verifyOtpApi = async ({ identifier, email, otp, otp_code, type = 'email', purpose = 'login' }) => {
-  const target = identifier || email;
-  const code = otp || otp_code;
-  const isEmail = (target && target.includes('@')) || type === 'email';
-  const cleanType = isEmail ? 'email' : 'phone';
+export const verifyOtpApi = async ({ identifier, email, phone, otp, otp_code, type, purpose = 'login' }) => {
+  const target = String(identifier || phone || email || '').trim();
+  const digitsOnly = target.replace(/\D/g, '');
+  const hasAt = target.includes('@');
+  const isPhone = !hasAt && digitsOnly.length >= 10;
+  const cleanType = isPhone ? 'phone' : (type || (hasAt ? 'email' : 'phone'));
+  const code = String(otp || otp_code || '').trim();
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 20000);

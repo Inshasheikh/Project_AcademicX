@@ -1,3 +1,4 @@
+import re
 from datetime import timedelta
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -28,16 +29,35 @@ class SendOTPView(APIView):
             if not serializer.is_valid():
                 return Response({"success": False, "error": serializer.errors, "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-            raw_target = serializer.validated_data['email']
+            raw_target = str(serializer.validated_data.get('email') or serializer.validated_data.get('identifier') or request.data.get('phone') or '').strip()
             purpose = serializer.validated_data.get('purpose', 'login')
-            req_type = request.data.get('type', 'email')
+            req_type = request.data.get('type') or serializer.validated_data.get('type')
 
-            is_email = '@' in raw_target or req_type == 'email'
+            clean_digits = re.sub(r'\D', '', raw_target)
+            has_at = '@' in raw_target
+
+            if has_at:
+                is_email = True
+            elif len(clean_digits) >= 10 and not any(c.isalpha() for c in raw_target):
+                is_email = False
+            else:
+                is_email = (req_type != 'phone')
+
             clean_target = raw_target if is_email else normalize_phone(raw_target)
+            print(f"\n[BACKEND OTP REQUEST] Raw: '{raw_target}' | Resolved Type: {'EMAIL' if is_email else 'PHONE (Fast2SMS)'} | Target: {clean_target} | Purpose: {purpose}")
 
             # 0. User existence check for 'login' and 'reset_password'
             if purpose in ['login', 'reset_password']:
                 user, _ = find_user_by_identifier(clean_target)
+                if not user:
+                    try:
+                        from api.supabase_client import get_profile_by_phone, get_profile_by_email
+                        sb_profile = get_profile_by_email(clean_target) if is_email else get_profile_by_phone(clean_target)
+                        if sb_profile:
+                            user = True
+                    except Exception:
+                        pass
+
                 if not user:
                     target_desc = "email address" if is_email else "mobile phone number"
                     return Response({

@@ -1,6 +1,19 @@
 import axios from 'axios';
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8001/api'}/auth`;
+const getAuthApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return `${import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '')}/auth`;
+  }
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://127.0.0.1:8000/api/auth';
+    }
+  }
+  return 'https://project-academicx.onrender.com/api/auth';
+};
+
+const API_BASE_URL = getAuthApiBaseUrl();
 
 // Create Axios Instance with Interceptors
 const api = axios.create({

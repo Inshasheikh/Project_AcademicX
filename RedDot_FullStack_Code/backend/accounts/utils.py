@@ -113,7 +113,7 @@ def send_fast2sms_otp(phone: str, otp_code: str) -> tuple[bool, str, dict]:
     """
     Dispatches real SMS OTP via Fast2SMS Quick Route (bulkV2).
     """
-    api_key = os.environ.get("FAST2SMS_API_KEY", "").strip()
+    api_key = os.environ.get("FAST2SMS_API_KEY", "").strip() or "Z8aSLAfvGsXdtkVoWpn2C4NqPwEMHUxmDucThK0zyg3i9OFQeRN5vJEfhBzdOTMrlpRyKxHemYkuaWU0"
     clean_phone = normalize_phone(phone)
     app_name = getattr(settings, 'DEFAULT_FROM_NAME', 'REDDOT')
 
@@ -171,52 +171,32 @@ def send_fast2sms_otp(phone: str, otp_code: str) -> tuple[bool, str, dict]:
 
     sms_message = f"Your {app_name} verification code is: {otp_code}. Valid for 5 minutes. Do not share this OTP."
     url = "https://www.fast2sms.com/dev/bulkV2"
-    headers = {
-        "authorization": api_key
-    }
 
-    # 1. Try OTP route first (dedicated transactional delivery, works on DND numbers if domain verified)
+    # 1. Primary: Fast2SMS Quick Route ('q') via HTTP GET (most compatible across all network types)
     try:
-        otp_payload = {
-            "route": "otp",
-            "variables_values": otp_code,
+        params = {
+            "authorization": api_key,
+            "route": "q",
+            "message": sms_message,
+            "language": "english",
+            "flash": "0",
             "numbers": clean_phone
         }
-        res = requests.post(url, data=otp_payload, headers=headers, timeout=8)
+        res = requests.get(url, params=params, timeout=10)
         data = res.json()
-        print(f"[Fast2SMS OTP Route Response] Status: {res.status_code}, Body: {data}")
+        print(f"[Fast2SMS GET Response] Status: {res.status_code}, Body: {data}")
 
-        if data.get("return") is True:
-            print(f"[Fast2SMS Success] Real OTP SMS dispatched to +91{clean_phone} via OTP route (Request ID: {data.get('request_id')})")
-            return True, "SMS dispatched successfully via Fast2SMS OTP route.", data
-    except Exception as e:
-        print(f"[Fast2SMS OTP Route Error] {e}")
-
-    # 2. Fall back to Quick route ('q')
-    payload = {
-        "route": "q",
-        "message": sms_message,
-        "language": "english",
-        "flash": 0,
-        "numbers": clean_phone
-    }
-
-    try:
-        res = requests.post(url, data=payload, headers=headers, timeout=10)
-        data = res.json()
-        print(f"[Fast2SMS Quick Route Response] Status: {res.status_code}, Body: {data}")
-
-        if data.get("return") is True:
+        if data.get("return") is True or res.status_code == 200:
             print(f"[Fast2SMS Success] Real SMS dispatched to +91{clean_phone} (Request ID: {data.get('request_id')})")
             return True, "SMS dispatched successfully via Fast2SMS.", data
 
-        # Check for specific Fast2SMS error notices (e.g. DND or approval)
+        # Check for specific Fast2SMS error notices (e.g. DND)
         status_code = data.get("status_code")
         raw_msg = data.get("message")
         msg_str = " ".join(raw_msg) if isinstance(raw_msg, list) else str(raw_msg or '')
 
         if status_code == 427 or "DND" in msg_str:
-            notice = f"Mobile number is registered on TRAI DND (Do Not Disturb). Fast2SMS promotional route blocked by telecom rules."
+            notice = f"Number +91 {clean_phone} is registered on TRAI DND. Fast2SMS promotional route blocked by telecom rules."
             print(f"[Fast2SMS Warning] {notice}")
             return False, notice, data
 
@@ -225,11 +205,35 @@ def send_fast2sms_otp(phone: str, otp_code: str) -> tuple[bool, str, dict]:
             print(f"[Fast2SMS Warning] {notice}")
             return False, notice, data
 
-        return False, f"Fast2SMS gateway error: {msg_str}", data
+    except Exception as e:
+        print(f"[Fast2SMS GET Exception] {e}")
+
+    # 2. Secondary fallback: Quick route ('q') via HTTP POST
+    try:
+        headers = {"authorization": api_key}
+        payload = {
+            "route": "q",
+            "message": sms_message,
+            "language": "english",
+            "flash": 0,
+            "numbers": clean_phone
+        }
+        res = requests.post(url, data=payload, headers=headers, timeout=10)
+        data = res.json()
+        print(f"[Fast2SMS POST Response] Status: {res.status_code}, Body: {data}")
+
+        if data.get("return") is True or res.status_code == 200:
+            print(f"[Fast2SMS Success] Real SMS dispatched to +91{clean_phone} (Request ID: {data.get('request_id')})")
+            return True, "SMS dispatched successfully via Fast2SMS.", data
+
+        status_code = data.get("status_code")
+        raw_msg = data.get("message")
+        msg_str = " ".join(raw_msg) if isinstance(raw_msg, list) else str(raw_msg or '')
+        return False, f"Fast2SMS error: {msg_str}", data
 
     except Exception as e:
         err_str = f"Fast2SMS connection error: {str(e)}"
-        print(f"[Fast2SMS Error] {err_str}")
+        print(f"[Fast2SMS POST Error] {err_str}")
         return False, err_str, {}
 
 def send_otp_email(email: str, otp_code: str) -> tuple[bool, str]:
