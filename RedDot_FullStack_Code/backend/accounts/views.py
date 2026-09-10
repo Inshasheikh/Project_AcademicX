@@ -46,18 +46,9 @@ class SendOTPView(APIView):
             clean_target = raw_target if is_email else normalize_phone(raw_target)
             print(f"\n[BACKEND OTP REQUEST] Raw: '{raw_target}' | Resolved Type: {'EMAIL' if is_email else 'PHONE (Fast2SMS)'} | Target: {clean_target} | Purpose: {purpose}")
 
-            # 0. User existence check for 'login' and 'reset_password'
-            if purpose in ['login', 'reset_password']:
+            # 0. User existence check for 'reset_password' only
+            if purpose == 'reset_password':
                 user, _ = find_user_by_identifier(clean_target)
-                if not user:
-                    try:
-                        from api.supabase_client import get_profile_by_phone, get_profile_by_email
-                        sb_profile = get_profile_by_email(clean_target) if is_email else get_profile_by_phone(clean_target)
-                        if sb_profile:
-                            user = True
-                    except Exception:
-                        pass
-
                 if not user:
                     target_desc = "email address" if is_email else "mobile phone number"
                     return Response({
@@ -212,12 +203,42 @@ class VerifyOTPView(APIView):
         if purpose == 'login':
             user, profile = find_user_by_identifier(clean_target)
             if not user:
-                return Response({
-                    "success": False,
-                    "error": "User does not exist in the database. Please register first.",
-                    "message": "User does not exist in the database. Please register first.",
-                    "user_not_found": True
-                }, status=status.HTTP_404_NOT_FOUND)
+                # 1. Check Supabase
+                try:
+                    from api.supabase_client import get_profile_by_phone, get_profile_by_email
+                    sb_profile = get_profile_by_email(clean_target) if '@' in clean_target else get_profile_by_phone(clean_target)
+                    if sb_profile:
+                        username = sb_profile.get("email") or f"user_{clean_target}"
+                        user, _ = User.objects.get_or_create(
+                            username=username,
+                            defaults={"email": sb_profile.get("email", ""), "first_name": sb_profile.get("full_name", "User")}
+                        )
+                        profile, _ = UserProfile.objects.get_or_create(
+                            user=user,
+                            defaults={"role": sb_profile.get("role", "student"), "phone": clean_target}
+                        )
+                except Exception as e:
+                    print(f"[Supabase sync error on OTP login] {e}")
+
+            if not user:
+                # 2. Auto-provision student profile for verified phone/email
+                username = clean_target if '@' in clean_target else f"user_{clean_target}"
+                email_val = clean_target if '@' in clean_target else f"{clean_target}@academicx.sih"
+                user, _ = User.objects.get_or_create(
+                    username=username,
+                    defaults={
+                        "email": email_val,
+                        "first_name": f"User {clean_target[-4:] if len(clean_target)>=4 else clean_target}"
+                    }
+                )
+                profile, _ = UserProfile.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        "role": "student",
+                        "phone": clean_target if '@' not in clean_target else "",
+                        "is_verified": True
+                    }
+                )
 
             # Ensure profile exists
             if not profile:

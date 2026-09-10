@@ -106,24 +106,43 @@ export default function RegisterPage({ setActiveRole, setActiveTab }) {
   };
 
   const handleSendOtp = async () => {
-    const isEmail = otpChannel === 'email' || (formData.email && formData.email.includes('@'));
-    const target = isEmail ? formData.email : (formData.phone || formData.email);
-    if (!target || !target.trim()) {
-      setErrorMsg(`Please provide a valid ${isEmail ? 'email address' : 'phone number'} first.`);
+    const isPhone = otpChannel === 'phone';
+    const rawTarget = isPhone ? formData.phone : formData.email;
+    const target = (rawTarget || '').trim();
+
+    if (!target) {
+      setErrorMsg(`Please provide a valid ${isPhone ? 'mobile phone number' : 'email address'} first.`);
       return;
     }
+
+    if (isPhone) {
+      const digitsOnly = target.replace(/\D/g, '');
+      if (digitsOnly.length < 10) {
+        setErrorMsg('Please enter a valid 10-digit mobile number for SMS OTP.');
+        return;
+      }
+    }
+
     setIsLoading(true);
     setErrorMsg('');
     setSuccessMsg('');
 
     try {
-      const type = isEmail ? 'email' : 'phone';
-      const res = await sendOtpApi({ identifier: target.trim(), email: target.trim(), type, purpose: 'register' });
+      const type = isPhone ? 'phone' : 'email';
+      console.log(`[Register handleSendOtp] Sending ${type} OTP to ${target}`);
+      const res = await sendOtpApi({
+        identifier: target,
+        phone: isPhone ? target : '',
+        email: isPhone ? '' : target,
+        type,
+        purpose: 'register'
+      });
+
       if (res.success) {
         setOtpSent(true);
         setCountdown(res.retry_after || 60);
         if (res.sms_dispatched) {
-          setSuccessMsg(`6-digit OTP has been dispatched to +91 ${target} via SMS. Please enter it below.`);
+          setSuccessMsg(`6-digit OTP has been dispatched to mobile +91 ${target} via Fast2SMS. Please enter it below.`);
         } else if (res.email_dispatched) {
           setSuccessMsg(`6-digit OTP has been dispatched to ${target} via Email. Please check your inbox.`);
         } else {
@@ -144,8 +163,10 @@ export default function RegisterPage({ setActiveRole, setActiveTab }) {
   };
 
   const handleVerifyOtp = async () => {
-    const isEmail = otpChannel === 'email' || (formData.email && formData.email.includes('@'));
-    const target = isEmail ? formData.email : (formData.phone || formData.email);
+    const isPhone = otpChannel === 'phone';
+    const rawTarget = isPhone ? formData.phone : formData.email;
+    const target = (rawTarget || '').trim();
+
     if (!otpCode || otpCode.length !== 6) {
       setErrorMsg('Please enter the 6-digit numeric OTP.');
       return;
@@ -155,11 +176,19 @@ export default function RegisterPage({ setActiveRole, setActiveTab }) {
     setSuccessMsg('');
 
     try {
-      const type = isEmail ? 'email' : 'phone';
-      const res = await verifyOtpApi({ identifier: target.trim(), email: target.trim(), otp: otpCode, otp_code: otpCode, type, purpose: 'register' });
+      const type = isPhone ? 'phone' : 'email';
+      const res = await verifyOtpApi({
+        identifier: target,
+        phone: isPhone ? target : '',
+        email: isPhone ? '' : target,
+        otp: otpCode,
+        otp_code: otpCode,
+        type,
+        purpose: 'register'
+      });
       if (res.success) {
         setIsVerifiedOtp(true);
-        setSuccessMsg(`${type === 'phone' ? 'Phone Number' : 'Email'} verified successfully with Academia Gateway!`);
+        setSuccessMsg(`${isPhone ? 'Phone Number (+91 ' + target + ')' : 'Email (' + target + ')'} verified successfully!`);
       } else {
         setErrorMsg(res.error || res.message || 'Invalid OTP code.');
       }

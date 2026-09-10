@@ -160,9 +160,16 @@ export default function LoginPage({ setActiveRole, setActiveTab }) {
     setAuthSuccess('');
 
     try {
-      const isEmail = cleanId.includes('@') || otpType === 'email';
-      const type = isEmail ? 'email' : 'phone';
-      const res = await sendOtpApi({ identifier: cleanId, email: cleanId, type, purpose: 'login' });
+      const isPhone = otpType === 'phone';
+      const type = isPhone ? 'phone' : 'email';
+      console.log(`[Login handleSendOtp] Dispatching ${type} OTP to ${cleanId}`);
+      const res = await sendOtpApi({
+        identifier: cleanId,
+        phone: isPhone ? cleanId : '',
+        email: isPhone ? '' : cleanId,
+        type,
+        purpose: 'login'
+      });
 
       if (res.success) {
         setOtpSent(true);
@@ -201,13 +208,13 @@ export default function LoginPage({ setActiveRole, setActiveTab }) {
 
     try {
       const cleanId = otpIdentifier.trim();
-      const isEmail = cleanId.includes('@') || otpType === 'email';
+      const isPhone = otpType === 'phone';
       const payload = {
         otp: otpCode,
         isOtpLogin: true,
         identifier: cleanId,
-        email: isEmail ? cleanId : '',
-        phone: !isEmail ? cleanId : ''
+        email: isPhone ? '' : cleanId,
+        phone: isPhone ? cleanId : ''
       };
 
       const res = await loginUserApi(payload);
