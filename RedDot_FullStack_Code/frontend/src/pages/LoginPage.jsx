@@ -167,16 +167,13 @@ export default function LoginPage({ setActiveRole, setActiveTab }) {
       if (res.success) {
         setOtpSent(true);
         setCountdown(res.retry_after || 60);
-        const codeHint = (res.demo_code || res.demo_otp) ? ` [Verification Code: ${res.demo_code || res.demo_otp}]` : '';
-        if (res.message) {
-          setAuthSuccess(res.message + codeHint);
-        } else if (type === 'email') {
-          setAuthSuccess(`6-digit OTP dispatched to ${res.identifier || cleanId} via Email.${codeHint}`);
+        if (res.sms_dispatched) {
+          setAuthSuccess(`6-digit OTP has been dispatched to +91 ${cleanId} via SMS. Please enter it below.`);
+        } else if (res.email_dispatched) {
+          setAuthSuccess(`6-digit OTP has been dispatched to ${cleanId} via Email. Please check your inbox.`);
         } else {
-          setAuthSuccess(`6-digit OTP dispatched to +91 ${res.identifier || cleanId} via Fast2SMS.${codeHint}`);
-        }
-        if (res.demo_code || res.demo_otp) {
-          setOtpCode(res.demo_code || res.demo_otp);
+          const fallback = res.demo_code || res.demo_otp;
+          setAuthSuccess(res.message || (fallback ? `Verification code: ${fallback}` : 'OTP generated.'));
         }
       } else {
         setAuthError(res.error || res.message || 'Failed to dispatch OTP. Please try again.');

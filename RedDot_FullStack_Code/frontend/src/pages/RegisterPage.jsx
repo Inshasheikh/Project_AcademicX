@@ -122,16 +122,13 @@ export default function RegisterPage({ setActiveRole, setActiveTab }) {
       if (res.success) {
         setOtpSent(true);
         setCountdown(res.retry_after || 60);
-        const codeHint = (res.demo_code || res.demo_otp) ? ` [Verification Code: ${res.demo_code || res.demo_otp}]` : '';
-        if (res.message) {
-          setSuccessMsg(res.message + codeHint);
-        } else if (type === 'email') {
-          setSuccessMsg(`6-digit OTP dispatched to ${target} via Email.${codeHint}`);
+        if (res.sms_dispatched) {
+          setSuccessMsg(`6-digit OTP has been dispatched to +91 ${target} via SMS. Please enter it below.`);
+        } else if (res.email_dispatched) {
+          setSuccessMsg(`6-digit OTP has been dispatched to ${target} via Email. Please check your inbox.`);
         } else {
-          setSuccessMsg(`6-digit OTP dispatched to +91 ${target} via Fast2SMS.${codeHint}`);
-        }
-        if (res.demo_code || res.demo_otp) {
-          setOtpCode(res.demo_code || res.demo_otp);
+          const fallback = res.demo_code || res.demo_otp;
+          setSuccessMsg(res.message || (fallback ? `Verification code: ${fallback}` : 'OTP generated.'));
         }
       } else {
         setErrorMsg(res.error || res.message || 'Failed to dispatch OTP.');

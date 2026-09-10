@@ -137,6 +137,25 @@ def send_fast2sms_otp(phone: str, otp_code: str) -> tuple[bool, str, dict]:
     headers = {
         "authorization": api_key
     }
+
+    # 1. Try OTP route first (dedicated transactional delivery, works on DND numbers if domain verified)
+    try:
+        otp_payload = {
+            "route": "otp",
+            "variables_values": otp_code,
+            "numbers": clean_phone
+        }
+        res = requests.post(url, data=otp_payload, headers=headers, timeout=8)
+        data = res.json()
+        print(f"[Fast2SMS OTP Route Response] Status: {res.status_code}, Body: {data}")
+
+        if data.get("return") is True:
+            print(f"[Fast2SMS Success] Real OTP SMS dispatched to +91{clean_phone} via OTP route (Request ID: {data.get('request_id')})")
+            return True, "SMS dispatched successfully via Fast2SMS OTP route.", data
+    except Exception as e:
+        print(f"[Fast2SMS OTP Route Error] {e}")
+
+    # 2. Fall back to Quick route ('q')
     payload = {
         "route": "q",
         "message": sms_message,
@@ -148,7 +167,7 @@ def send_fast2sms_otp(phone: str, otp_code: str) -> tuple[bool, str, dict]:
     try:
         res = requests.post(url, data=payload, headers=headers, timeout=10)
         data = res.json()
-        print(f"[Fast2SMS Response] Status: {res.status_code}, Body: {data}")
+        print(f"[Fast2SMS Quick Route Response] Status: {res.status_code}, Body: {data}")
 
         if data.get("return") is True:
             print(f"[Fast2SMS Success] Real SMS dispatched to +91{clean_phone} (Request ID: {data.get('request_id')})")
@@ -160,12 +179,12 @@ def send_fast2sms_otp(phone: str, otp_code: str) -> tuple[bool, str, dict]:
         msg_str = " ".join(raw_msg) if isinstance(raw_msg, list) else str(raw_msg or '')
 
         if status_code == 427 or "DND" in msg_str:
-            notice = f"Mobile number is registered on TRAI DND (Do Not Disturb). Fast2SMS blocked promotional routing. Use console/dev OTP."
+            notice = f"Mobile number is registered on TRAI DND (Do Not Disturb). Fast2SMS promotional route blocked by telecom rules."
             print(f"[Fast2SMS Warning] {notice}")
             return False, notice, data
 
         if status_code == 996:
-            notice = "Fast2SMS requires website domain verification for OTP route. Using console/dev OTP."
+            notice = "Fast2SMS requires website domain verification for OTP route."
             print(f"[Fast2SMS Warning] {notice}")
             return False, notice, data
 
