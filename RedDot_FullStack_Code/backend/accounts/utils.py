@@ -126,11 +126,48 @@ def send_fast2sms_otp(phone: str, otp_code: str) -> tuple[bool, str, dict]:
     print(f" Fast2SMS Key  : {'Configured (' + api_key[:8] + '...)' if api_key else 'NOT CONFIGURED'}")
     print("=" * 60 + "\n")
 
-    if not api_key:
-        return True, "SMS simulated (FAST2SMS_API_KEY not set in .env).", {"simulated": True}
-
     if len(clean_phone) != 10 or not clean_phone.isdigit():
         return False, f"Invalid Indian phone number: '{phone}'. Must be a 10-digit mobile number.", {}
+
+    # 0. Check 2Factor.in (No DLT/KYC required for developers, bypasses DND 24/7)
+    twofactor_key = os.environ.get("TWOFACTOR_API_KEY", "").strip()
+    if twofactor_key:
+        try:
+            tf_url = f"https://2factor.in/API/V1/{twofactor_key}/SMS/{clean_phone}/{otp_code}"
+            tf_res = requests.get(tf_url, timeout=8)
+            tf_data = tf_res.json()
+            print(f"[2Factor.in Response] Status: {tf_res.status_code}, Body: {tf_data}")
+            if tf_data.get("Status") == "Success":
+                print(f"[2Factor Success] Real OTP SMS dispatched to +91{clean_phone} via 2Factor.in!")
+                return True, "SMS dispatched successfully via 2Factor.in.", tf_data
+        except Exception as tf_err:
+            print(f"[2Factor Error] {tf_err}")
+
+    # 0.1 Check Twilio (Global SMS API)
+    twilio_sid = os.environ.get("TWILIO_ACCOUNT_SID", "").strip()
+    twilio_token = os.environ.get("TWILIO_AUTH_TOKEN", "").strip()
+    twilio_from = os.environ.get("TWILIO_PHONE_NUMBER", "").strip()
+    if twilio_sid and twilio_token and twilio_from:
+        try:
+            tw_url = f"https://api.twilio.com/2010-04-01/Accounts/{twilio_sid}/Messages.json"
+            tw_res = requests.post(
+                tw_url,
+                data={
+                    "From": twilio_from,
+                    "To": f"+91{clean_phone}",
+                    "Body": f"Your {app_name} verification code is: {otp_code}. Valid for 5 minutes."
+                },
+                auth=(twilio_sid, twilio_token),
+                timeout=8
+            )
+            tw_data = tw_res.json()
+            if tw_res.status_code in (200, 201):
+                return True, "SMS dispatched successfully via Twilio.", tw_data
+        except Exception as tw_err:
+            print(f"[Twilio Error] {tw_err}")
+
+    if not api_key:
+        return True, "SMS simulated (no SMS gateway API key configured).", {"simulated": True}
 
     sms_message = f"Your {app_name} verification code is: {otp_code}. Valid for 5 minutes. Do not share this OTP."
     url = "https://www.fast2sms.com/dev/bulkV2"
