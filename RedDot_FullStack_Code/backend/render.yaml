@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: reddot-backend
+    runtime: python
+    rootDir: RedDot_FullStack_Code/backend
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn reddot.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.8
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.vercel.app,https://*.onrender.com"
+      - key: DIGILOCKER_SANDBOX_MODE
+        value: "True"

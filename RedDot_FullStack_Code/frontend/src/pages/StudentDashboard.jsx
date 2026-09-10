@@ -39,6 +39,8 @@ import {
   Code2,
   Tag
 } from 'lucide-react';
+import { BASE_URL } from '../services/api';
+
 export default function StudentDashboard({ setActiveTab }) {
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [toast, setToast] = useState(null);
@@ -694,7 +696,7 @@ export default function StudentDashboard({ setActiveTab }) {
       return;
     }
     try {
-      await fetch(`http://127.0.0.1:8001/api/jobs/${job.id}/apply/`, {
+      await fetch(`${BASE_URL}/jobs/${job.id}/apply/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ student_id: 1, roll_number: studentRollNo })
