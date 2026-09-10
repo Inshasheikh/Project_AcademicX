@@ -4,7 +4,7 @@ services:
     runtime: python
     rootDir: RedDot_FullStack_Code/backend
     buildCommand: "./build.sh"
-    startCommand: "gunicorn reddot.wsgi:application"
+    startCommand: "gunicorn reddot.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.8

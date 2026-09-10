@@ -13,17 +13,40 @@ export const sendOtpApi = async ({ identifier, email, type = 'email', purpose = 
   const isEmail = (target && target.includes('@')) || type === 'email';
   const cleanType = isEmail ? 'email' : 'phone';
 
-  const res = await fetch(`${BASE_URL}/auth/send-otp/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      identifier: target,
-      email: target,
-      type: cleanType,
-      purpose
-    })
-  });
-  return await res.json();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+  try {
+    const res = await fetch(`${BASE_URL}/auth/send-otp/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        identifier: target,
+        email: target,
+        type: cleanType,
+        purpose
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return await res.json();
+    }
+    return {
+      success: false,
+      error: res.status === 502 || res.status === 503
+        ? 'Backend service is starting up on Render. Please wait 10 seconds and try again.'
+        : `Server returned HTTP status ${res.status}.`
+    };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      return { success: false, error: 'Request timed out. The backend might be waking up from sleep, please try again.' };
+    }
+    return { success: false, error: err.message || 'Unable to connect to backend service.' };
+  }
 };
 
 export const verifyOtpApi = async ({ identifier, email, otp, otp_code, type = 'email', purpose = 'login' }) => {
@@ -32,35 +55,70 @@ export const verifyOtpApi = async ({ identifier, email, otp, otp_code, type = 'e
   const isEmail = (target && target.includes('@')) || type === 'email';
   const cleanType = isEmail ? 'email' : 'phone';
 
-  const res = await fetch(`${BASE_URL}/auth/verify-otp/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      identifier: target,
-      email: target,
-      otp: code,
-      otp_code: code,
-      type: cleanType,
-      purpose
-    })
-  });
-  return await res.json();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+  try {
+    const res = await fetch(`${BASE_URL}/auth/verify-otp/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        identifier: target,
+        email: target,
+        otp: code,
+        otp_code: code,
+        type: cleanType,
+        purpose
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return await res.json();
+    }
+    return {
+      success: false,
+      error: `Server returned HTTP status ${res.status}. Please try again.`
+    };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      return { success: false, error: 'Request timed out. Please try again.' };
+    }
+    return { success: false, error: err.message || 'Unable to connect to backend service.' };
+  }
 };
 
 export const registerUserApi = async (userData) => {
-  const res = await fetch(`${BASE_URL}/auth/register/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData)
-  });
-  const data = await res.json();
-  if (data.user) {
-    localStorage.setItem('reddot_user', JSON.stringify(data.user));
-    localStorage.setItem('reddot_token', data.token || 'jwt_token');
-    localStorage.setItem('user', JSON.stringify(data.user));
-    localStorage.setItem('access_token', data.token || 'jwt_token');
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+  try {
+    const res = await fetch(`${BASE_URL}/auth/register/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const data = await res.json();
+      if (data.user) {
+        localStorage.setItem('reddot_user', JSON.stringify(data.user));
+        localStorage.setItem('reddot_token', data.token || 'jwt_token');
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
+      return data;
+    }
+    return { success: false, error: `Server returned HTTP status ${res.status}.` };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    return { success: false, error: err.name === 'AbortError' ? 'Registration timed out. Please retry.' : err.message };
   }
-  return data;
 };
 
 export const loginUserApi = async (credentials) => {

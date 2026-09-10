@@ -16,7 +16,7 @@ if env_path.exists():
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'reddot-sih2026-key-problem26044-production-grade')
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
 ALLOWED_HOSTS_ENV = os.environ.get('ALLOWED_HOSTS', '')
 if ALLOWED_HOSTS_ENV:

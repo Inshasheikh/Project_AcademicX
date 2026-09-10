@@ -23,98 +23,108 @@ class SendOTPView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = SendOTPSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response({"success": False, "error": serializer.errors, "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            serializer = SendOTPSerializer(data=request.data)
+            if not serializer.is_valid():
+                return Response({"success": False, "error": serializer.errors, "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-        raw_target = serializer.validated_data['email']
-        purpose = serializer.validated_data.get('purpose', 'login')
-        req_type = request.data.get('type', 'email')
+            raw_target = serializer.validated_data['email']
+            purpose = serializer.validated_data.get('purpose', 'login')
+            req_type = request.data.get('type', 'email')
 
-        is_email = '@' in raw_target or req_type == 'email'
-        clean_target = raw_target if is_email else normalize_phone(raw_target)
+            is_email = '@' in raw_target or req_type == 'email'
+            clean_target = raw_target if is_email else normalize_phone(raw_target)
 
-        # 0. User existence check for 'login' and 'reset_password'
-        if purpose in ['login', 'reset_password']:
-            user, _ = find_user_by_identifier(clean_target)
-            if not user:
-                target_desc = "email address" if is_email else "mobile phone number"
+            # 0. User existence check for 'login' and 'reset_password'
+            if purpose in ['login', 'reset_password']:
+                user, _ = find_user_by_identifier(clean_target)
+                if not user:
+                    target_desc = "email address" if is_email else "mobile phone number"
+                    return Response({
+                        "success": False,
+                        "error": f"No account found with this {target_desc}. Please register first.",
+                        "message": f"No account found with this {target_desc}. Please register first.",
+                        "user_not_found": True
+                    }, status=status.HTTP_404_NOT_FOUND)
+
+            # 1. Rate Limiting Check (60s Cooldown, Max 5/hr)
+            allowed, retry_after, rl_msg = check_rate_limit(clean_target, action="send_otp")
+            if not allowed:
                 return Response({
                     "success": False,
-                    "error": f"No account found with this {target_desc}. Please register first.",
-                    "message": f"No account found with this {target_desc}. Please register first.",
-                    "user_not_found": True
-                }, status=status.HTTP_404_NOT_FOUND)
+                    "error": rl_msg,
+                    "message": rl_msg,
+                    "retry_after": retry_after
+                }, status=status.HTTP_429_TOO_MANY_REQUESTS)
 
-        # 1. Rate Limiting Check (60s Cooldown, Max 5/hr)
-        allowed, retry_after, rl_msg = check_rate_limit(clean_target, action="send_otp")
-        if not allowed:
+            # 2. Invalidate old active OTPs for this target and purpose
+            OTPVerification.objects.filter(email=clean_target, purpose=purpose).delete()
+
+            # 3. Generate 6-digit OTP and 5-minute expiry
+            otp_code = generate_otp_code()
+            expires_at = timezone.now() + timedelta(minutes=5)
+
+            # 4. Store in database
+            OTPVerification.objects.create(
+                email=clean_target,
+                phone=clean_target if not is_email else None,
+                otp_code=otp_code,
+                expires_at=expires_at,
+                purpose=purpose,
+                verified=False,
+                attempts=0
+            )
+
+            response_payload = {
+                "success": True,
+                "identifier": clean_target,
+                "purpose": purpose,
+                "expires_in_minutes": 5
+            }
+
+            # Enable demo OTP in Debug or Sandbox mode
+            if getattr(settings, 'DEBUG', True) or getattr(settings, 'DIGILOCKER_SANDBOX_MODE', True):
+                response_payload["demo_otp"] = otp_code
+                response_payload["demo_code"] = otp_code
+
+            if is_email:
+                send_success, send_msg = send_otp_email(clean_target, otp_code)
+                if not send_success:
+                    return Response({
+                        "success": False,
+                        "error": send_msg,
+                        "message": send_msg,
+                        "identifier": clean_target,
+                        "email": clean_target,
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                response_payload["message"] = f"OTP sent successfully to {clean_target}."
+                response_payload["email"] = clean_target
+                return Response(response_payload, status=status.HTTP_200_OK)
+            else:
+                # Real Phone / Fast2SMS SMS Delivery
+                sms_success, sms_msg, sms_data = send_fast2sms_otp(clean_target, otp_code)
+                response_payload["phone"] = clean_target
+                response_payload["sms_dispatched"] = sms_success
+                response_payload["gateway_message"] = sms_msg
+
+                if sms_success:
+                    response_payload["message"] = f"OTP dispatched to mobile +91 {clean_target} via Fast2SMS."
+                else:
+                    response_payload["message"] = f"Fast2SMS Notice: {sms_msg}"
+                    if getattr(settings, 'DEBUG', True) or getattr(settings, 'DIGILOCKER_SANDBOX_MODE', True):
+                        response_payload["message"] += f" (Demo OTP: {otp_code})"
+
+                return Response(response_payload, status=status.HTTP_200_OK)
+        except Exception as exc:
+            import traceback
+            traceback.print_exc()
             return Response({
                 "success": False,
-                "error": rl_msg,
-                "message": rl_msg,
-                "retry_after": retry_after
-            }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+                "error": f"Server processing error: {str(exc)}",
+                "message": "Internal server error occurred while sending OTP."
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # 2. Invalidate old active OTPs for this target and purpose
-        OTPVerification.objects.filter(email=clean_target, purpose=purpose).delete()
-
-        # 3. Generate 6-digit OTP and 5-minute expiry
-        otp_code = generate_otp_code()
-        expires_at = timezone.now() + timedelta(minutes=5)
-
-        # 4. Store in database
-        OTPVerification.objects.create(
-            email=clean_target,
-            phone=clean_target if not is_email else None,
-            otp_code=otp_code,
-            expires_at=expires_at,
-            purpose=purpose,
-            verified=False,
-            attempts=0
-        )
-
-        response_payload = {
-            "success": True,
-            "identifier": clean_target,
-            "purpose": purpose,
-            "expires_in_minutes": 5
-        }
-
-        # Gate demo OTP behind settings.DEBUG (Security Hardening)
-        if getattr(settings, 'DEBUG', True):
-            response_payload["demo_otp"] = otp_code
-            response_payload["demo_code"] = otp_code
-
-        if is_email:
-            send_success, send_msg = send_otp_email(clean_target, otp_code)
-            if not send_success:
-                return Response({
-                    "success": False,
-                    "error": send_msg,
-                    "message": send_msg,
-                    "identifier": clean_target,
-                    "email": clean_target,
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            response_payload["message"] = f"OTP sent successfully to {clean_target}."
-            response_payload["email"] = clean_target
-            return Response(response_payload, status=status.HTTP_200_OK)
-        else:
-            # Real Phone / Fast2SMS SMS Delivery
-            sms_success, sms_msg, sms_data = send_fast2sms_otp(clean_target, otp_code)
-            response_payload["phone"] = clean_target
-            response_payload["sms_dispatched"] = sms_success
-            response_payload["gateway_message"] = sms_msg
-
-            if sms_success:
-                response_payload["message"] = f"OTP dispatched to mobile +91 {clean_target} via Fast2SMS."
-            else:
-                response_payload["message"] = f"Fast2SMS Gateway notice: {sms_msg}"
-                if getattr(settings, 'DEBUG', True):
-                    response_payload["message"] += f" [Dev OTP: {otp_code}]"
-
-            return Response(response_payload, status=status.HTTP_200_OK)
 
 
 class VerifyOTPView(APIView):
