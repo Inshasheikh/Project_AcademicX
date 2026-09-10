@@ -218,4 +218,26 @@ def send_otp_email(email: str, otp_code: str) -> tuple[bool, str]:
     except Exception as e:
         err_msg = f"[SMTP Error] Failed to send email to {email}: {str(e)}"
         print(err_msg)
+
+        # Fallback to Resend HTTPS API if SMTP port 587 is blocked by cloud provider (e.g. Render Free)
+        resend_key = os.environ.get('RESEND_API_KEY', '').strip()
+        if resend_key:
+            try:
+                r = requests.post(
+                    "https://api.resend.com/emails",
+                    headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"},
+                    json={
+                        "from": f"{getattr(settings, 'DEFAULT_FROM_NAME', 'AcademicX')} <onboarding@resend.dev>",
+                        "to": [email],
+                        "subject": f"Your AcademicX Verification Code: {otp_code}",
+                        "html": f"<p>Your AcademicX verification code is: <strong>{otp_code}</strong>. Valid for 5 minutes.</p>"
+                    },
+                    timeout=8
+                )
+                if r.status_code in (200, 201):
+                    print(f"[Success] Real email delivered to {email} via Resend HTTPS API.")
+                    return True, "Email sent successfully via Resend HTTPS."
+            except Exception as re_err:
+                print(f"[Resend Fallback Error] {re_err}")
+
         return False, err_msg
