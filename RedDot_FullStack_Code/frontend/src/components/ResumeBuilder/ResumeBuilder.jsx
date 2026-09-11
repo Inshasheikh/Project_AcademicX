@@ -874,14 +874,10 @@ export default function ResumeBuilder({ onSendToReview, initialPreset = 'fullsta
               <span className="px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[11px] font-extrabold uppercase tracking-wide flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-sky-600" /> Interactive CV Studio
               </span>
-              <span className="text-xs text-slate-400 font-medium">• ATS Guaranteed Standards</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-['Outfit']">
               Build Your High-Impact Industry Resume
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5 max-w-2xl">
-              Effortlessly compose a recruiter-ready CV with 1-click AcademicX profile sync, verified grades, ATS keyword alignment, and instant PDF download.
-            </p>
           </div>
 
           {/* Quick Action Buttons */}
@@ -1148,21 +1144,12 @@ export default function ResumeBuilder({ onSendToReview, initialPreset = 'fullsta
                   </div>
                 </div>
 
-                {/* Professional Summary with AI Generator */}
+                {/* Professional Summary */}
                 <div className="pt-3 border-t border-slate-100 space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="block text-[11px] font-bold text-slate-700">
                       Professional Summary / Bio
                     </label>
-                    <button
-                      type="button"
-                      onClick={handleGenerateAiSummary}
-                      className="px-2.5 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-[11px] font-bold transition flex items-center gap-1 cursor-pointer border border-sky-200/60"
-                      title="Generate a high-impact summary with AI"
-                    >
-                      <Sparkles className="w-3 h-3 text-sky-600" />
-                      <span>AI Generate Summary</span>
-                    </button>
                   </div>
                   <textarea
                     rows={4}

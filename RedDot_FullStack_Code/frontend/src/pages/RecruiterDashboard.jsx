@@ -758,7 +758,7 @@ export default function RecruiterDashboard() {
             {data.company_name} Campus Talent Desk
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Authorized Talent Partner: <span className="text-slate-800 font-semibold">{data.recruiter_name}</span> • Verified Academic Pipeline
+            Authorized Talent Partner: <span className="text-slate-800 font-semibold">{data.recruiter_name}</span>
           </p>
         </div>
 

@@ -1098,26 +1098,6 @@ Projects:
                 </span>
               </button>
             </div>
-
-            {resumeMode === 'review' ? (
-              <button
-                type="button"
-                onClick={() => setResumeMode('builder')}
-                className="text-xs font-semibold text-sky-700 hover:text-sky-800 flex items-center gap-1 px-3 py-1 cursor-pointer"
-              >
-                <span>Create New CV</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setResumeMode('review')}
-                className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1 px-3 py-1 cursor-pointer"
-              >
-                <span>Switch to ATS Reviewer</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            )}
           </div>
 
           {resumeMode === 'builder' ? (
@@ -1287,27 +1267,6 @@ Projects:
                     placeholder="Paste resume text or upload your PDF file..."
                   />
                 </div>
-              </div>
-
-              <div className="pt-3">
-                <button
-                  onClick={handleAuditResume}
-                  disabled={isAuditingResume}
-                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-98 cursor-pointer disabled:opacity-75"
-                >
-                  {isAuditingResume ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin text-white" />
-                      {auditProgressStep === 1 && "Extracting semantic credentials..."}
-                      {auditProgressStep === 2 && "Benchmarking against 10,000+ top company hires..."}
-                      {auditProgressStep === 3 && "Curating courses, video links & projects..."}
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 text-amber-300" /> Run Deep Resume Review & AI Research
-                    </>
-                  )}
-                </button>
               </div>
             </div>
 

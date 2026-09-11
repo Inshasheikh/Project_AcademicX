@@ -209,13 +209,6 @@ export default function AdminDashboard() {
               <Terminal className="w-3.5 h-3.5 text-emerald-400" />
               App Developer &amp; Owner Console
             </span>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono text-[11px] flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              All 6 Services Operational
-            </span>
-            <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-100 font-mono text-[11px]">
-              v2.4.0 (Prod-Mumbai)
-            </span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 font-['Outfit'] tracking-tight">
