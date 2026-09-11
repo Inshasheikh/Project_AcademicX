@@ -65,6 +65,11 @@ export default function Navbar({ activeRole, setActiveRole, activeTab, setActive
       isActive: location.pathname === '/' || (!isAuth && activeRole === 'landing')
     },
     { 
+      name: 'About', 
+      action: () => handleNavigate('/about', 'about', 'about'),
+      isActive: location.pathname === '/about' || activeRole === 'about'
+    },
+    { 
       name: 'For Students', 
       action: () => handleNavigate('/student/dashboard', 'student', 'dashboard'),
       isActive: location.pathname.startsWith('/student')
@@ -83,11 +88,6 @@ export default function Navbar({ activeRole, setActiveRole, activeTab, setActive
       name: 'Institutions', 
       action: () => handleNavigate('/admin/dashboard', 'admin', 'admin'),
       isActive: location.pathname.startsWith('/admin') || activeRole === 'admin'
-    },
-    { 
-      name: 'About', 
-      action: () => handleNavigate('/about', 'about', 'about'),
-      isActive: location.pathname === '/about' || activeRole === 'about'
     },
   ];
 

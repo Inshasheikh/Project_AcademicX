@@ -204,13 +204,6 @@ export default function AdminDashboard() {
       {/* ========================================================= */}
       <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-3xl shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-1.5">
-          <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-sky-700">
-            <span className="px-3 py-1 rounded-full bg-slate-900 text-white flex items-center gap-1.5 font-mono text-[11px]">
-              <Terminal className="w-3.5 h-3.5 text-emerald-400" />
-              App Developer &amp; Owner Console
-            </span>
-          </div>
-
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 font-['Outfit'] tracking-tight">
             Platform Application Data &amp; Telemetry
           </h1>

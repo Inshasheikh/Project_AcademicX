@@ -422,13 +422,13 @@ export default function RecruiterDashboard() {
   const [lastDispatchedTime, setLastDispatchedTime] = useState(null);
   const [digestChannels, setDigestChannels] = useState({
     tpoEmail: true,
-    slackWebhook: true,
-    deanDossier: true,
-    academicFeedback: true
+    slackWebhook: true
   });
+  const [digestOptionalNote, setDigestOptionalNote] = useState('');
 
   // Academic Feedback Modal States
   const [showAcademicFeedbackModal, setShowAcademicFeedbackModal] = useState(false);
+  const [feedbackModalTab, setFeedbackModalTab] = useState('form'); // 'form' | 'history'
   const [feedbackSuccess, setFeedbackSuccess] = useState(false);
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const [academicFeedbackList, setAcademicFeedbackList] = useState([
@@ -541,59 +541,27 @@ export default function RecruiterDashboard() {
       setDigestSuccess(true);
       const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       setLastDispatchedTime(nowStr);
-
-      if (digestChannels.academicFeedback && newFeedback.notes.trim()) {
-        const createdItem = {
-          id: `af-${Date.now()}`,
-          department: newFeedback.department,
-          batch: newFeedback.batch || "Batch 2026 (Final Year)",
-          category: newFeedback.category,
-          rating: newFeedback.rating,
-          readinessScore: `${Math.floor(Math.random() * 8 + 88)}%`,
-          notes: newFeedback.notes,
-          submitted_at: `Today at ${nowStr}`,
-          status: "Transmitted via Pipeline Digest",
-          actionTaken: "Forwarded to University BoS & Placement Cell"
-        };
-        setAcademicFeedbackList(prev => [createdItem, ...prev]);
-      }
-
-      triggerAutomationToast("TPO, BoS & Slack Webhook", `PIPELINE_DIGEST_DELIVERED at ${nowStr}`);
-    }, 1200);
+      triggerAutomationToast("TPO & Slack Webhook", `PIPELINE_DIGEST_DELIVERED at ${nowStr}`);
+    }, 900);
   };
 
   const handleDownloadDigestJSON = () => {
-    const topCandidate = data?.ai_recommended_candidates?.[0];
     const digestPayload = {
-      report_title: "REDDOT National Campus Pipeline Digest & Academic Feedback",
+      report_title: "Campus Recruitment Pipeline Digest",
       company_name: data?.company_name || "Enterprise Partner",
-      authorized_recruiter: data?.recruiter_name || "Talent Acquisition Lead",
+      authorized_recruiter: data?.recruiter_name || "Campus Hiring Lead",
       dispatched_at: new Date().toISOString(),
       pipeline_summary: {
-        total_candidates: data?.total_applications_count || 0,
-        shortlisted_pool: data?.shortlisted_count || 0,
-        direct_hires: data?.hired_count || 0,
-        roles_closing_soon: data?.active_jobs_count || 0,
-        apaar_verification_rate: "100% Cryptographically Verified"
+        total_candidates: data?.total_applications_count || 48,
+        shortlisted_pool: data?.shortlisted_count || 12,
+        direct_hires: data?.hired_count || 3,
+        active_roles: data?.active_jobs_count || 5,
+        verification_status: "100% Cryptographically Verified via DigiLocker / APAAR"
       },
-      academic_curriculum_feedback: {
-        department: newFeedback.department,
-        batch: newFeedback.batch,
-        category: newFeedback.category,
-        readiness_rating: `${newFeedback.rating}/5`,
-        recommendations: newFeedback.notes || "Add Redis caching and Kafka streaming to Semester 6 labs."
-      },
-      top_candidate_spotlight: topCandidate ? {
-        name: topCandidate.name,
-        college: topCandidate.college,
-        apaar_id: topCandidate.apaar_id || "VERIFIED",
-        match_score: topCandidate.match_score,
-        projects: topCandidate.projects || []
-      } : null,
-      institutional_destinations: [
-        { channel: "TPO Direct Desk", recipient: "tpo-placement@campus.edu", status: "Delivered" },
-        { channel: "Team Webhook", recipient: "#campus-talent-pipeline", status: "Dispatched" },
-        { channel: "Dean & BoS Academic Feedback", recipient: "dean-academics@campus.edu", status: "Delivered" }
+      recruiter_notes: digestOptionalNote.trim() || "Regular weekly talent pipeline dispatch.",
+      destinations: [
+        { channel: "Placement Cell (TPO)", recipient: "tpo-placement@campus.edu", delivered: digestChannels.tpoEmail },
+        { channel: "Hiring Team Slack", recipient: "#campus-talent-pipeline", delivered: digestChannels.slackWebhook }
       ]
     };
 
@@ -601,7 +569,7 @@ export default function RecruiterDashboard() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `REDDOT_Pipeline_Digest_${new Date().toISOString().slice(0, 10)}.json`;
+    link.download = `Pipeline_Digest_${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     URL.revokeObjectURL(url);
     triggerAutomationToast("Pipeline Digest", "REPORT_JSON_DOWNLOADED");
@@ -1883,246 +1851,292 @@ export default function RecruiterDashboard() {
       )}
 
       {/* ========================================================= */}
-      {/* MODAL: DISPATCH PIPELINE DIGEST & AUTOMATED TALENT REPORT */}
+      {/* MODAL: DISPATCH PIPELINE DIGEST (CLEAN & STREAMLINED) */}
       {/* ========================================================= */}
       {showDigestModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-3xl border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-6">
+          <div className="bg-white w-full max-w-xl rounded-3xl border border-slate-200 shadow-2xl p-6 sm:p-7 space-y-5">
             
-            {/* Top Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 pb-4">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100 shadow-xs">
-                  <MessageSquare className="w-6 h-6" />
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100 shrink-0">
+                  <MessageSquare className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-['Outfit']">
+                  <h2 className="text-lg font-bold text-slate-900 font-['Outfit']">
                     Dispatch Pipeline Digest
                   </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Transmit live verified candidate pipeline &amp; interview schedules to University TPO Desks &amp; Team Slack
+                  <p className="text-xs text-slate-500">
+                    Send candidate shortlist &amp; recruitment status to University Placement Office &amp; Team Slack
                   </p>
                 </div>
               </div>
 
               <button 
                 onClick={() => setShowDigestModal(false)}
-                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition cursor-pointer"
+                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Success Notification Banner if just dispatched */}
+            {/* Success Notification Banner */}
             {digestSuccess && (
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in slide-in-from-top duration-300">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
-                    <Check className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <strong className="block text-sm font-bold text-slate-900">Pipeline Digest Successfully Dispatched!</strong>
-                    <span className="text-xs text-slate-600">
-                      Authenticated payload transmitted to <strong>tpo-placement@campus.edu</strong> and <strong>#campus-talent-pipeline</strong> at {lastDispatchedTime}.
-                    </span>
-                  </div>
+              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 flex items-center gap-3 animate-in fade-in">
+                <div className="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                  <Check className="w-4 h-4" />
                 </div>
-                <span className="text-[11px] font-mono font-bold text-emerald-800 bg-white px-3 py-1 rounded-lg border border-emerald-200 self-start sm:self-auto">
-                  STATUS: 200 OK
-                </span>
+                <div className="text-xs">
+                  <strong className="block font-bold text-slate-900">Pipeline Digest Dispatched!</strong>
+                  <span className="text-slate-600">
+                    Delivered to <strong>tpo-placement@campus.edu</strong> and <strong>#campus-talent-pipeline</strong> at {lastDispatchedTime}.
+                  </span>
+                </div>
               </div>
             )}
 
-            {/* Pipeline Snapshot Metrics 4-Box Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-                <span className="text-[10px] font-bold uppercase text-slate-400 block">Total Pipeline</span>
-                <strong className="text-xl font-extrabold text-slate-900 font-['Outfit']">48</strong>
-                <span className="text-[10px] text-emerald-700 block font-semibold">100% Verified</span>
+            {/* Live Pipeline Snapshot Strip */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-4 gap-2 text-center text-xs">
+              <div>
+                <span className="text-[10px] font-bold uppercase text-slate-400 block">Candidates</span>
+                <strong className="text-base font-extrabold text-slate-900 font-['Outfit']">{data.total_applications_count || 48}</strong>
               </div>
-              <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 text-center">
-                <span className="text-[10px] font-bold uppercase text-amber-600 block">Shortlisted Pool</span>
-                <strong className="text-xl font-extrabold text-amber-900 font-['Outfit']">12</strong>
-                <span className="text-[10px] text-amber-700 block font-semibold">Avg Match: 91%</span>
+              <div>
+                <span className="text-[10px] font-bold uppercase text-amber-600 block">Shortlisted</span>
+                <strong className="text-base font-extrabold text-amber-900 font-['Outfit']">{data.shortlisted_count || 12}</strong>
               </div>
-              <div className="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-200 text-center">
-                <span className="text-[10px] font-bold uppercase text-rose-600 block">Urgent Postings</span>
-                <strong className="text-xl font-extrabold text-rose-900 font-['Outfit']">2</strong>
-                <span className="text-[10px] text-rose-700 block font-semibold">Closing &lt; 48h</span>
+              <div>
+                <span className="text-[10px] font-bold uppercase text-emerald-600 block">Selected</span>
+                <strong className="text-base font-extrabold text-emerald-900 font-['Outfit']">{data.hired_count || 3}</strong>
               </div>
-              <div className="p-3.5 rounded-2xl bg-sky-50/70 border border-sky-200 text-center">
-                <span className="text-[10px] font-bold uppercase text-sky-600 block">Selected Offers</span>
-                <strong className="text-xl font-extrabold text-sky-900 font-['Outfit']">3</strong>
-                <span className="text-[10px] text-sky-700 block font-semibold">Direct MoA Linked</span>
+              <div>
+                <span className="text-[10px] font-bold uppercase text-sky-600 block">Active Roles</span>
+                <strong className="text-base font-extrabold text-sky-900 font-['Outfit']">{data.active_jobs_count || 5}</strong>
               </div>
             </div>
 
-            {/* Top Highlighted Candidate Spotlight */}
-            {data?.ai_recommended_candidates && data.ai_recommended_candidates.length > 0 && (
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-50 via-white to-indigo-50 border border-sky-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3.5">
-                  <img 
-                    src={data.ai_recommended_candidates[0].avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"} 
-                    alt={data.ai_recommended_candidates[0].name} 
-                    className="w-13 h-13 rounded-2xl object-cover border-2 border-sky-500 shadow-xs"
-                  />
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <strong className="text-sm font-bold text-slate-900">{data.ai_recommended_candidates[0].name}</strong>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">
-                        #1 Ranked Candidate ({data.ai_recommended_candidates[0].match_score}% Match)
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500">
-                      {data.ai_recommended_candidates[0].college} • <span className="font-mono text-slate-700">ID: {data.ai_recommended_candidates[0].apaar_id || 'VERIFIED'}</span> • CGPA: {data.ai_recommended_candidates[0].cgpa || 'N/A'}
-                    </p>
-                    <div className="flex items-center gap-1.5 mt-1 text-[11px] text-slate-600">
-                      <span className="font-bold text-sky-700">Verified Skills</span>: {(data.ai_recommended_candidates[0].skills || []).slice(0, 4).join(', ')}
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => openStudentProfile(data.ai_recommended_candidates[0])}
-                  className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 shrink-0 cursor-pointer self-start sm:self-auto"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>View Candidate Profile</span>
-                </button>
-              </div>
-            )}
-
-            {/* Target Dispatch Channels Config */}
-            <div className="space-y-3">
-              <span className="text-xs font-bold text-slate-800 uppercase tracking-wider block">
-                Select Dispatch Channels &amp; Recipients:
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                
-                <label className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
-                  digestChannels.tpoEmail ? 'bg-sky-50/50 border-sky-300 ring-1 ring-sky-400' : 'bg-slate-50 border-slate-200'
+            {/* Recipients Selection */}
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
+                Deliver Report To:
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <label className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center gap-2.5 ${
+                  digestChannels.tpoEmail ? 'bg-sky-50/60 border-sky-300 ring-1 ring-sky-400' : 'bg-slate-50 border-slate-200'
                 }`}>
                   <input 
                     type="checkbox" 
                     checked={digestChannels.tpoEmail}
                     onChange={(e) => setDigestChannels({ ...digestChannels, tpoEmail: e.target.checked })}
-                    className="mt-0.5 rounded text-sky-600 focus:ring-sky-500"
+                    className="rounded text-sky-600 focus:ring-sky-500 cursor-pointer"
                   />
-                  <div>
-                    <strong className="text-xs font-bold text-slate-900 block flex items-center gap-1">
-                      <Mail className="w-3.5 h-3.5 text-sky-600" /> TPO Email Broadcast
+                  <div className="text-xs">
+                    <strong className="font-bold text-slate-900 flex items-center gap-1">
+                      <Mail className="w-3.5 h-3.5 text-sky-600" /> Placement Cell (TPO)
                     </strong>
-                    <p className="text-[10px] text-slate-500 mt-0.5">
-                      Official dispatch to Dean Placements (<code className="text-slate-700">tpo-placement@campus.edu</code>)
-                    </p>
+                    <span className="text-[10px] text-slate-500">tpo-placement@campus.edu</span>
                   </div>
                 </label>
 
-                <label className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
-                  digestChannels.slackWebhook ? 'bg-indigo-50/50 border-indigo-300 ring-1 ring-indigo-400' : 'bg-slate-50 border-slate-200'
+                <label className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center gap-2.5 ${
+                  digestChannels.slackWebhook ? 'bg-indigo-50/60 border-indigo-300 ring-1 ring-indigo-400' : 'bg-slate-50 border-slate-200'
                 }`}>
                   <input 
                     type="checkbox" 
                     checked={digestChannels.slackWebhook}
                     onChange={(e) => setDigestChannels({ ...digestChannels, slackWebhook: e.target.checked })}
-                    className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
+                    className="rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                   />
-                  <div>
-                    <strong className="text-xs font-bold text-slate-900 block flex items-center gap-1">
-                      <MessageSquare className="w-3.5 h-3.5 text-indigo-600" /> Slack Talent Webhook
+                  <div className="text-xs">
+                    <strong className="font-bold text-slate-900 flex items-center gap-1">
+                      <MessageSquare className="w-3.5 h-3.5 text-indigo-600" /> Team Slack Channel
                     </strong>
-                    <p className="text-[10px] text-slate-500 mt-0.5">
-                      Live candidate cards to <code className="text-slate-700">#campus-hiring-2026</code>
-                    </p>
+                    <span className="text-[10px] text-slate-500">#campus-talent-pipeline</span>
                   </div>
                 </label>
-
-                <label className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
-                  digestChannels.deanDossier ? 'bg-emerald-50/50 border-emerald-300 ring-1 ring-emerald-400' : 'bg-slate-50 border-slate-200'
-                }`}>
-                  <input 
-                    type="checkbox" 
-                    checked={digestChannels.deanDossier}
-                    onChange={(e) => setDigestChannels({ ...digestChannels, deanDossier: e.target.checked })}
-                    className="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500"
-                  />
-                  <div>
-                    <strong className="text-xs font-bold text-slate-900 block flex items-center gap-1">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Verified Audit Dossier
-                    </strong>
-                    <p className="text-[10px] text-slate-500 mt-0.5">
-                      SHA-256 cryptographic verification ledger
-                    </p>
-                  </div>
-                </label>
-
-                <label className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
-                  digestChannels.academicFeedback ? 'bg-sky-50/50 border-sky-300 ring-1 ring-sky-400' : 'bg-slate-50 border-slate-200'
-                }`}>
-                  <input 
-                    type="checkbox" 
-                    checked={digestChannels.academicFeedback}
-                    onChange={(e) => setDigestChannels({ ...digestChannels, academicFeedback: e.target.checked })}
-                    className="mt-0.5 rounded text-sky-600 focus:ring-sky-500"
-                  />
-                  <div>
-                    <strong className="text-xs font-bold text-slate-900 block flex items-center gap-1">
-                      <GraduationCap className="w-3.5 h-3.5 text-sky-600" /> Academic &amp; BoS Feedback
-                    </strong>
-                    <p className="text-[10px] text-slate-500 mt-0.5">
-                      Direct syllabus recommendations to Dean of Academics &amp; HOD
-                    </p>
-                  </div>
-                </label>
-
               </div>
             </div>
 
-            {/* Academic & Curriculum Feedback Section inside Digest */}
-            {digestChannels.academicFeedback && (
-              <div className="p-4 sm:p-5 rounded-2xl bg-sky-50/70 border border-sky-200 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <GraduationCap className="w-5 h-5 text-sky-600" />
-                    <div>
-                      <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                        Academic &amp; Curriculum Feedback (Included in Digest)
-                      </h3>
-                      <p className="text-[11px] text-slate-500">
-                        Actionable technical feedback dispatched directly to University BoS, HOD &amp; Placement Faculty
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-sky-100 text-sky-800 border border-sky-200">
-                    BoS Direct Desk
+            {/* Optional Note */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
+                Add Optional Note / Next Steps:
+              </label>
+              <textarea
+                rows={2}
+                value={digestOptionalNote}
+                onChange={(e) => setDigestOptionalNote(e.target.value)}
+                placeholder="E.g. Technical Round 1 interviews scheduled for Friday 10:00 AM via Google Meet..."
+                className="w-full p-2.5 text-xs rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-1 focus:ring-sky-500 focus:outline-hidden transition"
+              />
+            </div>
+
+            {/* Modal Actions */}
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={handleDownloadDigestJSON}
+                className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" /> Download (.JSON)
+              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowDigestModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer"
+                >
+                  Close
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDispatchPipelineDigest}
+                  disabled={isDispatchingDigest}
+                  className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {isDispatchingDigest ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Dispatching...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Dispatch Digest</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL: ACADEMIC FEEDBACK (CLEAN & USER-FRIENDLY) */}
+      {/* ========================================================= */}
+      {showAcademicFeedbackModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-200 shadow-2xl p-6 sm:p-7 space-y-5">
+            
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100 shrink-0">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900 font-['Outfit']">
+                    Academic &amp; Curriculum Feedback
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Share skill gap recommendations with university faculty &amp; Dean of Academics
+                  </p>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => setShowAcademicFeedbackModal(false)}
+                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Segmented Mode Switcher: Form vs History */}
+            <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl">
+              <button
+                type="button"
+                onClick={() => setFeedbackModalTab('form')}
+                className={`flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                  feedbackModalTab === 'form'
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5 text-sky-600" />
+                <span>Submit New Feedback</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFeedbackModalTab('history')}
+                className={`flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                  feedbackModalTab === 'history'
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Building className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Feedback History ({academicFeedbackList.length})</span>
+              </button>
+            </div>
+
+            {/* Success Banner */}
+            {feedbackSuccess && (
+              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 flex items-center gap-3 animate-in fade-in">
+                <div className="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                  <Check className="w-4 h-4" />
+                </div>
+                <div className="text-xs">
+                  <strong className="block font-bold text-slate-900">Feedback Transmitted Successfully!</strong>
+                  <span className="text-slate-600">
+                    Forwarded to the University Board of Studies &amp; Campus Placement Office.
                   </span>
                 </div>
+              </div>
+            )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {feedbackModalTab === 'form' ? (
+              <form onSubmit={handleSubmitAcademicFeedback} className="space-y-4">
+                
+                {/* Row 1: Department & Cohort */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
                       Target Department
                     </label>
                     <select
                       value={newFeedback.department}
                       onChange={(e) => setNewFeedback({ ...newFeedback, department: e.target.value })}
-                      className="w-full text-xs font-semibold p-2 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                      className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white focus:ring-1 focus:ring-sky-500 focus:outline-hidden"
                     >
                       <option value="Department of Computer Science & Engineering">Computer Science &amp; Engineering</option>
                       <option value="Information Technology & Software Systems">Information Technology</option>
-                      <option value="AI & Data Science Engineering">AI &amp; Data Science</option>
+                      <option value="AI & Data Science Engineering">AI &amp; Data Science Engineering</option>
                       <option value="Electronics & Communication Engineering">Electronics &amp; Communication</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                      Observed Gap Area
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                      Student Cohort / Batch
+                    </label>
+                    <select
+                      value={newFeedback.batch}
+                      onChange={(e) => setNewFeedback({ ...newFeedback, batch: e.target.value })}
+                      className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white focus:ring-1 focus:ring-sky-500 focus:outline-hidden"
+                    >
+                      <option value="Batch 2026 (Final Year)">Batch 2026 (Final Year)</option>
+                      <option value="Batch 2027 (Pre-Final Year)">Batch 2027 (Pre-Final Year)</option>
+                      <option value="All Engineering Cohorts">All Engineering Cohorts</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Row 2: Gap Area & Star Rating */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                      Curriculum Gap Area
                     </label>
                     <select
                       value={newFeedback.category}
                       onChange={(e) => setNewFeedback({ ...newFeedback, category: e.target.value })}
-                      className="w-full text-xs font-semibold p-2 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                      className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white focus:ring-1 focus:ring-sky-500 focus:outline-hidden"
                     >
                       <option value="System Design & Distributed Concurrency">System Design &amp; Concurrency</option>
                       <option value="Modern Cloud & DevOps (Docker/K8s/CI-CD)">Cloud &amp; DevOps (Docker/K8s)</option>
@@ -2133,46 +2147,48 @@ export default function RecruiterDashboard() {
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                      Industry Readiness Rating
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                      Readiness Rating
                     </label>
-                    <div className="flex items-center gap-1 mt-0.5">
+                    <div className="flex items-center gap-1.5 p-1 bg-slate-50 rounded-xl border border-slate-200">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           key={star}
                           type="button"
                           onClick={() => setNewFeedback({ ...newFeedback, rating: star })}
-                          className={`p-1.5 rounded-lg border text-xs font-bold transition cursor-pointer flex items-center gap-0.5 ${
+                          className={`flex-1 py-1 rounded-lg text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1 ${
                             newFeedback.rating === star
-                              ? 'bg-amber-500 text-white border-amber-600'
-                              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                              ? 'bg-amber-500 text-white shadow-2xs'
+                              : 'text-slate-600 hover:bg-slate-200/60'
                           }`}
                         >
-                          <Star className={`w-3 h-3 ${newFeedback.rating >= star ? 'fill-current' : ''}`} />
+                          <Star className={`w-3.5 h-3.5 ${newFeedback.rating >= star ? 'fill-current' : ''}`} />
                           <span>{star}</span>
                         </button>
                       ))}
-                      <span className="text-[10px] text-slate-600 ml-1 font-bold">
-                        {newFeedback.rating}/5
-                      </span>
                     </div>
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                    Specific Syllabus &amp; Lab Recommendations:
-                  </label>
+                {/* Row 3: Actionable Recommendations */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                      Specific Recommendations for Syllabus Revision:
+                    </label>
+                    <span className="text-[10px] text-slate-400">Click a chip below to auto-fill</span>
+                  </div>
                   <textarea
-                    rows={2}
+                    rows={3}
                     value={newFeedback.notes}
                     onChange={(e) => setNewFeedback({ ...newFeedback, notes: e.target.value })}
-                    placeholder="E.g. Candidates demonstrated good core concepts, but require hands-on exposure to distributed caching (Redis Lua), Kafka message streams, and microservice containerization in upcoming lab coursework."
-                    className="w-full p-2.5 text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                    placeholder="Enter actionable advice for faculty (e.g. Include Redis caching and Docker containerization in semester 6 lab coursework)..."
+                    className="w-full p-2.5 text-xs rounded-xl border border-slate-300 bg-white focus:ring-1 focus:ring-sky-500 focus:outline-hidden"
+                    required
                   />
 
-                  <div className="flex items-center gap-1.5 flex-wrap mt-1.5">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Quick Add:</span>
+                  {/* 1-Click Suggestion Chips */}
+                  <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
                     {[
                       "+ Add Redis Caching Lab",
                       "+ Require Docker & CI/CD in Projects",
@@ -2186,360 +2202,99 @@ export default function RecruiterDashboard() {
                           ...prev,
                           notes: prev.notes ? `${prev.notes} ${chip.replace('+ ', '')}.` : `${chip.replace('+ ', '')}.`
                         }))}
-                        className="text-[10px] font-semibold text-sky-700 bg-white hover:bg-sky-50 px-2 py-0.5 rounded-md border border-sky-200 transition cursor-pointer"
+                        className="text-[10px] font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 px-2.5 py-1 rounded-lg border border-sky-200 transition cursor-pointer"
                       >
                         {chip}
                       </button>
                     ))}
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* Live Digest Content Preview Box */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                  Live Dispatch Payload Preview:
-                </span>
-                <span className="text-[11px] text-slate-400">
-                  Formatted for SMTP &amp; Incoming Webhook
-                </span>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-900 text-slate-200 text-xs font-mono space-y-2 leading-relaxed border border-slate-800 max-h-48 overflow-y-auto">
-                <p className="text-sky-400 font-bold">
-                  [REDDOT PIPELINE DIGEST] • {data?.company_name || 'Enterprise'} Talent Operations
-                </p>
-                <p className="text-slate-400 text-[11px]">
-                  Generated by: {data?.recruiter_name || 'Talent Acquisition Lead'} • Institutional MoA Grid
-                </p>
-                <div className="border-t border-slate-800 pt-2 space-y-1 text-[11px]">
-                  <p>📊 <strong className="text-white">Active Pool:</strong> {data?.total_applications_count || 0} Applicants ({data?.shortlisted_count || 0} Shortlisted | {data?.hired_count || 0} Selected)</p>
-                  <p>⚡ <strong className="text-amber-300">Active Roles:</strong> {data?.active_jobs_count || 0} Roles in Grid</p>
-                  {data?.ai_recommended_candidates?.[0] && (
-                    <p>🌟 <strong className="text-emerald-300">Top Candidate:</strong> {data.ai_recommended_candidates[0].name} ({data.ai_recommended_candidates[0].college}) — {data.ai_recommended_candidates[0].match_score}% Match</p>
-                  )}
-                  {digestChannels.academicFeedback && (
-                    <p>🎓 <strong className="text-sky-300">Academic Feedback Attached:</strong> {newFeedback.category} ({newFeedback.rating}/5 Readiness) &rarr; Transmitted to {newFeedback.department}</p>
-                  )}
-                  <p>🔒 <strong className="text-sky-300">Security:</strong> 100% transcripts verified via institutional SHA-256 seal</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Actions */}
-            <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleDispatchPipelineDigest}
-                  disabled={isDispatchingDigest}
-                  className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-xs transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {isDispatchingDigest ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Dispatching Across Channels...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-3.5 h-3.5" />
-                      <span>Dispatch Pipeline Digest Now</span>
-                    </>
-                  )}
-                </button>
-
-                <button
-                  onClick={handleDownloadDigestJSON}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs transition flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5" /> Download Digest (.JSON)
-                </button>
-              </div>
-
-              <button
-                onClick={() => setShowDigestModal(false)}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition cursor-pointer self-end sm:self-auto"
-              >
-                Close
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================= */}
-      {/* MODAL: ACADEMIC FEEDBACK & CURRICULUM RECOMMENDATIONS */}
-      {/* ========================================================= */}
-      {showAcademicFeedbackModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-3xl border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-6">
-            
-            {/* Top Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 pb-4">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100 shadow-xs">
-                  <GraduationCap className="w-6 h-6" />
-                </div>
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-['Outfit']">
-                    University Academic &amp; Curriculum Feedback Desk
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Direct corporate feedback loop to University BoS, Deans, and Faculty to close curriculum loopholes and improve placement readiness
-                  </p>
-                </div>
-              </div>
-
-              <button 
-                onClick={() => setShowAcademicFeedbackModal(false)}
-                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Success Banner */}
-            {feedbackSuccess && (
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in slide-in-from-top duration-300">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
-                    <Check className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <strong className="block text-sm font-bold text-slate-900">Academic Feedback Transmitted!</strong>
-                    <span className="text-xs text-slate-600">
-                      Feedback and curriculum upgrade points transmitted to University Board of Studies, HOD, and Campus Placement Office.
-                    </span>
-                  </div>
-                </div>
-                <span className="text-[11px] font-mono font-bold text-emerald-800 bg-white px-3 py-1 rounded-lg border border-emerald-200 self-start sm:self-auto">
-                  DELIVERED
-                </span>
-              </div>
-            )}
-
-            {/* Form: Submit Academic Feedback */}
-            <form onSubmit={handleSubmitAcademicFeedback} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-900 font-['Outfit'] flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-sky-600" />
-                  Submit New Academic Feedback to Faculty &amp; TPO
-                </h3>
-                <span className="text-[11px] font-medium text-slate-500">Industry Partner: {data?.company_name}</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                    Target Department
-                  </label>
-                  <select
-                    value={newFeedback.department}
-                    onChange={(e) => setNewFeedback({ ...newFeedback, department: e.target.value })}
-                    className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
-                  >
-                    <option value="Department of Computer Science & Engineering">Computer Science &amp; Engineering</option>
-                    <option value="Information Technology & Software Systems">Information Technology</option>
-                    <option value="AI & Data Science Engineering">AI &amp; Data Science Engineering</option>
-                    <option value="Electronics & Communication Engineering">Electronics &amp; Communication</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                    Target Cohort
-                  </label>
-                  <select
-                    value={newFeedback.batch}
-                    onChange={(e) => setNewFeedback({ ...newFeedback, batch: e.target.value })}
-                    className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
-                  >
-                    <option value="Batch 2026 (Final Year)">Batch 2026 (Final Year)</option>
-                    <option value="Batch 2027 (Pre-Final Year)">Batch 2027 (Pre-Final Year)</option>
-                    <option value="All Engineering Cohorts">All Engineering Cohorts</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                    Curriculum Gap Area
-                  </label>
-                  <select
-                    value={newFeedback.category}
-                    onChange={(e) => setNewFeedback({ ...newFeedback, category: e.target.value })}
-                    className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
-                  >
-                    <option value="System Design & Distributed Concurrency">System Design &amp; Concurrency</option>
-                    <option value="Modern Cloud & DevOps (Docker/K8s/CI-CD)">Cloud &amp; DevOps (Docker/K8s)</option>
-                    <option value="Real-World MLOps & Vector Databases">MLOps &amp; Vector Databases</option>
-                    <option value="Clean Architecture & Testing Rigor">Clean Architecture &amp; Testing</option>
-                    <option value="Algorithmic Rigor & Interview Drills">DSA &amp; Algorithmic Rigor</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Placement Readiness Rating */}
-              <div>
-                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1.5">
-                  Observed Cohort Industry Readiness:
-                </label>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setNewFeedback({ ...newFeedback, rating: star })}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border ${
-                        newFeedback.rating === star
-                          ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
-                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
-                      }`}
-                    >
-                      <Star className={`w-3.5 h-3.5 ${newFeedback.rating >= star ? 'fill-current' : ''}`} />
-                      <span>{star} / 5</span>
-                    </button>
-                  ))}
-                  <span className="text-[11px] text-slate-500 ml-2">
-                    {newFeedback.rating === 5 && '🌟 Exceptional Readiness'}
-                    {newFeedback.rating === 4 && '✨ Industry Ready with Tactical Gaps'}
-                    {newFeedback.rating === 3 && '⚡ Average Foundation (Practical Labs Needed)'}
-                    {newFeedback.rating <= 2 && '⚠️ Significant Curriculum Loopholes Identified'}
+                {/* Form Footer */}
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-500">
+                    Transmits directly to Board of Studies (BoS)
                   </span>
-                </div>
-              </div>
-
-              {/* Detailed Recommendations Textarea */}
-              <div>
-                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                  Specific Recommendations for Faculty &amp; Syllabus Revision:
-                </label>
-                <textarea
-                  rows={3}
-                  value={newFeedback.notes}
-                  onChange={(e) => setNewFeedback({ ...newFeedback, notes: e.target.value })}
-                  placeholder="E.g. Candidates demonstrated good theoretical concepts, but require hands-on exposure to distributed caching (Redis Lua), Kafka message streams, and microservice containerization in upcoming semester coursework."
-                  className="w-full p-3 text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
-                  required
-                />
-                
-                {/* Quick Suggestion Chips */}
-                <div className="flex items-center gap-2 flex-wrap mt-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Quick Suggestion:</span>
-                  {[
-                    "+ Add Redis Caching Lab",
-                    "+ Require Docker & CI/CD in Projects",
-                    "+ Include Vector DBs in AI Elective",
-                    "+ Practice Mock STAR Technical Interviews"
-                  ].map((chip, idx) => (
+                  <div className="flex items-center gap-2">
                     <button
-                      key={idx}
                       type="button"
-                      onClick={() => setNewFeedback(prev => ({
-                        ...prev,
-                        notes: prev.notes ? `${prev.notes} ${chip.replace('+ ', '')}.` : `${chip.replace('+ ', '')}.`
-                      }))}
-                      className="text-[10px] font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 px-2.5 py-1 rounded-lg border border-sky-200 transition cursor-pointer"
+                      onClick={() => setShowAcademicFeedbackModal(false)}
+                      className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer"
                     >
-                      {chip}
+                      Cancel
                     </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmittingFeedback || !newFeedback.notes.trim()}
+                      className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      {isSubmittingFeedback ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Transmitting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-3.5 h-3.5" />
+                          <span>Transmit Feedback</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-3">
+                <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                  {academicFeedbackList.map((item) => (
+                    <div key={item.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <strong className="text-xs font-bold text-slate-900">{item.department}</strong>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-slate-700 border border-slate-200">
+                            {item.batch}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 text-amber-500 text-xs font-bold">
+                          <Star className="w-3 h-3 fill-current" />
+                          <span>{item.rating}/5</span>
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-slate-700 leading-relaxed bg-white p-2.5 rounded-xl border border-slate-100">
+                        "{item.notes}"
+                      </p>
+
+                      <div className="flex items-center justify-between text-[11px] pt-1">
+                        <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          {item.actionTaken}
+                        </span>
+                        <span className="text-slate-400">{item.submitted_at}</span>
+                      </div>
+                    </div>
                   ))}
                 </div>
+
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={handleDownloadFeedbackJSON}
+                    className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" /> Download Report (.JSON)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowAcademicFeedbackModal(false)}
+                    className="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-2">
-                <span className="text-[11px] text-slate-500">
-                  Transmits formally to University Placement Desk &amp; Dean of Academic Affairs.
-                </span>
-                <button
-                  type="submit"
-                  disabled={isSubmittingFeedback || !newFeedback.notes.trim()}
-                  className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-xs transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {isSubmittingFeedback ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Transmitting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-3.5 h-3.5" />
-                      <span>Transmit Academic Feedback</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-
-            {/* Feedback History & Faculty Actions */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-900 font-['Outfit'] flex items-center gap-2">
-                  <Building className="w-4 h-4 text-sky-600" />
-                  Transmitted Feedback Log &amp; Institutional Responses ({academicFeedbackList.length})
-                </h3>
-                <span className="text-[11px] text-slate-500">Live University Linkage</span>
-              </div>
-
-              <div className="space-y-3">
-                {academicFeedbackList.map((item) => (
-                  <div key={item.id} className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-sky-300 transition space-y-2.5">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <strong className="text-xs font-bold text-slate-900">{item.department}</strong>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
-                          {item.batch}
-                        </span>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
-                          {item.category}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-amber-500 text-xs font-bold">
-                        <Star className="w-3.5 h-3.5 fill-current" />
-                        <span>{item.rating}/5 Readiness ({item.readinessScore})</span>
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-slate-700 leading-relaxed bg-slate-50/70 p-2.5 rounded-xl border border-slate-100">
-                      "{item.notes}"
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-[11px]">
-                      <div className="flex items-center gap-2 text-emerald-700 font-semibold">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        <span><strong>Faculty Action:</strong> {item.actionTaken}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-slate-400">
-                        <span>{item.submitted_at}</span>
-                        <span>•</span>
-                        <span className="text-sky-700 font-bold">{item.status}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Bottom Actions */}
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={handleDownloadFeedbackJSON}
-                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs transition flex items-center gap-1.5 cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5" /> Download Feedback Report (.JSON)
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowAcademicFeedbackModal(false)}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
+            )}
 
           </div>
         </div>
