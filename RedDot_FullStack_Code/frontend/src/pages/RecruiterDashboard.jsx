@@ -757,9 +757,6 @@ export default function RecruiterDashboard() {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Outfit']">
             {data.company_name} Campus Talent Desk
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Authorized Talent Partner: <span className="text-slate-800 font-semibold">{data.recruiter_name}</span>
-          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
