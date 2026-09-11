@@ -117,14 +117,13 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
               </div>
             </div>
 
-            {/* Right Column: High-Quality AcademicX Illustration */}
-            <div className="lg:col-span-6 flex justify-center lg:justify-end">
-              <div className="w-full max-w-lg lg:max-w-xl relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-sky-400/20 to-blue-500/20 rounded-3xl blur-xl opacity-70 group-hover:opacity-100 transition duration-1000"></div>
+            {/* Right Column: High-Quality AcademicX Illustration Seamlessly Blended */}
+            <div className="lg:col-span-6 flex justify-center lg:justify-end items-center">
+              <div className="w-full max-w-lg lg:max-w-xl relative flex justify-center">
                 <img 
-                  src="/hero-banner.jpg" 
+                  src="/hero-banner.png" 
                   alt="AcademicX - Talent Meets Opportunity" 
-                  className="relative w-full h-auto object-contain max-h-[470px] rounded-2xl drop-shadow-sm transition-transform duration-500 hover:scale-[1.01]" 
+                  className="w-full h-auto object-contain max-h-[480px] select-none transition-transform duration-500 hover:scale-[1.01]" 
                 />
               </div>
             </div>

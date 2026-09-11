@@ -694,12 +694,6 @@ export default function RecruiterDashboard() {
             <div className="text-3xl font-extrabold text-slate-900 font-['Outfit']">
               {data.active_jobs_count || 5}
             </div>
-            <div className="flex items-center gap-1.5 mt-1.5">
-              <span className="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-              <span className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
-                2 roles closing soon
-              </span>
-            </div>
           </div>
           <button 
             onClick={(e) => {
@@ -727,12 +721,6 @@ export default function RecruiterDashboard() {
             </div>
             <div className="text-3xl font-extrabold text-slate-900 font-['Outfit']">
               {data.total_applications_count || 48}
-            </div>
-            <div className="flex items-center gap-1.5 mt-1.5">
-              <Check className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                Verified credentials
-              </span>
             </div>
           </div>
           <button 
@@ -762,12 +750,6 @@ export default function RecruiterDashboard() {
             <div className="text-3xl font-extrabold text-slate-900 font-['Outfit']">
               {data.shortlisted_count || 12}
             </div>
-            <div className="flex items-center gap-1.5 mt-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
-                Average Match: 91%
-              </span>
-            </div>
           </div>
           <button 
             onClick={(e) => {
@@ -796,12 +778,6 @@ export default function RecruiterDashboard() {
             <div className="text-3xl font-extrabold text-emerald-700 font-['Outfit']">
               {data.hired_count || 3}
             </div>
-            <div className="flex items-center gap-1.5 mt-1.5">
-              <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                Direct university linkage
-              </span>
-            </div>
           </div>
           <button 
             onClick={(e) => {
@@ -822,7 +798,6 @@ export default function RecruiterDashboard() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-base font-bold text-slate-900 font-['Outfit']">Recommended Candidate Profiles</h2>
-            <p className="text-xs text-slate-500">Ranked according to authenticated coursework and competency testing</p>
           </div>
           <span 
             onClick={() => setActiveModal('applications')}

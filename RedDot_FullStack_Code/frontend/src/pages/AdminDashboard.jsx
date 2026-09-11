@@ -502,15 +502,6 @@ export default function AdminDashboard() {
                 </tbody>
               </table>
             </div>
-
-            <div className="p-4 bg-slate-50/80 border-t border-slate-200 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
-              <span className="font-mono text-[11px]">
-                Showing {filteredRecords.length} records • PostgreSQL Table: <code>public.core_user</code>
-              </span>
-              <span className="text-slate-400 text-[11px]">
-                Indexes: B-Tree on <code>id</code>, <code>email</code>, <code>student_roll_no</code>
-              </span>
-            </div>
           </div>
         </div>
       )}

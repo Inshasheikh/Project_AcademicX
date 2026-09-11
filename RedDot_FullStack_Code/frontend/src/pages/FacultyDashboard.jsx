@@ -504,10 +504,9 @@ export default function FacultyDashboard() {
 
           <button
             onClick={() => setShowAddCourseModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition cursor-pointer"
           >
-            <Gift className="w-4 h-4" />
-            <span>Add Free Course / Workshop</span>
+            Add Free Course / Workshop
           </button>
 
           <button
@@ -542,9 +541,6 @@ export default function FacultyDashboard() {
             <div className="text-3xl font-extrabold text-slate-900 font-['Outfit']">
               {overview.total_registered_students || 142}
             </div>
-            <p className="text-[11px] text-emerald-700 font-semibold mt-1 flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 100% Verified Academic Depository
-            </p>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-sky-700">
             <span>View Student Registry</span>
@@ -569,9 +565,6 @@ export default function FacultyDashboard() {
             <div className="text-3xl font-extrabold text-slate-900 font-['Outfit']">
               {overview.avg_placement_readiness}%
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">
-              48 applied, 12 shortlisted, 3 placed
-            </p>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-amber-800">
             <span>Audit Cohort Progress</span>
@@ -596,9 +589,6 @@ export default function FacultyDashboard() {
             <div className="text-3xl font-extrabold text-slate-900 font-['Outfit']">
               {events.length} Live
             </div>
-            <p className="text-[11px] text-indigo-700 font-semibold mt-1">
-              1 SIH Hackathon, 2 Contests, 1 Expo
-            </p>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-indigo-700">
             <span>Manage Events &amp; Competitions</span>
@@ -623,9 +613,6 @@ export default function FacultyDashboard() {
             <div className="text-3xl font-extrabold text-slate-900 font-['Outfit']">
               {courses.length} Open
             </div>
-            <p className="text-[11px] text-emerald-700 font-semibold mt-1">
-              100% Free Open Education for Students
-            </p>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700">
             <span>View Free Courses &amp; Labs</span>
@@ -641,42 +628,38 @@ export default function FacultyDashboard() {
       <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 overflow-x-auto text-xs">
         <button
           onClick={() => setActiveTab('students')}
-          className={`px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+          className={`px-4 py-2.5 rounded-xl font-bold transition whitespace-nowrap cursor-pointer ${
             activeTab === 'students' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <GraduationCap className="w-4 h-4 text-sky-600" />
-          <span>Registered Students Registry ({students.length})</span>
+          Registered Students Registry ({students.length})
         </button>
 
         <button
           onClick={() => setActiveTab('events')}
-          className={`px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+          className={`px-4 py-2.5 rounded-xl font-bold transition whitespace-nowrap cursor-pointer ${
             activeTab === 'events' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <Trophy className="w-4 h-4 text-amber-500" />
-          <span>Events, Hackathons &amp; Contests ({events.length})</span>
+          Events, Hackathons &amp; Contests ({events.length})
         </button>
 
         <button
           onClick={() => setActiveTab('courses')}
-          className={`px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+          className={`px-4 py-2.5 rounded-xl font-bold transition whitespace-nowrap cursor-pointer ${
             activeTab === 'courses' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <BookOpen className="w-4 h-4 text-emerald-600" />
-          <span>College Courses &amp; Free Education ({courses.length})</span>
+          College Courses &amp; Free Education ({courses.length})
         </button>
 
         <button
           onClick={() => setActiveTab('projects')}
-          className={`px-4 py-2.5 rounded-xl font-bold transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+          className={`px-4 py-2.5 rounded-xl font-bold transition whitespace-nowrap cursor-pointer ${
             activeTab === 'projects' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <Code2 className="w-4 h-4 text-indigo-600" />
-          <span>What Projects to Make (Capstone Blueprints)</span>
+          What Projects to Make (Capstone Blueprints)
         </button>
       </div>
 

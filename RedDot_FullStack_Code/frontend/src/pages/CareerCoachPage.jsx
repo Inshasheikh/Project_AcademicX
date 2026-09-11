@@ -1026,13 +1026,10 @@ Projects:
       {activeTab === 'resume' && (
         <div className="space-y-8">
 
-          {/* Top Control Bar: Target Role & Quick Sample Profile Loaders */}
-          <div className="bg-white border border-slate-200 p-5 rounded-3xl shadow-xs space-y-4">
+          {/* Top Control Bar: Target Role */}
+          <div className="bg-white border border-slate-200 p-5 rounded-3xl shadow-xs">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <span className="text-[10px] font-bold tracking-wider text-sky-700 uppercase bg-sky-50 px-2.5 py-1 rounded-full border border-sky-200 inline-block mb-1.5">
-                  AI-Powered Deep Resume Diagnostics
-                </span>
                 <h2 className="text-xl font-bold text-slate-900 font-['Outfit']">
                   Resume Analysis & Career Boost Engine
                 </h2>
@@ -1064,21 +1061,6 @@ Projects:
                   <option value="Software Engineer">Software Engineer (General)</option>
                 </select>
               </div>
-            </div>
-
-            {/* Quick Sample Profile Loaders */}
-            <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-semibold text-slate-400">Quick Test Profiles:</span>
-              {SAMPLE_PROFILES.map((prof, pIdx) => (
-                <button
-                  key={pIdx}
-                  onClick={() => handleLoadSample(prof)}
-                  className="px-3 py-1 rounded-lg bg-slate-100 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 text-slate-700 text-xs font-medium border border-slate-200 transition cursor-pointer flex items-center gap-1.5"
-                >
-                  <Sparkles className="w-3 h-3 text-sky-600" />
-                  {prof.label}
-                </button>
-              ))}
             </div>
           </div>
 
