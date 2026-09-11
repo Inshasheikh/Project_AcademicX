@@ -153,6 +153,7 @@ export default function SkillDiagnosticPage({ setActiveTab }) {
           domain: selectedDomain,
           timestamp: new Date().toISOString()
         }));
+        window.dispatchEvent(new Event('reddot_diagnostic_updated'));
       } catch (e) {
         console.error('Failed to save diagnostic result to localStorage:', e);
       }

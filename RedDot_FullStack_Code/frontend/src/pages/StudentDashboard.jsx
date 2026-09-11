@@ -52,12 +52,38 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [toast, setToast] = useState(null);
   const [showDocModal, setShowDocModal] = useState(false);
+  const [selectedDoc, setSelectedDoc] = useState(null);
   const [activeStatsModal, setActiveStatsModal] = useState(null);
   const [offerAccepted, setOfferAccepted] = useState(false);
   const [appFilter, setAppFilter] = useState('all');
   const [showAllJobs, setShowAllJobs] = useState(false);
   const [jobTypeFilter, setJobTypeFilter] = useState('all');
-  const [activeMainSection, setActiveMainSection] = useState(initialSection || 'jobs'); // 'jobs' | 'portfolio'
+  const [activeMainSection, setActiveMainSection] = useState(initialSection || 'jobs');
+
+  const [diagnosticResult, setDiagnosticResult] = useState(() => {
+    try {
+      const saved = localStorage.getItem('reddot_latest_diagnostic_result');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return null;
+  });
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      try {
+        const saved = localStorage.getItem('reddot_latest_diagnostic_result');
+        if (saved) setDiagnosticResult(JSON.parse(saved));
+      } catch (e) {}
+    };
+    window.addEventListener('reddot_diagnostic_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('reddot_diagnostic_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, []);
+
+  const diagnosticScore = diagnosticResult?.overall_score || 78;
 
   useEffect(() => {
     if (initialSection) {
@@ -196,30 +222,30 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
   const academicDocuments = [
     {
       id: 1,
-      title: "B.Tech Computer Science & Eng. Degree Transcript",
-      issuer: "National Institute of Technology, Trichy",
-      grade: "CGPA: 8.84 / 10.0 (Top 5% Cohort)",
-      status: "Verified by University Registrar",
-      date: "August 2026",
-      docId: "NIT-TR-2026-CS884"
+      title: "University Degree Academic Transcript",
+      issuer: currentUser?.college || "Institutional Academic Registrar",
+      grade: "Official Verified Academic Record",
+      status: "Verified by Registrar",
+      date: "Academic Session",
+      docId: `DOC-${studentRollNo ? String(studentRollNo).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) : 'ACAD'}-01`
     },
     {
       id: 2,
-      title: "Higher Secondary Examination Marksheet (Class XII)",
-      issuer: "Central Board of Secondary Education",
-      grade: "94.2% Marks (PCM Stream)",
+      title: "Higher Secondary Examination Marksheet",
+      issuer: "Secondary & Higher Secondary Education Board",
+      grade: "Authenticated Board Record",
       status: "Authenticated Board Record",
-      date: "May 2022",
-      docId: "CBSE-XII-2022-9421"
+      date: "Official Record",
+      docId: `DOC-${studentRollNo ? String(studentRollNo).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) : 'ACAD'}-02`
     },
     {
       id: 3,
       title: "Institutional Bona Fide Student Certificate",
-      issuer: "Dean of Academic Affairs, NIT",
-      grade: "Active 4th Year B.Tech Full-time",
+      issuer: currentUser?.college ? `Dean of Academic Affairs, ${currentUser.college}` : "Dean of Academic Affairs",
+      grade: "Active Full-Time Student",
       status: "Direct University Record",
-      date: "July 2026",
-      docId: "BONAFIDE-2026-NIT04"
+      date: "Current Session",
+      docId: `DOC-${studentRollNo ? String(studentRollNo).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) : 'ACAD'}-03`
     }
   ];
 
@@ -553,72 +579,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
     }
   ];
 
-  const initialApplications = [
-    {
-      id: 'app-1',
-      appRef: 'APP-MSFT-2026-904',
-      title: "Cloud Infrastructure Associate",
-      company: "Microsoft Azure",
-      appliedDate: "05 Sep 2026",
-      status: "Screening Passed • Hiring Manager Review",
-      category: "review",
-      statusColor: "text-amber-700 bg-amber-50 border-amber-200",
-      stage: "Technical Screening Assessment Cleared (Score: 88%)",
-      progressStep: 2,
-      location: "Hyderabad / Hybrid",
-      stipend: "₹14 LPA",
-      matchScore: 82,
-      transcriptSynced: true
-    },
-    {
-      id: 'app-2',
-      appRef: 'APP-INFY-2026-201',
-      title: "Distributed Systems & Cloud Intern",
-      company: "Infosys Springboard",
-      appliedDate: "03 Sep 2026",
-      status: "Application Under Review",
-      category: "review",
-      statusColor: "text-blue-700 bg-blue-50 border-blue-200",
-      stage: "Academic Profile & Coursework Synced with Recruiter",
-      progressStep: 1,
-      location: "Bengaluru / Remote",
-      stipend: "₹45,000/month",
-      matchScore: 86,
-      transcriptSynced: true
-    },
-    {
-      id: 'app-3',
-      appRef: 'APP-GOOG-2026-881',
-      title: "AI/ML Research Intern",
-      company: "Google Cloud India",
-      appliedDate: "02 Sep 2026",
-      status: "Shortlisted • Interview Scheduled",
-      category: "shortlisted",
-      statusColor: "text-sky-700 bg-sky-50 border-sky-200",
-      stage: "Round 2: Algorithmic & Systems Live Interview",
-      progressStep: 3,
-      location: "Bengaluru (Hybrid)",
-      stipend: "₹60,000/month",
-      matchScore: 94,
-      transcriptSynced: true
-    },
-    {
-      id: 'app-4',
-      appRef: 'APP-TCS-2026-710',
-      title: "Full Stack Platform Engineer",
-      company: "Tata Consultancy Services (Research)",
-      appliedDate: "28 Aug 2026",
-      status: "Offer Released",
-      category: "offers",
-      statusColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
-      stage: "Final Placement Offer Issued (Verified: ₹10 LPA)",
-      progressStep: 4,
-      location: "Pune / Remote",
-      stipend: "₹10 LPA",
-      matchScore: 89,
-      transcriptSynced: true
-    }
-  ];
+  const initialApplications = [];
 
   // Live dynamic applications list combining initial + dynamically applied jobs
   const liveApplicationsList = [
@@ -644,56 +605,9 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
     })
   ];
 
-  const shortlistedList = [
-    {
-      id: 'sl-1',
-      company: "Google Cloud India",
-      role: "AI/ML Research Intern",
-      round: "Round 2: Algorithmic & Systems Interview",
-      scheduledDate: "Tomorrow (08 Sep 2026) • 03:30 PM - 04:30 PM IST",
-      countdownBadge: "Starts in 18 hrs",
-      interviewer: "Dr. Rajesh Sen",
-      interviewerTitle: "Senior Staff ML Engineer, Google Cloud Bengaluru",
-      mode: "Google Meet • 1-on-1 Live Assessment",
-      status: "Interview Scheduled",
-      badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
-      skillsTested: ["Distributed PyTorch", "Graph Neural Networks", "Python Concurrency & AsyncIO"],
-      meetingLink: "https://meet.google.com/acd-xpr-opt",
-      preparationTips: [
-        "Be ready with your NIT student identity card.",
-        "Review dynamic programming on graphs & distributed training concepts.",
-        "Ensure stable internet and Google Meet test run 10 minutes before."
-      ]
-    },
-    {
-      id: 'sl-2',
-      company: "Tata Consultancy Services (Research)",
-      role: "Full Stack Platform Engineer",
-      round: "All 3 Evaluation Rounds Cleared",
-      scheduledDate: "Completed on 04 Sep 2026",
-      countdownBadge: "Rounds Completed",
-      interviewer: "TCS Campus Hiring & Research Board",
-      interviewerTitle: "Executive Technical Assessment Committee",
-      mode: "On-Campus Technical & Systems Architecture Board",
-      status: "Selected & Offer Released",
-      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      skillsTested: ["React 19 Architecture", "Django REST Framework", "Distributed PostgreSQL"],
-      meetingLink: null,
-      evaluationRemark: "Candidate ranked in the top 2nd percentile in the campus technical round. Offer letter officially dispatched."
-    }
-  ];
+  const shortlistedList = [];
 
-  const offerDetails = {
-    company: "Tata Consultancy Services (Research)",
-    role: "Full Stack Platform Engineer",
-    ctc: "₹10,00,000 / Year (₹10 LPA)",
-    breakdown: "Fixed Base: ₹8,50,000 • Performance Variable: ₹1,50,000 • Health Cover: ₹5,00,000",
-    location: "Pune Innovation Hub / Hybrid Flexibility",
-    joiningDate: "July 1, 2027 (Post Degree Completion)",
-    offerLetterId: "TCS-RES-2026-OFFER-8842",
-    verificationStamp: "Cryptographically Verified by NIT Placement Cell & TCS Campus Hiring Division",
-    deadline: "15 September 2026"
-  };
+  const offerDetails = null;
 
   const readinessBreakdown = [
     { skill: "Data Structures & Algorithms", score: 85, target: 80, status: "Proficient", color: "bg-emerald-500", note: "Cleared Hard dynamic programming questions" },
@@ -930,15 +844,6 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
               <p className="text-xs sm:text-sm text-slate-500 font-medium">
                 {currentUser?.branch || 'Academic Track'}{currentUser?.college ? ` • ${currentUser.college}` : ''} • ID: {studentRollNo}
               </p>
-
-              <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
-                <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-semibold text-[11px]">
-                  Semester 8 (2026 Batch)
-                </span>
-                <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-semibold text-[11px]">
-                  CGPA: 8.84
-                </span>
-              </div>
             </div>
           </div>
 
@@ -963,23 +868,41 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
 
       {/* Stats Cards Row - Interactive & Clickable */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Placement Readiness Card */}
+        {/* Placement Readiness / Diagnostic Benchmark Score Card */}
         <div 
-          onClick={() => setActiveStatsModal('readiness')}
+          onClick={() => {
+            setActiveMainSection('diagnostic');
+            navigate('/student/skills');
+          }}
           className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs hover:border-sky-400 hover:shadow-md transition-all cursor-pointer group relative overflow-hidden"
-          title="Click to view full Skill Competency & Diagnostic breakdown"
+          title="Click to take or view AI Skill Diagnostic Benchmark Test"
         >
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-semibold text-slate-500">Placement Readiness</span>
             <span className="text-[10px] text-sky-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
-              View &rarr;
+              Take Test &rarr;
             </span>
           </div>
-          <div className="text-3xl font-extrabold text-slate-900 font-['Outfit'] group-hover:text-sky-600 transition-colors">78%</div>
-          <span className="text-[11px] text-emerald-600 font-medium flex items-center gap-1.5 mt-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            Diagnostic Benchmark Score
-          </span>
+          <div className="text-3xl font-extrabold text-slate-900 font-['Outfit'] group-hover:text-sky-600 transition-colors">
+            {diagnosticScore}%
+          </div>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-[11px] text-emerald-600 font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Diagnostic Benchmark Score
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveStatsModal('readiness');
+              }}
+              className="text-[10px] text-slate-400 hover:text-sky-600 font-semibold underline cursor-pointer"
+              title="View full competency report"
+            >
+              Breakdown
+            </button>
+          </div>
         </div>
 
         {/* Active Applications Card */}
@@ -1015,14 +938,16 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
               View &rarr;
             </span>
           </div>
-          <div className="text-3xl font-extrabold text-sky-600 font-['Outfit']">2</div>
-          <span className="text-[11px] text-slate-500 truncate block mt-1">Google Cloud, TCS Research</span>
+          <div className="text-3xl font-extrabold text-sky-600 font-['Outfit']">{shortlistedList.length}</div>
+          <span className="text-[11px] text-slate-500 truncate block mt-1">
+            {shortlistedList.length > 0 ? `${shortlistedList.length} Active Shortlists` : 'No shortlists yet'}
+          </span>
         </div>
 
         {/* Placement Offers Card */}
         <div 
           onClick={() => setActiveStatsModal('offers')}
-          className="bg-white p-5 rounded-xl border border-emerald-300 bg-emerald-50/20 shadow-xs hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group relative overflow-hidden"
+          className="bg-white p-5 rounded-xl border border-slate-200 bg-emerald-50/10 shadow-xs hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group relative overflow-hidden"
           title="Click to view verified placement offers and employment agreements"
         >
           <div className="flex items-center justify-between mb-1">
@@ -1031,10 +956,9 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
               View &rarr;
             </span>
           </div>
-          <div className="text-3xl font-extrabold text-emerald-600 font-['Outfit']">1</div>
-          <span className="text-[11px] text-emerald-700 font-medium flex items-center gap-1 mt-1">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-            Verified Offer: ₹10 LPA
+          <div className="text-3xl font-extrabold text-emerald-600 font-['Outfit']">{offerDetails ? 1 : 0}</div>
+          <span className="text-[11px] text-slate-500 font-medium flex items-center gap-1 mt-1">
+            {offerDetails ? 'Verified Offer Released' : 'No offers released yet'}
           </span>
         </div>
       </div>
@@ -1189,15 +1113,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
           <div className="lg:col-span-2 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs">
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-base font-bold text-slate-900 font-['Outfit']">Recommended Opportunities</h2>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
-                    {jobs.length} Active Openings
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500">
-                  Curated campus drives, high-growth tech roles & 100% free virtual externships
-                </p>
+                <h2 className="text-base font-bold text-slate-900 font-['Outfit']">Recommended Opportunities</h2>
               </div>
 
               {/* View All Openings Button */}
@@ -1447,14 +1363,11 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
             </button>
           </div>
 
-          {/* Upcoming Interview Card */}
+          {/* AI Mock Interview Practice Studio Card */}
           <div className="bg-white p-6 rounded-2xl border-l-4 border-l-sky-600 border-t border-r border-b border-slate-200 shadow-xs space-y-3">
-            <span className="text-[10px] font-bold text-sky-600 uppercase tracking-wider block">Upcoming Interview</span>
-            <h4 className="text-sm font-bold text-slate-900 font-['Outfit']">Google Cloud Solutions</h4>
-            <p className="text-xs text-slate-500">Role: AI/ML Research Intern</p>
-            <div className="text-xs text-slate-500 flex items-center gap-1.5 pt-1">
-              <Clock className="w-3.5 h-3.5 text-slate-400" /> Tomorrow at 11:00 AM IST (Google Meet)
-            </div>
+            <span className="text-[10px] font-bold text-sky-600 uppercase tracking-wider block">Interview Studio</span>
+            <h4 className="text-sm font-bold text-slate-900 font-['Outfit']">Company Mock Simulation</h4>
+            <p className="text-xs text-slate-500">Practice 4-round technical coding & system design simulations with real-time feedback</p>
 
             <button
               onClick={() => {
@@ -2170,7 +2083,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                     : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                Offers (1)
+                Offers ({offerDetails ? 1 : 0})
               </button>
 
               <button
@@ -2182,7 +2095,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                     : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                Readiness (78%)
+                Readiness ({diagnosticScore}%)
               </button>
             </div>
 
@@ -2270,392 +2183,208 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                   </div>
 
                   {/* Application Cards List */}
-                  <div className="space-y-3">
-                    {liveApplicationsList
-                      .filter(app => appFilter === 'all' || app.category === appFilter)
-                      .map((app) => (
-                        <div 
-                          key={app.id} 
-                          className="p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-xs transition space-y-3"
+                  {liveApplicationsList.filter(app => appFilter === 'all' || app.category === appFilter).length === 0 ? (
+                    <div className="py-12 px-4 text-center rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 space-y-3">
+                      <div className="w-12 h-12 mx-auto rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                        <FileText className="w-6 h-6" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-bold text-slate-800">No applications submitted yet</h4>
+                        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                          {appFilter === 'all' 
+                            ? "Browse active campus openings and submit your verified application with 1 click." 
+                            : `You have no applications currently categorized under "${appFilter}".`}
+                        </p>
+                      </div>
+                      {appFilter === 'all' && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveStatsModal(null);
+                            document.getElementById('job-listings')?.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer"
                         >
-                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold">
-                                  {app.appRef}
-                                </span>
-                                <span className="text-[11px] text-slate-400">
-                                  Submitted: {app.appliedDate}
+                          Explore Opportunities
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {liveApplicationsList
+                        .filter(app => appFilter === 'all' || app.category === appFilter)
+                        .map((app) => (
+                          <div 
+                            key={app.id} 
+                            className="p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-xs transition space-y-3"
+                          >
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold">
+                                    {app.appRef}
+                                  </span>
+                                  <span className="text-[11px] text-slate-400">
+                                    Submitted: {app.appliedDate}
+                                  </span>
+                                </div>
+                                <h4 className="text-sm font-bold text-slate-900 mt-1">{app.title}</h4>
+                                <p className="text-xs text-slate-500 font-medium">
+                                  {app.company} • {app.location}
+                                </p>
+                              </div>
+
+                              <div className="text-left sm:text-right shrink-0">
+                                <span className="text-xs font-bold text-slate-900 block">{app.stipend}</span>
+                                <span className="text-[11px] font-semibold text-sky-600">
+                                  {app.matchScore}% Skill Match
                                 </span>
                               </div>
-                              <h4 className="text-sm font-bold text-slate-900 mt-1">{app.title}</h4>
-                              <p className="text-xs text-slate-500 font-medium">
-                                {app.company} • {app.location}
-                              </p>
                             </div>
 
-                            <div className="text-left sm:text-right shrink-0">
-                              <span className="text-xs font-bold text-slate-900 block">{app.stipend}</span>
-                              <span className="text-[11px] font-semibold text-sky-600">
-                                {app.matchScore}% Skill Match
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Live Status and Timeline Milestone */}
-                          <div className="space-y-2">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
-                              <div className="flex items-center gap-1.5">
-                                <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold border ${app.statusColor}`}>
-                                  {app.status}
-                                </span>
-                                <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 font-medium flex items-center gap-1">
-                                  <ShieldCheck className="w-3 h-3" /> Transcripts Synced
+                            {/* Live Status and Timeline Milestone */}
+                            <div className="space-y-2">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
+                                <div className="flex items-center gap-1.5">
+                                  <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold border ${app.statusColor}`}>
+                                    {app.status}
+                                  </span>
+                                  <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 font-medium flex items-center gap-1">
+                                    <ShieldCheck className="w-3 h-3" /> Transcripts Synced
+                                  </span>
+                                </div>
+                                <span className="text-[11px] text-slate-500 font-medium">
+                                  {app.stage}
                                 </span>
                               </div>
-                              <span className="text-[11px] text-slate-500 font-medium">
-                                {app.stage}
-                              </span>
+
+                              <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div 
+                                  className={`h-full rounded-full transition-all duration-500 ${
+                                    app.progressStep === 4 ? 'bg-emerald-500' : 'bg-sky-500'
+                                  }`} 
+                                  style={{ width: `${(app.progressStep / 4) * 100}%` }}
+                                />
+                              </div>
+
+                              <div className="flex justify-between text-[10px] text-slate-400">
+                                <span className={app.progressStep >= 1 ? 'text-sky-600 font-bold' : ''}>1. Applied</span>
+                                <span className={app.progressStep >= 2 ? 'text-sky-600 font-bold' : ''}>2. Screening</span>
+                                <span className={app.progressStep >= 3 ? 'text-sky-600 font-bold' : ''}>3. Shortlisted</span>
+                                <span className={app.progressStep >= 4 ? 'text-emerald-600 font-bold' : ''}>4. Offer Extended</span>
+                              </div>
                             </div>
 
-                            <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                              <div 
-                                className={`h-full rounded-full transition-all duration-500 ${
-                                  app.progressStep === 4 ? 'bg-emerald-500' : 'bg-sky-500'
-                                }`} 
-                                style={{ width: `${(app.progressStep / 4) * 100}%` }}
-                              />
-                            </div>
-
-                            <div className="flex justify-between text-[10px] text-slate-400">
-                              <span className={app.progressStep >= 1 ? 'text-sky-600 font-bold' : ''}>1. Applied</span>
-                              <span className={app.progressStep >= 2 ? 'text-sky-600 font-bold' : ''}>2. Screening</span>
-                              <span className={app.progressStep >= 3 ? 'text-sky-600 font-bold' : ''}>3. Shortlisted</span>
-                              <span className={app.progressStep >= 4 ? 'text-emerald-600 font-bold' : ''}>4. Offer Extended</span>
-                            </div>
-                          </div>
-
-                          {/* Quick Actions */}
-                          <div className="pt-2 flex items-center justify-between border-t border-slate-100 text-xs">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setToast(`Official submission acknowledgment copied for ${app.appRef}`);
-                                setTimeout(() => setToast(null), 3000);
-                              }}
-                              className="text-slate-500 hover:text-slate-800 font-medium text-[11px] flex items-center gap-1 cursor-pointer"
-                            >
-                              <FileText className="w-3 h-3" /> View Application Slip
-                            </button>
-
-                            {app.category === 'shortlisted' && (
+                            {/* Quick Actions */}
+                            <div className="pt-2 flex items-center justify-between border-t border-slate-100 text-xs">
                               <button
                                 type="button"
-                                onClick={() => setActiveStatsModal('shortlisted')}
-                                className="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold text-xs transition cursor-pointer"
+                                onClick={() => {
+                                  setToast(`Official submission acknowledgment copied for ${app.appRef}`);
+                                  setTimeout(() => setToast(null), 3000);
+                                }}
+                                className="text-slate-500 hover:text-slate-800 font-medium text-[11px] flex items-center gap-1 cursor-pointer"
                               >
-                                View Interview Details &rarr;
+                                <FileText className="w-3 h-3" /> View Application Slip
                               </button>
-                            )}
 
-                            {app.category === 'offers' && (
-                              <button
-                                type="button"
-                                onClick={() => setActiveStatsModal('offers')}
-                                className="px-3 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs transition cursor-pointer"
-                              >
-                                View Placement Offer &rarr;
-                              </button>
-                            )}
+                              {app.category === 'shortlisted' && (
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveStatsModal('shortlisted')}
+                                  className="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold text-xs transition cursor-pointer"
+                                >
+                                  View Interview Details &rarr;
+                                </button>
+                              )}
+
+                              {app.category === 'offers' && (
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveStatsModal('offers')}
+                                  className="px-3 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs transition cursor-pointer"
+                                >
+                                  View Placement Offer &rarr;
+                                </button>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                  </div>
+                        ))}
+                    </div>
+                  )}
                 </div>
               )}
 
-              {/* TAB 2: SHORTLISTED POOL (Recruiter Interview Command Center) */}
+              {/* TAB 2: SHORTLISTED POOL */}
               {activeStatsModal === 'shortlisted' && (
                 <div className="space-y-4">
-                  {/* Highlight Banner */}
-                  <div className="p-4 bg-gradient-to-r from-sky-900 to-indigo-900 text-white rounded-2xl shadow-sm space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                      <span className="text-[11px] font-bold text-sky-300 uppercase tracking-wider">
-                        Recruiter Selection Command Desk
-                      </span>
-                    </div>
-                    <h4 className="text-base font-bold font-['Outfit']">
-                      You have 2 active corporate shortlists in progress
-                    </h4>
-                    <p className="text-xs text-sky-200">
-                      Recruiters evaluated your Digilocker-verified transcripts and advanced your profile directly into assessment rounds.
-                    </p>
-                  </div>
-
-                  {/* Company 1: Google Cloud India (Upcoming Live Interview) */}
-                  <div className="p-5 rounded-2xl border-2 border-sky-300 bg-gradient-to-br from-sky-50/40 via-white to-indigo-50/20 shadow-sm space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 pb-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-base font-bold text-slate-900">Google Cloud India</h4>
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
-                            Interview Scheduled
-                          </span>
-                        </div>
-                        <p className="text-xs text-sky-700 font-semibold mt-0.5">
-                          AI/ML Research Intern • Bengaluru (Hybrid) • ₹60,000/month
+                  {shortlistedList.length === 0 ? (
+                    <div className="py-12 px-4 text-center rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 space-y-3">
+                      <div className="w-12 h-12 mx-auto rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                        <Calendar className="w-6 h-6" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-bold text-slate-800">No Corporate Shortlists Yet</h4>
+                        <p className="text-xs text-slate-500 max-w-md mx-auto">
+                          When corporate recruiters review your verified transcripts and advance your application, scheduled interviews and assessment links will appear here.
                         </p>
                       </div>
-
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 text-xs font-bold animate-pulse">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>Starts in 18 hrs</span>
+                      <div className="pt-2 flex flex-wrap justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveStatsModal(null);
+                            setActiveMainSection('diagnostic');
+                            navigate('/student/skills');
+                          }}
+                          className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer"
+                        >
+                          Take Skill Diagnostics
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveStatsModal(null);
+                            document.getElementById('job-listings')?.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          className="px-4 py-2 border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer"
+                        >
+                          Explore Opportunities
+                        </button>
                       </div>
                     </div>
-
-                    {/* Interview Schedule Details */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                          Evaluation Round
-                        </span>
-                        <p className="font-bold text-slate-900">Round 2: Algorithmic & Systems Live Coding</p>
-                        <span className="text-[11px] text-slate-500 block">Duration: 60 minutes • 1-on-1</span>
-                      </div>
-
-                      <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                          Technical Assessor
-                        </span>
-                        <p className="font-bold text-slate-900">Dr. Rajesh Sen</p>
-                        <span className="text-[11px] text-slate-500 block">Senior Staff ML Engineer, Google Cloud</span>
-                      </div>
-
-                      <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                          Scheduled Date & Time
-                        </span>
-                        <p className="font-bold text-slate-900 flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-sky-600" />
-                          Tomorrow (08 Sep 2026), 03:30 PM IST
-                        </p>
-                      </div>
-
-                      <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                          Verified Sourced Candidate
-                        </span>
-                        <p className="font-bold text-emerald-700 flex items-center gap-1">
-                          <ShieldCheck className="w-3.5 h-3.5" /> NIT Transcript Auto-Synced
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Syllabus Focus Checklist */}
-                    <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                      <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
-                        Assessor Focus Areas & Syllabus
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        <span className="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-[11px] font-semibold text-slate-700">
-                          Distributed PyTorch (94% Match)
-                        </span>
-                        <span className="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-[11px] font-semibold text-slate-700">
-                          Graph Neural Networks
-                        </span>
-                        <span className="px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-[11px] font-semibold text-slate-700">
-                          Python Concurrency & AsyncIO
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Pre-Interview Checklist */}
-                    <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs space-y-1.5 text-amber-900">
-                      <span className="font-bold block flex items-center gap-1.5">
-                        <AlertCircle className="w-3.5 h-3.5 text-amber-700" />
-                        Candidate Pre-Flight Checklist:
-                      </span>
-                      <ul className="list-disc list-inside text-[11px] text-amber-800 space-y-0.5">
-                        <li>Transcripts and CGPA (8.84) are pre-verified with the recruiter.</li>
-                        <li>Keep your NIT student identity card (Roll: 22BCSE104) ready for visual check.</li>
-                        <li>Join the Google Meet room 10 minutes before for camera and mic testing.</li>
-                      </ul>
-                    </div>
-
-                    {/* Direct Action Buttons */}
-                    <div className="pt-1 flex flex-col sm:flex-row items-center justify-end gap-2.5">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setToast("Calendar invite downloaded: Google Cloud Technical Interview (08 Sep, 3:30 PM)");
-                          setTimeout(() => setToast(null), 3500);
-                        }}
-                        className="w-full sm:w-auto px-4 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
-                      >
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span>Add to Google Calendar</span>
-                      </button>
-
-                      <a
-                        href="https://meet.google.com/acd-xpr-opt"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full sm:w-auto px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
-                      >
-                        <Video className="w-4 h-4" />
-                        <span>Join Live Google Meet Room</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Company 2: TCS Research (All Rounds Cleared - Offer Issued) */}
-                  <div className="p-5 rounded-2xl border border-emerald-300 bg-gradient-to-br from-emerald-50/50 via-white to-slate-50 shadow-sm space-y-3.5">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 pb-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-base font-bold text-slate-900">Tata Consultancy Services (Research)</h4>
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                            Candidate Selected
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-600 font-semibold mt-0.5">
-                          Full Stack Platform Engineer • Pune / Remote • ₹10 LPA
-                        </p>
-                      </div>
-
-                      <span className="px-3 py-1 bg-emerald-600 text-white rounded-full text-xs font-bold inline-flex items-center gap-1.5">
-                        <Check className="w-3.5 h-3.5" />
-                        All 3 Rounds Cleared
-                      </span>
-                    </div>
-
-                    <div className="p-3 bg-white rounded-xl border border-slate-200 text-xs space-y-1.5">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                        Assessment Committee Evaluation
-                      </span>
-                      <p className="text-slate-800">
-                        "Candidate scored in the <strong>Top 2nd percentile</strong> during the on-campus systems architecture round. Exceptional mastery demonstrated in React 19 architecture and Django REST microservices."
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-1">
-                      <span className="text-[11px] text-emerald-800 font-medium">
-                        Verified Offer Letter Dispatched by Registrar Office
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setActiveStatsModal('offers')}
-                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
-                      >
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>View Official ₹10 LPA Offer Letter &rarr;</span>
-                      </button>
-                    </div>
-                  </div>
+                  ) : null}
                 </div>
               )}
 
               {/* TAB 3: PLACEMENT OFFERS */}
               {activeStatsModal === 'offers' && (
                 <div className="space-y-4">
-                  {offerAccepted && (
-                    <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2.5 text-xs text-emerald-800 animate-fade-in">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <div>
-                        <strong>Offer Formally Accepted & Locked!</strong> Recorded in the Dean Placement cell repository.
+                  {!offerDetails ? (
+                    <div className="py-12 px-4 text-center rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 space-y-3">
+                      <div className="w-12 h-12 mx-auto rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <Sparkles className="w-6 h-6" />
                       </div>
-                    </div>
-                  )}
-
-                  {/* Official Offer Letter Card */}
-                  <div className="p-5 rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50/40 via-white to-sky-50/20 shadow-xs space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg">
-                          TCS
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="text-base font-bold text-slate-900">{offerDetails.company}</h4>
-                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-[10px] font-bold border border-emerald-200">
-                              Verified Institutional Offer
-                            </span>
-                          </div>
-                          <p className="text-xs text-slate-600 font-semibold">{offerDetails.role}</p>
-                        </div>
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-bold text-slate-800">No Placement Offers Extended Yet</h4>
+                        <p className="text-xs text-slate-500 max-w-md mx-auto">
+                          Official institutional offer letters dispatched by campus recruitment partners and dean placement offices will be digitally sealed and verifiable here.
+                        </p>
                       </div>
-                      <div className="text-left sm:text-right">
-                        <div className="text-xl font-extrabold text-emerald-700 font-['Outfit']">{offerDetails.ctc}</div>
-                        <span className="text-[10px] text-slate-500">Annual Gross Compensation</span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                        <span className="text-[11px] text-slate-500 block mb-0.5 font-medium">Compensation Breakdown</span>
-                        <span className="text-slate-800 font-semibold">{offerDetails.breakdown}</span>
-                      </div>
-                      <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                        <span className="text-[11px] text-slate-500 block mb-0.5 font-medium">Work Location</span>
-                        <span className="text-slate-800 font-semibold">{offerDetails.location}</span>
-                      </div>
-                      <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                        <span className="text-[11px] text-slate-500 block mb-0.5 font-medium">Expected Joining Date</span>
-                        <span className="text-slate-800 font-semibold">{offerDetails.joiningDate}</span>
-                      </div>
-                      <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                        <span className="text-[11px] text-slate-500 block mb-0.5 font-medium">Offer Acceptance Deadline</span>
-                        <span className="text-amber-700 font-bold">{offerDetails.deadline}</span>
-                      </div>
-                    </div>
-
-                    <div className="p-3 bg-slate-900 text-slate-200 rounded-xl text-[11px] flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Fingerprint className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <div>
-                          <div className="font-mono text-emerald-300 font-semibold">Ref: {offerDetails.offerLetterId}</div>
-                          <div className="text-[10px] text-slate-400">{offerDetails.verificationStamp}</div>
-                        </div>
-                      </div>
-                      <span className="text-emerald-400 font-mono text-[10px] uppercase font-bold">DIGITALLY_SEALED</span>
-                    </div>
-
-                    <div className="pt-2 flex flex-col sm:flex-row items-center justify-end gap-2.5">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setToast("Official Offer Letter PDF (TCS-RES-2026-OFFER-8842) downloaded successfully.");
-                          setTimeout(() => setToast(null), 3500);
-                        }}
-                        className="w-full sm:w-auto px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download Offer Letter (PDF)</span>
-                      </button>
-
-                      {!offerAccepted ? (
+                      <div className="pt-2 flex justify-center">
                         <button
                           type="button"
                           onClick={() => {
-                            setOfferAccepted(true);
-                            setToast(`Congratulations ${studentName}! Research placement offer officially accepted & recorded.`);
-                            setTimeout(() => setToast(null), 4000);
+                            setActiveStatsModal(null);
+                            document.getElementById('job-listings')?.scrollIntoView({ behavior: 'smooth' });
                           }}
-                          className="w-full sm:w-auto px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer"
                         >
-                          <Check className="w-4 h-4" />
-                          <span>Accept Offer Letter</span>
+                          Apply to Partner Roles
                         </button>
-                      ) : (
-                        <span className="px-4 py-2 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          Accepted on 07 Sep 2026
-                        </span>
-                      )}
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
                 </div>
               )}
 
@@ -2664,30 +2393,41 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>
-                      <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Overall Benchmark Score</span>
+                      <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Overall Diagnostic Benchmark Score</span>
                       <div className="text-3xl font-extrabold text-slate-900 font-['Outfit'] mt-0.5">
-                        78<span className="text-lg text-slate-400 font-medium">/100</span>
+                        {diagnosticScore}<span className="text-lg text-slate-400 font-medium">/100</span>
                       </div>
                       <p className="text-xs text-slate-500 mt-1">
-                        Ranked in the <strong>Top 8th percentile</strong> among CSE batch 2026 at NIT.
+                        Ranked in the <strong>Top {Math.max(1, 100 - (diagnosticResult?.percentile || Math.round(diagnosticScore * 0.95)))}th percentile</strong> among academic cohort.
                       </p>
                     </div>
 
                     <div className="w-full sm:w-48 bg-white p-3 rounded-lg border border-slate-200 text-xs space-y-1">
                       <div className="flex justify-between text-slate-500">
                         <span>Cohort Rank:</span>
-                        <span className="font-bold text-slate-900">#9 / 180</span>
+                        <span className="font-bold text-slate-900">
+                          #{Math.max(1, Math.round(180 * (1 - (diagnosticScore / 100))))} / 180
+                        </span>
                       </div>
                       <div className="flex justify-between text-slate-500">
                         <span>Eligibility Tier:</span>
-                        <span className="font-bold text-emerald-600">Tier-1 Corporate</span>
+                        <span className="font-bold text-emerald-600">
+                          {diagnosticScore >= 80 ? 'Tier-1 Priority' : diagnosticScore >= 60 ? 'Tier-2 Eligible' : 'In Diagnostic Training'}
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   {/* Competency breakdown */}
                   <div className="space-y-3">
-                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide">Competency Domain Analysis</h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide">Competency Domain Analysis</h4>
+                      {diagnosticResult?.timestamp && (
+                        <span className="text-[10px] text-slate-400 font-medium">
+                          Last evaluated: {new Date(diagnosticResult.timestamp).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
                     {readinessBreakdown.map((item, idx) => (
                       <div key={idx} className="p-3.5 rounded-xl border border-slate-200 bg-white space-y-2">
                         <div className="flex items-center justify-between text-xs">
@@ -2711,7 +2451,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                     ))}
                   </div>
 
-                  <div className="pt-2 flex justify-end">
+                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-end gap-2.5">
                     <button
                       type="button"
                       onClick={() => {
@@ -2719,10 +2459,23 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                         setActiveMainSection('roadmap');
                         navigate('/student/roadmap');
                       }}
-                      className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
+                      className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer"
                     >
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Launch AI Career Coach & Remedial Roadmap</span>
+                      <Compass className="w-3.5 h-3.5 text-slate-600" />
+                      <span>Launch Remedial Roadmap</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveStatsModal(null);
+                        setActiveMainSection('diagnostic');
+                        navigate('/student/skills');
+                      }}
+                      className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center justify-center gap-2 transition shadow-xs cursor-pointer"
+                    >
+                      <Target className="w-3.5 h-3.5" />
+                      <span>Take / Update Diagnostic Assessment</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>

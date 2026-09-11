@@ -129,7 +129,7 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
                 </div>
                 <div className="flex items-center gap-1.5 justify-center lg:justify-start font-medium">
                   <Building2 className="w-4 h-4 text-sky-600 shrink-0" />
-                  <span>1,200+ Recruiters</span>
+                  <span>Corporate Network</span>
                 </div>
               </div>
             </div>
@@ -151,26 +151,26 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
       </section>
 
       {/* ========================================================================= */}
-      {/* 2. IMPACT METRICS BAR */}
+      {/* 2. PLATFORM ATTRIBUTES BAR */}
       {/* ========================================================================= */}
       <section className="bg-white py-10 border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 text-center">
             <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100">
-              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Outfit']">50,000+</div>
-              <div className="text-xs text-slate-500 font-medium mt-1">Students Diagnosed</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Outfit']">Real-Time</div>
+              <div className="text-xs text-slate-500 font-medium mt-1">AI Skill Diagnostics</div>
             </div>
             <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100">
-              <div className="text-2xl sm:text-3xl font-extrabold text-sky-600 font-['Outfit']">1,200+</div>
-              <div className="text-xs text-slate-500 font-medium mt-1">Corporate Recruiters</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-sky-600 font-['Outfit']">100%</div>
+              <div className="text-xs text-slate-500 font-medium mt-1">Verified Transcripts</div>
             </div>
             <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100">
-              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Outfit']">150+</div>
-              <div className="text-xs text-slate-500 font-medium mt-1">Institutions & Universities</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Outfit']">Multi-Role</div>
+              <div className="text-xs text-slate-500 font-medium mt-1">Students, Faculty & Recruiters</div>
             </div>
             <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100">
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 font-['Outfit']">40% Faster</div>
-              <div className="text-xs text-slate-500 font-medium mt-1">Campus Placement Cycle</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 font-['Outfit']">Outcome-Driven</div>
+              <div className="text-xs text-slate-500 font-medium mt-1">Campus Placement Lifecycle</div>
             </div>
           </div>
         </div>
@@ -443,7 +443,7 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
             Ready to Accelerate Your Career or Campus Hiring?
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
-            Join over 50,000 students, 1,200 recruiters, and 150 institutes transforming higher education outcomes today.
+            Empowering students, academic faculties, and corporate recruiters with verified skill intelligence and streamlined hiring.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
             {currentUser ? (
