@@ -10,7 +10,6 @@ import {
   User, 
   Brain, 
   Target, 
-  Building2,
   ExternalLink,
   Code2,
   Database,
@@ -115,22 +114,6 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
                     </button>
                   </>
                 )}
-              </div>
-
-              {/* Trust Badges */}
-              <div className="pt-4 grid grid-cols-3 gap-2 sm:gap-4 max-w-lg mx-auto lg:mx-0 border-t border-slate-200/80 text-[11px] sm:text-xs text-slate-600">
-                <div className="flex items-center gap-1.5 justify-center lg:justify-start font-medium">
-                  <ShieldCheck className="w-4 h-4 text-sky-600 shrink-0" />
-                  <span>Fraud-Proof</span>
-                </div>
-                <div className="flex items-center gap-1.5 justify-center lg:justify-start font-medium">
-                  <Brain className="w-4 h-4 text-sky-600 shrink-0" />
-                  <span>AI Diagnostics</span>
-                </div>
-                <div className="flex items-center gap-1.5 justify-center lg:justify-start font-medium">
-                  <Building2 className="w-4 h-4 text-sky-600 shrink-0" />
-                  <span>Corporate Network</span>
-                </div>
               </div>
             </div>
 
