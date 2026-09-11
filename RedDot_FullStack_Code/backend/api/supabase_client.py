@@ -68,7 +68,7 @@ def create_user_profile(email: str, phone: str, full_name: str, password_hash: s
             "college": extra_data.get("college", ""),
             "branch": extra_data.get("branch", ""),
             "year_of_study": int(extra_data.get("year_of_study", 1)),
-            "apaar_id": extra_data.get("apaar_id") or f"{clean_phone[-4:] if clean_phone else '0000'}-APAAR",
+            "apaar_id": extra_data.get("apaar_id") or f"STU-{clean_phone[-4:] if clean_phone else '0000'}",
             "student_roll_no": extra_data.get("student_roll_no", ""),
             "is_verified": True,
             "digilocker_verified": True,

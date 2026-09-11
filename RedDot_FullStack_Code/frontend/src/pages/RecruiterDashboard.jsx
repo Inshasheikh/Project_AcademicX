@@ -31,7 +31,8 @@ import {
   Phone,
   Mail,
   Copy,
-  CheckCheck
+  CheckCheck,
+  Star
 } from 'lucide-react';
 import { fetchRecruiterStats } from '../services/api';
 
@@ -422,7 +423,47 @@ export default function RecruiterDashboard() {
   const [digestChannels, setDigestChannels] = useState({
     tpoEmail: true,
     slackWebhook: true,
-    deanDossier: true
+    deanDossier: true,
+    academicFeedback: true
+  });
+
+  // Academic Feedback Modal States
+  const [showAcademicFeedbackModal, setShowAcademicFeedbackModal] = useState(false);
+  const [feedbackSuccess, setFeedbackSuccess] = useState(false);
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [academicFeedbackList, setAcademicFeedbackList] = useState([
+    {
+      id: "af-1",
+      department: "Department of Computer Science & Engineering",
+      batch: "Batch 2026 (Final Year)",
+      category: "System Design & Distributed Concurrency",
+      rating: 4,
+      readinessScore: "84%",
+      notes: "Students demonstrate strong algorithmic foundation, but lack practical exposure to Redis Lua scripts, distributed locks, and Kafka event streaming. Recommend introducing these in 6th-semester lab projects.",
+      submitted_at: "Yesterday at 04:30 PM",
+      status: "Acknowledged by Academic Board",
+      actionTaken: "Faculty added Redis & Kafka lab module to curriculum"
+    },
+    {
+      id: "af-2",
+      department: "AI & Data Science Engineering",
+      batch: "Batch 2026 & 2027",
+      category: "Real-World MLOps & Vector Databases",
+      rating: 4,
+      readinessScore: "86%",
+      notes: "High theoretical precision in neural networks. Practical focus needed on imbalanced dataset metrics (PR-AUC vs accuracy), FastAPI model endpoints, and Vector DB retrieval for enterprise LLMs.",
+      submitted_at: "3 days ago",
+      status: "Integrated into Electives",
+      actionTaken: "New workshop on Vector DBs scheduled"
+    }
+  ]);
+
+  const [newFeedback, setNewFeedback] = useState({
+    department: "Department of Computer Science & Engineering",
+    batch: "Batch 2026 (Final Year)",
+    category: "System Design & Distributed Concurrency",
+    rating: 4,
+    notes: ""
   });
 
   const [newJob, setNewJob] = useState({
@@ -500,14 +541,31 @@ export default function RecruiterDashboard() {
       setDigestSuccess(true);
       const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       setLastDispatchedTime(nowStr);
-      triggerAutomationToast("Campus TPO & Slack Webhook", `PIPELINE_DIGEST_DELIVERED at ${nowStr}`);
+
+      if (digestChannels.academicFeedback && newFeedback.notes.trim()) {
+        const createdItem = {
+          id: `af-${Date.now()}`,
+          department: newFeedback.department,
+          batch: newFeedback.batch || "Batch 2026 (Final Year)",
+          category: newFeedback.category,
+          rating: newFeedback.rating,
+          readinessScore: `${Math.floor(Math.random() * 8 + 88)}%`,
+          notes: newFeedback.notes,
+          submitted_at: `Today at ${nowStr}`,
+          status: "Transmitted via Pipeline Digest",
+          actionTaken: "Forwarded to University BoS & Placement Cell"
+        };
+        setAcademicFeedbackList(prev => [createdItem, ...prev]);
+      }
+
+      triggerAutomationToast("TPO, BoS & Slack Webhook", `PIPELINE_DIGEST_DELIVERED at ${nowStr}`);
     }, 1200);
   };
 
   const handleDownloadDigestJSON = () => {
     const topCandidate = data?.ai_recommended_candidates?.[0];
     const digestPayload = {
-      report_title: "REDDOT National Campus Pipeline Digest",
+      report_title: "REDDOT National Campus Pipeline Digest & Academic Feedback",
       company_name: data?.company_name || "Enterprise Partner",
       authorized_recruiter: data?.recruiter_name || "Talent Acquisition Lead",
       dispatched_at: new Date().toISOString(),
@@ -518,6 +576,13 @@ export default function RecruiterDashboard() {
         roles_closing_soon: data?.active_jobs_count || 0,
         apaar_verification_rate: "100% Cryptographically Verified"
       },
+      academic_curriculum_feedback: {
+        department: newFeedback.department,
+        batch: newFeedback.batch,
+        category: newFeedback.category,
+        readiness_rating: `${newFeedback.rating}/5`,
+        recommendations: newFeedback.notes || "Add Redis caching and Kafka streaming to Semester 6 labs."
+      },
       top_candidate_spotlight: topCandidate ? {
         name: topCandidate.name,
         college: topCandidate.college,
@@ -527,7 +592,8 @@ export default function RecruiterDashboard() {
       } : null,
       institutional_destinations: [
         { channel: "TPO Direct Desk", recipient: "tpo-placement@campus.edu", status: "Delivered" },
-        { channel: "Team Webhook", recipient: "#campus-talent-pipeline", status: "Dispatched" }
+        { channel: "Team Webhook", recipient: "#campus-talent-pipeline", status: "Dispatched" },
+        { channel: "Dean & BoS Academic Feedback", recipient: "dean-academics@campus.edu", status: "Delivered" }
       ]
     };
 
@@ -539,6 +605,56 @@ export default function RecruiterDashboard() {
     link.click();
     URL.revokeObjectURL(url);
     triggerAutomationToast("Pipeline Digest", "REPORT_JSON_DOWNLOADED");
+  };
+
+  const handleSubmitAcademicFeedback = (e) => {
+    e.preventDefault();
+    if (!newFeedback.notes.trim()) return;
+    setIsSubmittingFeedback(true);
+    setTimeout(() => {
+      const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const createdItem = {
+        id: `af-${Date.now()}`,
+        department: newFeedback.department,
+        batch: newFeedback.batch,
+        category: newFeedback.category,
+        rating: newFeedback.rating,
+        readinessScore: `${Math.floor(Math.random() * 8 + 88)}%`,
+        notes: newFeedback.notes,
+        submitted_at: `Today at ${nowStr}`,
+        status: "Transmitted to University BoS & TPO",
+        actionTaken: "Pending Faculty Review"
+      };
+      setAcademicFeedbackList(prev => [createdItem, ...prev]);
+      setIsSubmittingFeedback(false);
+      setFeedbackSuccess(true);
+      setNewFeedback({
+        department: "Department of Computer Science & Engineering",
+        batch: "Batch 2026 (Final Year)",
+        category: "System Design & Distributed Concurrency",
+        rating: 4,
+        notes: ""
+      });
+      triggerAutomationToast("University Board of Studies & TPO", "ACADEMIC_FEEDBACK_TRANSMITTED");
+    }, 800);
+  };
+
+  const handleDownloadFeedbackJSON = () => {
+    const payload = {
+      report_title: "Corporate Academic Feedback & Curriculum Recommendations",
+      organization: data?.company_name || "Tata Consultancy Services (TCS)",
+      evaluator: data?.recruiter_name || "Campus Hiring Lead",
+      timestamp: new Date().toISOString(),
+      feedbacks: academicFeedbackList
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Academic_Feedback_Report_${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    triggerAutomationToast("Academic Feedback Report", "REPORT_DOWNLOADED");
   };
 
   const handleUpdateStatus = (appId, newStatus) => {
@@ -670,6 +786,16 @@ export default function RecruiterDashboard() {
             ) : (
               <span className="w-2 h-2 rounded-full bg-sky-500"></span>
             )}
+          </button>
+          <button
+            onClick={() => {
+              setShowAcademicFeedbackModal(true);
+              setFeedbackSuccess(false);
+            }}
+            className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-sky-700 hover:border-sky-300 font-semibold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer group"
+          >
+            <GraduationCap className="w-4 h-4 text-slate-500 group-hover:text-sky-600 transition-colors" />
+            <span>Academic Feedback</span>
           </button>
         </div>
       </div>
@@ -1933,8 +2059,145 @@ export default function RecruiterDashboard() {
                   </div>
                 </label>
 
+                <label className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
+                  digestChannels.academicFeedback ? 'bg-sky-50/50 border-sky-300 ring-1 ring-sky-400' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <input 
+                    type="checkbox" 
+                    checked={digestChannels.academicFeedback}
+                    onChange={(e) => setDigestChannels({ ...digestChannels, academicFeedback: e.target.checked })}
+                    className="mt-0.5 rounded text-sky-600 focus:ring-sky-500"
+                  />
+                  <div>
+                    <strong className="text-xs font-bold text-slate-900 block flex items-center gap-1">
+                      <GraduationCap className="w-3.5 h-3.5 text-sky-600" /> Academic &amp; BoS Feedback
+                    </strong>
+                    <p className="text-[10px] text-slate-500 mt-0.5">
+                      Direct syllabus recommendations to Dean of Academics &amp; HOD
+                    </p>
+                  </div>
+                </label>
+
               </div>
             </div>
+
+            {/* Academic & Curriculum Feedback Section inside Digest */}
+            {digestChannels.academicFeedback && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-sky-50/70 border border-sky-200 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5 text-sky-600" />
+                    <div>
+                      <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                        Academic &amp; Curriculum Feedback (Included in Digest)
+                      </h3>
+                      <p className="text-[11px] text-slate-500">
+                        Actionable technical feedback dispatched directly to University BoS, HOD &amp; Placement Faculty
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-sky-100 text-sky-800 border border-sky-200">
+                    BoS Direct Desk
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                      Target Department
+                    </label>
+                    <select
+                      value={newFeedback.department}
+                      onChange={(e) => setNewFeedback({ ...newFeedback, department: e.target.value })}
+                      className="w-full text-xs font-semibold p-2 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                    >
+                      <option value="Department of Computer Science & Engineering">Computer Science &amp; Engineering</option>
+                      <option value="Information Technology & Software Systems">Information Technology</option>
+                      <option value="AI & Data Science Engineering">AI &amp; Data Science</option>
+                      <option value="Electronics & Communication Engineering">Electronics &amp; Communication</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                      Observed Gap Area
+                    </label>
+                    <select
+                      value={newFeedback.category}
+                      onChange={(e) => setNewFeedback({ ...newFeedback, category: e.target.value })}
+                      className="w-full text-xs font-semibold p-2 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                    >
+                      <option value="System Design & Distributed Concurrency">System Design &amp; Concurrency</option>
+                      <option value="Modern Cloud & DevOps (Docker/K8s/CI-CD)">Cloud &amp; DevOps (Docker/K8s)</option>
+                      <option value="Real-World MLOps & Vector Databases">MLOps &amp; Vector Databases</option>
+                      <option value="Clean Architecture & Testing Rigor">Clean Architecture &amp; Testing</option>
+                      <option value="Algorithmic Rigor & Interview Drills">DSA &amp; Algorithmic Rigor</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                      Industry Readiness Rating
+                    </label>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setNewFeedback({ ...newFeedback, rating: star })}
+                          className={`p-1.5 rounded-lg border text-xs font-bold transition cursor-pointer flex items-center gap-0.5 ${
+                            newFeedback.rating === star
+                              ? 'bg-amber-500 text-white border-amber-600'
+                              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                          }`}
+                        >
+                          <Star className={`w-3 h-3 ${newFeedback.rating >= star ? 'fill-current' : ''}`} />
+                          <span>{star}</span>
+                        </button>
+                      ))}
+                      <span className="text-[10px] text-slate-600 ml-1 font-bold">
+                        {newFeedback.rating}/5
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                    Specific Syllabus &amp; Lab Recommendations:
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={newFeedback.notes}
+                    onChange={(e) => setNewFeedback({ ...newFeedback, notes: e.target.value })}
+                    placeholder="E.g. Candidates demonstrated good core concepts, but require hands-on exposure to distributed caching (Redis Lua), Kafka message streams, and microservice containerization in upcoming lab coursework."
+                    className="w-full p-2.5 text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                  />
+
+                  <div className="flex items-center gap-1.5 flex-wrap mt-1.5">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Quick Add:</span>
+                    {[
+                      "+ Add Redis Caching Lab",
+                      "+ Require Docker & CI/CD in Projects",
+                      "+ Include Vector DBs in AI Elective",
+                      "+ Practice Mock STAR Technical Interviews"
+                    ].map((chip, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setNewFeedback(prev => ({
+                          ...prev,
+                          notes: prev.notes ? `${prev.notes} ${chip.replace('+ ', '')}.` : `${chip.replace('+ ', '')}.`
+                        }))}
+                        className="text-[10px] font-semibold text-sky-700 bg-white hover:bg-sky-50 px-2 py-0.5 rounded-md border border-sky-200 transition cursor-pointer"
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Live Digest Content Preview Box */}
             <div className="space-y-2">
@@ -1959,6 +2222,9 @@ export default function RecruiterDashboard() {
                   <p>⚡ <strong className="text-amber-300">Active Roles:</strong> {data?.active_jobs_count || 0} Roles in Grid</p>
                   {data?.ai_recommended_candidates?.[0] && (
                     <p>🌟 <strong className="text-emerald-300">Top Candidate:</strong> {data.ai_recommended_candidates[0].name} ({data.ai_recommended_candidates[0].college}) — {data.ai_recommended_candidates[0].match_score}% Match</p>
+                  )}
+                  {digestChannels.academicFeedback && (
+                    <p>🎓 <strong className="text-sky-300">Academic Feedback Attached:</strong> {newFeedback.category} ({newFeedback.rating}/5 Readiness) &rarr; Transmitted to {newFeedback.department}</p>
                   )}
                   <p>🔒 <strong className="text-sky-300">Security:</strong> 100% transcripts verified via institutional SHA-256 seal</p>
                 </div>
@@ -1997,6 +2263,282 @@ export default function RecruiterDashboard() {
               <button
                 onClick={() => setShowDigestModal(false)}
                 className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition cursor-pointer self-end sm:self-auto"
+              >
+                Close
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL: ACADEMIC FEEDBACK & CURRICULUM RECOMMENDATIONS */}
+      {/* ========================================================= */}
+      {showAcademicFeedbackModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-3xl border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-6">
+            
+            {/* Top Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100 shadow-xs">
+                  <GraduationCap className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-['Outfit']">
+                    University Academic &amp; Curriculum Feedback Desk
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Direct corporate feedback loop to University BoS, Deans, and Faculty to close curriculum loopholes and improve placement readiness
+                  </p>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => setShowAcademicFeedbackModal(false)}
+                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Success Banner */}
+            {feedbackSuccess && (
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in slide-in-from-top duration-300">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                    <Check className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <strong className="block text-sm font-bold text-slate-900">Academic Feedback Transmitted!</strong>
+                    <span className="text-xs text-slate-600">
+                      Feedback and curriculum upgrade points transmitted to University Board of Studies, HOD, and Campus Placement Office.
+                    </span>
+                  </div>
+                </div>
+                <span className="text-[11px] font-mono font-bold text-emerald-800 bg-white px-3 py-1 rounded-lg border border-emerald-200 self-start sm:self-auto">
+                  DELIVERED
+                </span>
+              </div>
+            )}
+
+            {/* Form: Submit Academic Feedback */}
+            <form onSubmit={handleSubmitAcademicFeedback} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-slate-900 font-['Outfit'] flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-sky-600" />
+                  Submit New Academic Feedback to Faculty &amp; TPO
+                </h3>
+                <span className="text-[11px] font-medium text-slate-500">Industry Partner: {data?.company_name}</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                    Target Department
+                  </label>
+                  <select
+                    value={newFeedback.department}
+                    onChange={(e) => setNewFeedback({ ...newFeedback, department: e.target.value })}
+                    className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                  >
+                    <option value="Department of Computer Science & Engineering">Computer Science &amp; Engineering</option>
+                    <option value="Information Technology & Software Systems">Information Technology</option>
+                    <option value="AI & Data Science Engineering">AI &amp; Data Science Engineering</option>
+                    <option value="Electronics & Communication Engineering">Electronics &amp; Communication</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                    Target Cohort
+                  </label>
+                  <select
+                    value={newFeedback.batch}
+                    onChange={(e) => setNewFeedback({ ...newFeedback, batch: e.target.value })}
+                    className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                  >
+                    <option value="Batch 2026 (Final Year)">Batch 2026 (Final Year)</option>
+                    <option value="Batch 2027 (Pre-Final Year)">Batch 2027 (Pre-Final Year)</option>
+                    <option value="All Engineering Cohorts">All Engineering Cohorts</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                    Curriculum Gap Area
+                  </label>
+                  <select
+                    value={newFeedback.category}
+                    onChange={(e) => setNewFeedback({ ...newFeedback, category: e.target.value })}
+                    className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                  >
+                    <option value="System Design & Distributed Concurrency">System Design &amp; Concurrency</option>
+                    <option value="Modern Cloud & DevOps (Docker/K8s/CI-CD)">Cloud &amp; DevOps (Docker/K8s)</option>
+                    <option value="Real-World MLOps & Vector Databases">MLOps &amp; Vector Databases</option>
+                    <option value="Clean Architecture & Testing Rigor">Clean Architecture &amp; Testing</option>
+                    <option value="Algorithmic Rigor & Interview Drills">DSA &amp; Algorithmic Rigor</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Placement Readiness Rating */}
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1.5">
+                  Observed Cohort Industry Readiness:
+                </label>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setNewFeedback({ ...newFeedback, rating: star })}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border ${
+                        newFeedback.rating === star
+                          ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
+                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      <Star className={`w-3.5 h-3.5 ${newFeedback.rating >= star ? 'fill-current' : ''}`} />
+                      <span>{star} / 5</span>
+                    </button>
+                  ))}
+                  <span className="text-[11px] text-slate-500 ml-2">
+                    {newFeedback.rating === 5 && '🌟 Exceptional Readiness'}
+                    {newFeedback.rating === 4 && '✨ Industry Ready with Tactical Gaps'}
+                    {newFeedback.rating === 3 && '⚡ Average Foundation (Practical Labs Needed)'}
+                    {newFeedback.rating <= 2 && '⚠️ Significant Curriculum Loopholes Identified'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Detailed Recommendations Textarea */}
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                  Specific Recommendations for Faculty &amp; Syllabus Revision:
+                </label>
+                <textarea
+                  rows={3}
+                  value={newFeedback.notes}
+                  onChange={(e) => setNewFeedback({ ...newFeedback, notes: e.target.value })}
+                  placeholder="E.g. Candidates demonstrated good theoretical concepts, but require hands-on exposure to distributed caching (Redis Lua), Kafka message streams, and microservice containerization in upcoming semester coursework."
+                  className="w-full p-3 text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:outline-hidden"
+                  required
+                />
+                
+                {/* Quick Suggestion Chips */}
+                <div className="flex items-center gap-2 flex-wrap mt-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Quick Suggestion:</span>
+                  {[
+                    "+ Add Redis Caching Lab",
+                    "+ Require Docker & CI/CD in Projects",
+                    "+ Include Vector DBs in AI Elective",
+                    "+ Practice Mock STAR Technical Interviews"
+                  ].map((chip, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setNewFeedback(prev => ({
+                        ...prev,
+                        notes: prev.notes ? `${prev.notes} ${chip.replace('+ ', '')}.` : `${chip.replace('+ ', '')}.`
+                      }))}
+                      className="text-[10px] font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 px-2.5 py-1 rounded-lg border border-sky-200 transition cursor-pointer"
+                    >
+                      {chip}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-[11px] text-slate-500">
+                  Transmits formally to University Placement Desk &amp; Dean of Academic Affairs.
+                </span>
+                <button
+                  type="submit"
+                  disabled={isSubmittingFeedback || !newFeedback.notes.trim()}
+                  className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-xs transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isSubmittingFeedback ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Transmitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Transmit Academic Feedback</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+
+            {/* Feedback History & Faculty Actions */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-slate-900 font-['Outfit'] flex items-center gap-2">
+                  <Building className="w-4 h-4 text-sky-600" />
+                  Transmitted Feedback Log &amp; Institutional Responses ({academicFeedbackList.length})
+                </h3>
+                <span className="text-[11px] text-slate-500">Live University Linkage</span>
+              </div>
+
+              <div className="space-y-3">
+                {academicFeedbackList.map((item) => (
+                  <div key={item.id} className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-sky-300 transition space-y-2.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <strong className="text-xs font-bold text-slate-900">{item.department}</strong>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                          {item.batch}
+                        </span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
+                          {item.category}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-amber-500 text-xs font-bold">
+                        <Star className="w-3.5 h-3.5 fill-current" />
+                        <span>{item.rating}/5 Readiness ({item.readinessScore})</span>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-slate-700 leading-relaxed bg-slate-50/70 p-2.5 rounded-xl border border-slate-100">
+                      "{item.notes}"
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-[11px]">
+                      <div className="flex items-center gap-2 text-emerald-700 font-semibold">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span><strong>Faculty Action:</strong> {item.actionTaken}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-400">
+                        <span>{item.submitted_at}</span>
+                        <span>•</span>
+                        <span className="text-sky-700 font-bold">{item.status}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={handleDownloadFeedbackJSON}
+                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" /> Download Feedback Report (.JSON)
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowAcademicFeedbackModal(false)}
+                className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition cursor-pointer"
               >
                 Close
               </button>

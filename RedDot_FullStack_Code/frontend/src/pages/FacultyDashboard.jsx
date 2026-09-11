@@ -353,7 +353,7 @@ export default function FacultyDashboard() {
   const filteredStudents = students.filter(s => {
     const matchesSearch = s.name.toLowerCase().includes(studentSearch.toLowerCase()) ||
       s.roll_no.toLowerCase().includes(studentSearch.toLowerCase()) ||
-      s.apaar_id.toLowerCase().includes(studentSearch.toLowerCase()) ||
+      (s.apaar_id || '').toLowerCase().includes(studentSearch.toLowerCase()) ||
       s.branch.toLowerCase().includes(studentSearch.toLowerCase());
     if (!matchesSearch) return false;
     if (branchFilter !== 'ALL' && !s.branch.toLowerCase().includes(branchFilter.toLowerCase())) return false;
@@ -763,7 +763,6 @@ export default function FacultyDashboard() {
                   <tr>
                     <th className="py-3.5 px-4">Student &amp; College Roll</th>
                     <th className="py-3.5 px-4">Branch &amp; Year</th>
-                    <th className="py-3.5 px-4">Academic ID &amp; CGPA</th>
                     <th className="py-3.5 px-4">Diagnostic Assessment</th>
                     <th className="py-3.5 px-4">Placement Status</th>
                     <th className="py-3.5 px-4 text-right">Student Dossier</th>
@@ -772,7 +771,7 @@ export default function FacultyDashboard() {
                 <tbody className="divide-y divide-slate-100">
                   {filteredStudents.length === 0 ? (
                     <tr>
-                      <td colSpan="6" className="py-12 text-center text-slate-400">
+                      <td colSpan="5" className="py-12 text-center text-slate-400">
                         <GraduationCap className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                         <span className="text-sm font-semibold text-slate-600 block">No registered students found</span>
                         <span className="text-xs text-slate-400">Student accounts registered from your campus will populate here automatically.</span>
@@ -812,17 +811,6 @@ export default function FacultyDashboard() {
                       <td className="py-3.5 px-4">
                         <strong className="text-slate-800 block">{student.degree}</strong>
                         <span className="text-[11px] text-slate-500">{student.year}</span>
-                      </td>
-
-                      {/* Academic ID & CGPA */}
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-mono text-slate-700 font-bold">{student.apaar_id}</span>
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                        </div>
-                        <span className="text-[11px] text-emerald-700 font-semibold block mt-0.5">
-                          CGPA: <strong>{student.cgpa}</strong> ({student.class_rank})
-                        </span>
                       </td>
 
                       {/* Diagnostic Score & Percentile */}
@@ -1294,7 +1282,7 @@ export default function FacultyDashboard() {
                     {selectedStudent.degree} • {selectedStudent.year} • Roll No: <strong className="font-mono text-slate-900">{selectedStudent.roll_no}</strong>
                   </p>
                   <p className="text-[11px] text-slate-500 mt-0.5">
-                    Academic ID: <span className="font-mono text-slate-700 font-bold">{selectedStudent.apaar_id || selectedStudent.roll_no}</span> • <strong className="text-emerald-700">CGPA: {selectedStudent.cgpa}</strong> ({selectedStudent.class_rank}) • {selectedStudent.email}
+                    {selectedStudent.email}
                   </p>
                 </div>
               </div>
