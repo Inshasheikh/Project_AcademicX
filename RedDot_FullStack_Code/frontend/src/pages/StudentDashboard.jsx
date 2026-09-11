@@ -1101,6 +1101,26 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
               <span>Resume Review</span>
             </button>
 
+            {/* 6. CV & Resume Builder */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveMainSection('builder');
+                navigate('/student/builder');
+              }}
+              className={`group flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200 shrink-0 cursor-pointer select-none ${
+                activeMainSection === 'builder'
+                  ? 'bg-white text-slate-900 shadow-xs border border-slate-200/80'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-sky-600" />
+              <span>CV Builder</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-extrabold uppercase">
+                NEW
+              </span>
+            </button>
+
             {/* 6. Academic Portfolio */}
             <button
               type="button"
@@ -2090,7 +2110,14 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
       {/* VIEW 6: DEEP RESUME REVIEW & ATS AUDIT */}
       {activeMainSection === 'resume' && (
         <div className="space-y-6 animate-fade-in">
-          <CareerCoachPage initialTab="resume" setActiveTab={setActiveTab} />
+          <CareerCoachPage initialTab="resume" initialResumeMode="review" setActiveTab={setActiveTab} />
+        </div>
+      )}
+
+      {/* VIEW 7: INTERACTIVE CV & RESUME BUILDER */}
+      {activeMainSection === 'builder' && (
+        <div className="space-y-6 animate-fade-in">
+          <CareerCoachPage initialTab="resume" initialResumeMode="builder" setActiveTab={setActiveTab} />
         </div>
       )}
 

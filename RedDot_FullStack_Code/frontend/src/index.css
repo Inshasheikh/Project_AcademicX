@@ -63,3 +63,26 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Print Styles for Clean A4 Resume PDF Export */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+  }
+  header, footer, nav, button, .no-print {
+    display: none !important;
+  }
+  #academicx-resume-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 auto !important;
+    padding: 10mm !important;
+    width: 100% !important;
+    max-width: 210mm !important;
+  }
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+}

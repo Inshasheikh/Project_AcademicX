@@ -118,6 +118,22 @@ function AppContent() {
             } 
           />
           <Route 
+            path="/student/builder" 
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <StudentDashboard setActiveTab={setActiveTab} initialSection="builder" />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/student/resume-builder" 
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <StudentDashboard setActiveTab={setActiveTab} initialSection="builder" />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/student/jobs" 
             element={
               <ProtectedRoute allowedRoles={['student']}>

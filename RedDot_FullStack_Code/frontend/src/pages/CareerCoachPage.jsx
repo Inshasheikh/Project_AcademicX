@@ -50,6 +50,7 @@ import {
   auditResumeText,
   getDeepResumeRecommendations
 } from '../services/api';
+import ResumeBuilder from '../components/ResumeBuilder/ResumeBuilder';
 
 const COMPANY_STYLES = [
   {
@@ -81,11 +82,15 @@ const AVAILABLE_ROLES = [
   "Cloud/DevOps Engineer"
 ];
 
-export default function CareerCoachPage({ initialTab = 'interview', setActiveTab: setParentTab }) {
-  const [activeTab, setActiveTab] = useState(initialTab); // 'interview' | 'resume' | 'roadmap'
+export default function CareerCoachPage({ initialTab = 'interview', initialResumeMode = 'review', setActiveTab: setParentTab }) {
+  const [activeTab, setActiveTab] = useState(initialTab === 'builder' ? 'resume' : initialTab); // 'interview' | 'resume' | 'roadmap'
+  const [resumeMode, setResumeMode] = useState(initialResumeMode || (initialTab === 'builder' ? 'builder' : 'review')); // 'review' | 'builder'
 
   useEffect(() => {
-    if (initialTab) {
+    if (initialTab === 'builder') {
+      setActiveTab('resume');
+      setResumeMode('builder');
+    } else if (initialTab) {
       setActiveTab(initialTab);
     }
   }, [initialTab]);
@@ -335,6 +340,41 @@ Projects:
       setIsUploadingResume(false);
     }
   };
+
+  const handleBuilderSendToReview = async (text, role) => {
+    setResumeText(text);
+    if (role) {
+      setResumeTargetRole(role);
+    }
+    setResumeMode('review');
+    setIsAuditingResume(true);
+    setAuditProgressStep(1);
+    try {
+      await new Promise(r => setTimeout(r, 350));
+      setAuditProgressStep(2);
+      await new Promise(r => setTimeout(r, 350));
+      setAuditProgressStep(3);
+      const res = await auditResumeText(text, role || resumeTargetRole);
+      setAtsResult(res);
+    } catch (err) {
+      console.error('Failed to audit built resume:', err);
+    } finally {
+      setIsAuditingResume(false);
+      setAuditProgressStep(0);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      const pendingText = localStorage.getItem('academicx_audit_pending_text');
+      const pendingRole = localStorage.getItem('academicx_audit_pending_role');
+      if (pendingText) {
+        localStorage.removeItem('academicx_audit_pending_text');
+        localStorage.removeItem('academicx_audit_pending_role');
+        handleBuilderSendToReview(pendingText, pendingRole || resumeTargetRole);
+      }
+    } catch (e) {}
+  }, []);
 
   // ==========================================
   // TAB 3: STEP-BY-STEP CAREER PROGRESSION ROADMAP STATE
@@ -1021,13 +1061,101 @@ Projects:
       )}
 
       {/* ========================================================= */}
-      {/* TAB 2: DEEP RESUME REVIEW & ACTIONABLE RECOMMENDATION ENGINE */}
+      {/* TAB 2: DEEP RESUME REVIEW & INTERACTIVE CV BUILDER STUDIO */}
       {/* ========================================================= */}
       {activeTab === 'resume' && (
-        <div className="space-y-8">
+        <div className="space-y-6">
 
-          {/* Top Control Bar: Target Role */}
-          <div className="bg-white border border-slate-200 p-5 rounded-3xl shadow-xs">
+          {/* Sub-Mode Navigation Switcher: Review vs Builder */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-2.5 rounded-2xl border border-slate-200 shadow-xs">
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setResumeMode('review')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                  resumeMode === 'review'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <FileText className="w-4 h-4 text-sky-400" />
+                <span>AI Resume Review & ATS Audit</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setResumeMode('builder')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+                  resumeMode === 'builder'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <Sparkles className="w-4 h-4 text-sky-400" />
+                <span>Interactive CV / Resume Builder</span>
+                <span className="px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-extrabold uppercase">
+                  NEW
+                </span>
+              </button>
+            </div>
+
+            {resumeMode === 'review' ? (
+              <button
+                type="button"
+                onClick={() => setResumeMode('builder')}
+                className="text-xs font-semibold text-sky-700 hover:text-sky-800 flex items-center gap-1 px-3 py-1 cursor-pointer"
+              >
+                <span>Create New CV</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setResumeMode('review')}
+                className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1 px-3 py-1 cursor-pointer"
+              >
+                <span>Switch to ATS Reviewer</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {resumeMode === 'builder' ? (
+            <ResumeBuilder
+              onSendToReview={handleBuilderSendToReview}
+              initialPreset={
+                resumeTargetRole === 'AI/ML Engineer'
+                  ? 'aiml'
+                  : resumeTargetRole === 'Cloud/DevOps Engineer'
+                  ? 'devops'
+                  : 'fullstack'
+              }
+            />
+          ) : (
+            <div className="space-y-8">
+              {/* Promotional Callout to Builder */}
+              <div className="bg-gradient-to-r from-sky-500/10 via-indigo-500/10 to-emerald-500/10 border border-sky-200 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900">Want to create an ATS-guaranteed resume from scratch?</h4>
+                    <p className="text-xs text-slate-600">Use our new Interactive CV Builder with 1-click AcademicX vault sync, pre-built presets, and PDF download.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setResumeMode('builder')}
+                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs"
+                >
+                  <span>Launch CV Builder</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Top Control Bar: Target Role */}
+              <div className="bg-white border border-slate-200 p-5 rounded-3xl shadow-xs">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-bold text-slate-900 font-['Outfit']">
@@ -1682,10 +1810,12 @@ Projects:
               </div>
             )}
 
+            </div>
           </div>
+        )}
 
-        </div>
-      )}
+      </div>
+    )}
 
       {/* ========================================================= */}
       {/* TAB 3: STEP-BY-STEP CAREER PROGRESSION ROADMAP */}
