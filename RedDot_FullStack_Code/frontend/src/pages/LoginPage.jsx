@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Mail, 
   Lock, 
@@ -12,12 +13,30 @@ import {
   AlertCircle,
   Loader2
 } from 'lucide-react';
-import { loginUserApi, sendOtpApi, verifyOtpApi } from '../services/api';
+import { loginUserApi, sendOtpApi, verifyOtpApi, getCurrentUserApi } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import slide1Img from '../assets/carousel/slide1.jpg';
 import slide2Img from '../assets/carousel/slide2.jpg';
 import slide3Img from '../assets/carousel/slide3.jpg';
 
 export default function LoginPage({ setActiveRole, setActiveTab }) {
+  const navigate = useNavigate();
+  const { user, role, isAuthenticated } = useAuth();
+
+  // If already authenticated, automatically redirect to dedicated dashboard
+  useEffect(() => {
+    const token = localStorage.getItem('access_token') || localStorage.getItem('reddot_token');
+    const storedUser = getCurrentUserApi();
+    const effectiveRole = (role || user?.role || user?.profile?.role || storedUser?.role || storedUser?.profile?.role || '').toLowerCase();
+    if ((isAuthenticated || token) && effectiveRole) {
+      if (effectiveRole === 'student') {
+        navigate('/student/dashboard', { replace: true });
+      } else {
+        navigate(`/${effectiveRole}/dashboard`, { replace: true });
+      }
+    }
+  }, [isAuthenticated, role, user, navigate]);
+
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [showHelpModal, setShowHelpModal] = useState(false);
@@ -114,11 +133,17 @@ export default function LoginPage({ setActiveRole, setActiveTab }) {
 
       if (res.success && res.user) {
         setAuthSuccess(`Welcome back, ${res.user.full_name || 'User'}!`);
-        const targetRole = res.user.role || detectRoleFromEmail(credentials.email);
+        const rawRole = res.user.role || detectRoleFromEmail(credentials.email) || 'student';
+        const targetRole = String(rawRole).toLowerCase();
         setTimeout(() => {
-          setActiveRole(targetRole);
-          if (targetRole === 'student') setActiveTab('dashboard');
-        }, 600);
+          if (typeof setActiveRole === 'function') setActiveRole(targetRole);
+          if (targetRole === 'student') {
+            if (typeof setActiveTab === 'function') setActiveTab('dashboard');
+            navigate('/student/dashboard', { replace: true });
+          } else {
+            navigate(`/${targetRole}/dashboard`, { replace: true });
+          }
+        }, 500);
       } else {
         setAuthError(res.error || 'Authentication failed. Please check your credentials.');
       }
@@ -220,11 +245,17 @@ export default function LoginPage({ setActiveRole, setActiveTab }) {
       const res = await loginUserApi(payload);
       if (res.success && res.user) {
         setAuthSuccess('OTP verified successfully! Launching workspace...');
-        const targetRole = res.user.role || res.role || detectRoleFromEmail(cleanId);
+        const rawRole = res.user.role || res.role || detectRoleFromEmail(cleanId) || 'student';
+        const targetRole = String(rawRole).toLowerCase();
         setTimeout(() => {
-          setActiveRole(targetRole);
-          if (targetRole === 'student') setActiveTab('dashboard');
-        }, 600);
+          if (typeof setActiveRole === 'function') setActiveRole(targetRole);
+          if (targetRole === 'student') {
+            if (typeof setActiveTab === 'function') setActiveTab('dashboard');
+            navigate('/student/dashboard', { replace: true });
+          } else {
+            navigate(`/${targetRole}/dashboard`, { replace: true });
+          }
+        }, 500);
       } else {
         setAuthError(res.error || res.message || 'Invalid OTP code.');
       }
@@ -236,10 +267,14 @@ export default function LoginPage({ setActiveRole, setActiveTab }) {
   };
 
   const handleGoogleSignIn = () => {
-    const role = detectRoleFromEmail(credentials.email);
-    setActiveRole(role);
-    if (role === 'student') {
-      setActiveTab('dashboard');
+    const rawRole = detectRoleFromEmail(credentials.email);
+    const targetRole = String(rawRole).toLowerCase();
+    if (typeof setActiveRole === 'function') setActiveRole(targetRole);
+    if (targetRole === 'student') {
+      if (typeof setActiveTab === 'function') setActiveTab('dashboard');
+      navigate('/student/dashboard', { replace: true });
+    } else {
+      navigate(`/${targetRole}/dashboard`, { replace: true });
     }
   };
 
@@ -250,7 +285,11 @@ export default function LoginPage({ setActiveRole, setActiveTab }) {
       <header className="w-full max-w-5xl mx-auto flex items-center justify-between py-2 mb-2 select-none">
         {/* Brand */}
         <div 
-          onClick={() => { setActiveRole('landing'); setActiveTab('home'); }}
+          onClick={() => {
+            if (typeof setActiveRole === 'function') setActiveRole('landing');
+            if (typeof setActiveTab === 'function') setActiveTab('home');
+            navigate('/');
+          }}
           className="flex items-center gap-2.5 cursor-pointer group"
         >
           <img 
@@ -266,14 +305,21 @@ export default function LoginPage({ setActiveRole, setActiveTab }) {
         {/* Back and Register links */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => { setActiveRole('landing'); setActiveTab('home'); }}
+            onClick={() => {
+              if (typeof setActiveRole === 'function') setActiveRole('landing');
+              if (typeof setActiveTab === 'function') setActiveTab('home');
+              navigate('/');
+            }}
             className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white/90 hover:bg-white px-3 py-1.5 rounded-full border border-slate-200/80 shadow-2xs transition cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Home</span>
           </button>
           <button
-            onClick={() => setActiveRole('register')}
+            onClick={() => {
+              if (typeof setActiveRole === 'function') setActiveRole('register');
+              navigate('/register');
+            }}
             className="text-xs font-semibold text-sky-700 hover:text-sky-800 bg-sky-50 hover:bg-sky-100/70 px-3.5 py-1.5 rounded-full border border-sky-200 shadow-2xs transition cursor-pointer"
           >
             Sign Up
@@ -642,7 +688,10 @@ export default function LoginPage({ setActiveRole, setActiveTab }) {
                 Don't have an account?{' '}
                 <button
                   type="button"
-                  onClick={() => setActiveRole('register')}
+                  onClick={() => {
+                    if (typeof setActiveRole === 'function') setActiveRole('register');
+                    navigate('/register');
+                  }}
                   className="text-sky-700 font-bold hover:underline cursor-pointer ml-1"
                 >
                   Sign up

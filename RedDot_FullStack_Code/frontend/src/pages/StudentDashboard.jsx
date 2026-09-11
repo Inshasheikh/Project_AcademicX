@@ -37,11 +37,18 @@ import {
   Trash2,
   Eye,
   Code2,
-  Tag
+  Tag,
+  Target,
+  Compass,
+  Mic
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../services/api';
+import SkillDiagnosticPage from './SkillDiagnosticPage';
+import CareerCoachPage from './CareerCoachPage';
 
-export default function StudentDashboard({ setActiveTab }) {
+export default function StudentDashboard({ setActiveTab, initialSection = 'jobs' }) {
+  const navigate = useNavigate();
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [toast, setToast] = useState(null);
   const [showDocModal, setShowDocModal] = useState(false);
@@ -50,7 +57,14 @@ export default function StudentDashboard({ setActiveTab }) {
   const [appFilter, setAppFilter] = useState('all');
   const [showAllJobs, setShowAllJobs] = useState(false);
   const [jobTypeFilter, setJobTypeFilter] = useState('all');
-  const [activeMainSection, setActiveMainSection] = useState('jobs'); // 'jobs' | 'portfolio'
+  const [activeMainSection, setActiveMainSection] = useState(initialSection || 'jobs'); // 'jobs' | 'portfolio'
+
+  useEffect(() => {
+    if (initialSection) {
+      setActiveMainSection(initialSection);
+    }
+  }, [initialSection]);
+
   const [selectedJobForDetails, setSelectedJobForDetails] = useState(null);
   const [jobToApply, setJobToApply] = useState(null);
   const [confirmProfileChecked, setConfirmProfileChecked] = useState(true);
@@ -1025,44 +1039,132 @@ export default function StudentDashboard({ setActiveTab }) {
         </div>
       </div>
 
-      {/* Student Workspace Sub-Navigation: Opportunities Explorer vs Profile Enhancement */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
-        <div className="flex items-center gap-2 p-1 bg-slate-100/90 rounded-xl w-full sm:w-auto">
+      {/* Student Workspace Sub-Navigation: Opportunities, Skill Analysis, Roadmap, Mock Interview, Resume & Portfolio */}
+      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-3 bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 rounded-xl overflow-x-auto max-w-full w-full xl:w-auto scrollbar-thin">
+          {/* 1. Opportunities Explorer */}
           <button
             type="button"
-            onClick={() => setActiveMainSection('jobs')}
-            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+            onClick={() => {
+              setActiveMainSection('jobs');
+              navigate('/student/dashboard');
+            }}
+            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
               activeMainSection === 'jobs'
                 ? 'bg-white text-slate-900 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Briefcase className="w-3.5 h-3.5 text-sky-600" />
-            <span>Opportunities Explorer</span>
+            <span>Opportunities</span>
             <span className="px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-700 text-[10px] font-extrabold">
               {jobs.length}
             </span>
           </button>
 
+          {/* 2. Skill Analysis */}
           <button
             type="button"
-            onClick={() => setActiveMainSection('portfolio')}
-            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+            onClick={() => {
+              setActiveMainSection('diagnostic');
+              navigate('/student/skills');
+            }}
+            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
+              activeMainSection === 'diagnostic'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Target className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Skill Analysis</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-extrabold">
+              AI Test
+            </span>
+          </button>
+
+          {/* 3. Learning Roadmap */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveMainSection('roadmap');
+              navigate('/student/roadmap');
+            }}
+            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
+              activeMainSection === 'roadmap'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5 text-amber-600" />
+            <span>Learning Roadmap</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 text-[10px] font-extrabold">
+              6-Week
+            </span>
+          </button>
+
+          {/* 4. Mock Interview */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveMainSection('interview');
+              navigate('/student/interview');
+            }}
+            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
+              activeMainSection === 'interview'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Mic className="w-3.5 h-3.5 text-rose-600" />
+            <span>Mock Interview</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700 text-[10px] font-extrabold">
+              Simulation
+            </span>
+          </button>
+
+          {/* 5. Resume Review */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveMainSection('resume');
+              navigate('/student/resume');
+            }}
+            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
+              activeMainSection === 'resume'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5 text-purple-600" />
+            <span>Resume Review</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-purple-100 text-purple-700 text-[10px] font-extrabold">
+              ATS
+            </span>
+          </button>
+
+          {/* 6. Academic Portfolio */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveMainSection('portfolio');
+              navigate('/student/profile');
+            }}
+            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
               activeMainSection === 'portfolio'
                 ? 'bg-white text-slate-900 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Academic & Professional Portfolio</span>
+            <span>Portfolio</span>
             <span className="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-extrabold">
-              Enhanced
+              Verified
             </span>
           </button>
         </div>
 
         {/* Recruiter Visibility Toggle Badge */}
-        <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs self-stretch sm:self-auto justify-between sm:justify-start">
+        <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs self-stretch xl:self-auto justify-between xl:justify-start shrink-0">
           <div className="flex items-center gap-1.5">
             <span className={`w-2 h-2 rounded-full ${recruiterVisibility ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
             <span className="text-slate-600 font-medium">Recruiter Discovery:</span>
@@ -1335,7 +1437,10 @@ export default function StudentDashboard({ setActiveTab }) {
             </div>
 
             <button
-              onClick={() => setActiveTab('diagnostic')}
+              onClick={() => {
+                setActiveMainSection('diagnostic');
+                navigate('/student/skills');
+              }}
               className="w-full py-2.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-semibold text-center transition cursor-pointer"
             >
               Analyze & Bridge Gaps &rarr;
@@ -1352,10 +1457,13 @@ export default function StudentDashboard({ setActiveTab }) {
             </div>
 
             <button
-              onClick={() => setActiveTab('coach')}
+              onClick={() => {
+                setActiveMainSection('interview');
+                navigate('/student/interview');
+              }}
               className="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs shadow-sm transition cursor-pointer"
             >
-              Practice with AI Career Coach
+              Practice with AI Career Coach &rarr;
             </button>
           </div>
         </div>
@@ -1953,6 +2061,34 @@ export default function StudentDashboard({ setActiveTab }) {
             </div>
 
           </div>
+        </div>
+      )}
+
+      {/* VIEW 3: SKILL ANALYSIS & DIAGNOSTIC ASSESSMENT */}
+      {activeMainSection === 'diagnostic' && (
+        <div className="space-y-6 animate-fade-in">
+          <SkillDiagnosticPage setActiveTab={setActiveTab} />
+        </div>
+      )}
+
+      {/* VIEW 4: REMEDIAL CAREER ROADMAP (6-WEEK TARGETED PLAN) */}
+      {activeMainSection === 'roadmap' && (
+        <div className="space-y-6 animate-fade-in">
+          <CareerCoachPage initialTab="roadmap" setActiveTab={setActiveTab} />
+        </div>
+      )}
+
+      {/* VIEW 5: COMPANY-CALIBRATED AI MOCK INTERVIEW */}
+      {activeMainSection === 'interview' && (
+        <div className="space-y-6 animate-fade-in">
+          <CareerCoachPage initialTab="interview" setActiveTab={setActiveTab} />
+        </div>
+      )}
+
+      {/* VIEW 6: DEEP RESUME REVIEW & ATS AUDIT */}
+      {activeMainSection === 'resume' && (
+        <div className="space-y-6 animate-fade-in">
+          <CareerCoachPage initialTab="resume" setActiveTab={setActiveTab} />
         </div>
       )}
 
@@ -2579,12 +2715,9 @@ export default function StudentDashboard({ setActiveTab }) {
                     <button
                       type="button"
                       onClick={() => {
-                        if (typeof setActiveTab === 'function') {
-                          setActiveTab('career-coach');
-                        }
                         setActiveStatsModal(null);
-                        setToast("Navigating to AI Career Coach & Skill Diagnostics...");
-                        setTimeout(() => setToast(null), 3000);
+                        setActiveMainSection('roadmap');
+                        navigate('/student/roadmap');
                       }}
                       className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
                     >

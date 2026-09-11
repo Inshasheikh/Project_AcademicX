@@ -178,12 +178,21 @@ export const logoutUserApi = () => {
 };
 
 
+export const getAuthHeaders = (customHeaders = {}) => {
+  const token = localStorage.getItem('access_token') || localStorage.getItem('reddot_token');
+  const headers = { ...customHeaders };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+};
+
 export const fetchRecruiterStats = async (email) => {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3500);
     const url = email ? `${BASE_URL}/recruiter/stats/?email=${encodeURIComponent(email)}` : `${BASE_URL}/recruiter/stats/`;
-    const res = await fetch(url, { signal: controller.signal });
+    const res = await fetch(url, { headers: getAuthHeaders(), signal: controller.signal });
     clearTimeout(timeoutId);
     if (!res.ok) throw new Error('Network response not ok');
     return await res.json();
@@ -1099,9 +1108,10 @@ export const submitCompanyMockSession = async (sessionData) => {
   }
 };
 
-export const fetchFacultyOverview = async () => {
+export const fetchFacultyOverview = async (email) => {
   try {
-    const res = await fetch(`${BASE_URL}/faculty/overview/`);
+    const url = email ? `${BASE_URL}/faculty/overview/?email=${encodeURIComponent(email)}` : `${BASE_URL}/faculty/overview/`;
+    const res = await fetch(url, { headers: getAuthHeaders() });
     if (!res.ok) throw new Error('Network response not ok');
     return await res.json();
   } catch (err) {

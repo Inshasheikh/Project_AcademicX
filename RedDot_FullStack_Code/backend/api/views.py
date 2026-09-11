@@ -22,6 +22,7 @@ from .supabase_client import (
     get_profile_by_email, get_profile_by_phone,
     create_user_profile, fetch_all_jobs, fetch_student_dashboard_data
 )
+from .permissions import IsRecruiterUser, IsFacultyUser
 
 class StudentDashboardViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'])
@@ -50,6 +51,8 @@ class StudentDashboardViewSet(viewsets.ViewSet):
             })
 
 class RecruiterDashboardViewSet(viewsets.ViewSet):
+    permission_classes = [IsRecruiterUser]
+
     @action(detail=False, methods=['get'])
     def stats(self, request):
         email = request.query_params.get('email')
@@ -690,6 +693,8 @@ class AdminVerificationViewSet(viewsets.ViewSet):
         })
 
 class FacultyViewSet(viewsets.ViewSet):
+    permission_classes = [IsFacultyUser]
+
     @action(detail=False, methods=['get'])
     def overview(self, request):
         email = request.query_params.get('email')
@@ -709,7 +714,7 @@ class FacultyViewSet(viewsets.ViewSet):
                         department = fac_rows[0].get('department', department)
                         institution_name = fac_rows[0].get('college', institution_name)
 
-            stud_res = client.table("student_profiles").select("*, profiles(full_name, email, phone, avatar_url)").execute()
+            stud_res = client.table("student_profiles").select("*, profiles(full_name, email, phone_number, avatar_url)").execute()
             students = stud_res.data or []
             total_students = len(students)
             verified_count = len([s for s in students if s.get("is_verified")])

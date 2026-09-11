@@ -28,16 +28,22 @@ import {
   FileCheck2,
   Users
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { getCurrentUserApi } from '../services/api';
 
 export default function LandingPage({ setActiveRole, setActiveTab }) {
+  const navigate = useNavigate();
   const currentUser = getCurrentUserApi();
 
   const handleGoToWorkspace = () => {
-    const role = currentUser?.role || 'student';
-    setActiveRole(role);
-    if (role === 'student' && typeof setActiveTab === 'function') {
-      setActiveTab('dashboard');
+    const rawRole = currentUser?.role || 'student';
+    const role = String(rawRole).toLowerCase();
+    if (typeof setActiveRole === 'function') setActiveRole(role);
+    if (role === 'student') {
+      if (typeof setActiveTab === 'function') setActiveTab('dashboard');
+      navigate('/student/dashboard');
+    } else {
+      navigate(`/${role}/dashboard`);
     }
   };
 
@@ -52,12 +58,6 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
             
             {/* Left Column: Text & Call to Action */}
             <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
-              {/* Trust Pill */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-50 border border-sky-200/70 text-sky-700 text-xs font-semibold shadow-2xs">
-                <Sparkles className="w-3.5 h-3.5 text-sky-600 animate-pulse" />
-                <span>AICTE & NEP 2020 Aligned • India's Talent Transformation Ecosystem</span>
-              </div>
-
               {/* Main Headline */}
               <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-black text-slate-900 tracking-tight leading-[1.12] font-['Outfit']">
                 Bridge the{' '}
@@ -95,14 +95,20 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
                 ) : (
                   <>
                     <button
-                      onClick={() => setActiveRole('register')}
+                      onClick={() => {
+                        if (typeof setActiveRole === 'function') setActiveRole('register');
+                        navigate('/register');
+                      }}
                       className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 group"
                     >
                       <span>Get Started Free</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </button>
                     <button
-                      onClick={() => setActiveRole('login')}
+                      onClick={() => {
+                        if (typeof setActiveRole === 'function') setActiveRole('login');
+                        navigate('/login');
+                      }}
                       className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-semibold text-sm shadow-2xs transition-all cursor-pointer"
                     >
                       Sign In to Portal
@@ -189,7 +195,11 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
           {/* 1. For Students */}
           <div 
-            onClick={() => { setActiveRole('student'); if (typeof setActiveTab === 'function') setActiveTab('dashboard'); }}
+            onClick={() => { 
+              if (typeof setActiveRole === 'function') setActiveRole('student'); 
+              if (typeof setActiveTab === 'function') setActiveTab('dashboard'); 
+              navigate('/student/dashboard');
+            }}
             className="rounded-2xl p-7 flex flex-col justify-between cursor-pointer bg-white border border-slate-200 hover:border-sky-400 hover:shadow-xl transition-all group relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-28 h-28 bg-sky-50 rounded-full -mr-14 -mt-14 group-hover:scale-110 transition-transform"></div>
@@ -224,7 +234,10 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
 
           {/* 2. For Recruiters */}
           <div 
-            onClick={() => setActiveRole('recruiter')}
+            onClick={() => {
+              if (typeof setActiveRole === 'function') setActiveRole('recruiter');
+              navigate('/recruiter/dashboard');
+            }}
             className="rounded-2xl p-7 flex flex-col justify-between cursor-pointer bg-white border border-slate-200 hover:border-cyan-400 hover:shadow-xl transition-all group relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-28 h-28 bg-cyan-50 rounded-full -mr-14 -mt-14 group-hover:scale-110 transition-transform"></div>
@@ -259,7 +272,10 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
 
           {/* 3. For Faculty & Institutions */}
           <div 
-            onClick={() => setActiveRole('faculty')}
+            onClick={() => {
+              if (typeof setActiveRole === 'function') setActiveRole('faculty');
+              navigate('/faculty/dashboard');
+            }}
             className="rounded-2xl p-7 flex flex-col justify-between cursor-pointer bg-white border border-slate-200 hover:border-amber-400 hover:shadow-xl transition-all group relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-28 h-28 bg-amber-50 rounded-full -mr-14 -mt-14 group-hover:scale-110 transition-transform"></div>
@@ -441,13 +457,19 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
             ) : (
               <>
                 <button
-                  onClick={() => setActiveRole('register')}
+                  onClick={() => {
+                    if (typeof setActiveRole === 'function') setActiveRole('register');
+                    navigate('/register');
+                  }}
                   className="px-8 py-3.5 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm shadow-md transition cursor-pointer"
                 >
                   Create Free Account
                 </button>
                 <button
-                  onClick={() => setActiveRole('login')}
+                  onClick={() => {
+                    if (typeof setActiveRole === 'function') setActiveRole('login');
+                    navigate('/login');
+                  }}
                   className="px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-sm transition cursor-pointer"
                 >
                   Sign In

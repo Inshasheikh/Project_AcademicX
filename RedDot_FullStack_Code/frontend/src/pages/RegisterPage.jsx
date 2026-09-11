@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ShieldCheck, 
   User, 
@@ -11,19 +12,37 @@ import {
   Compass, 
   Building2, 
   ArrowRight, 
-  ArrowLeft,
-  Check,
-  Phone,
-  KeyRound,
-  AlertCircle,
-  Loader2
+  ArrowLeft, 
+  Check, 
+  Phone, 
+  KeyRound, 
+  AlertCircle, 
+  Loader2 
 } from 'lucide-react';
-import { registerUserApi, sendOtpApi, verifyOtpApi } from '../services/api';
+import { registerUserApi, sendOtpApi, verifyOtpApi, getCurrentUserApi } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import regSlide1Img from '../assets/registration/reg_slide1.jpg';
 import regSlide2Img from '../assets/registration/reg_slide2.jpg';
 import regSlide3Img from '../assets/registration/reg_slide3.jpg';
 
 export default function RegisterPage({ setActiveRole, setActiveTab }) {
+  const navigate = useNavigate();
+  const { user, role, isAuthenticated } = useAuth();
+
+  // If already authenticated, redirect to dedicated dashboard
+  useEffect(() => {
+    const token = localStorage.getItem('access_token') || localStorage.getItem('reddot_token');
+    const storedUser = getCurrentUserApi();
+    const effectiveRole = (role || user?.role || user?.profile?.role || storedUser?.role || storedUser?.profile?.role || '').toLowerCase();
+    if ((isAuthenticated || token) && effectiveRole) {
+      if (effectiveRole === 'student') {
+        navigate('/student/dashboard', { replace: true });
+      } else {
+        navigate(`/${effectiveRole}/dashboard`, { replace: true });
+      }
+    }
+  }, [isAuthenticated, role, user, navigate]);
+
   const [step, setStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState('student'); // 'student' | 'recruiter' | 'faculty' | 'admin'
   const [showPassword, setShowPassword] = useState(false);
@@ -227,18 +246,30 @@ export default function RegisterPage({ setActiveRole, setActiveTab }) {
           role: selectedRole
         };
         const res = await registerUserApi(payload);
+        const targetRole = String(selectedRole || 'student').toLowerCase();
         if (res.success) {
           setSuccessMsg('Profile provisioned in Supabase! Launching...');
           setTimeout(() => {
-            setActiveRole(selectedRole);
-            if (selectedRole === 'student') setActiveTab('dashboard');
+            if (typeof setActiveRole === 'function') setActiveRole(targetRole);
+            if (targetRole === 'student') {
+              if (typeof setActiveTab === 'function') setActiveTab('dashboard');
+              navigate('/student/dashboard', { replace: true });
+            } else {
+              navigate(`/${targetRole}/dashboard`, { replace: true });
+            }
           }, 600);
         } else {
           setErrorMsg(res.error || 'Registration failed.');
         }
       } catch (err) {
-        setActiveRole(selectedRole);
-        if (selectedRole === 'student') setActiveTab('dashboard');
+        const targetRole = String(selectedRole || 'student').toLowerCase();
+        if (typeof setActiveRole === 'function') setActiveRole(targetRole);
+        if (targetRole === 'student') {
+          if (typeof setActiveTab === 'function') setActiveTab('dashboard');
+          navigate('/student/dashboard', { replace: true });
+        } else {
+          navigate(`/${targetRole}/dashboard`, { replace: true });
+        }
       } finally {
         setIsLoading(false);
       }
@@ -252,7 +283,11 @@ export default function RegisterPage({ setActiveRole, setActiveTab }) {
       <header className="w-full max-w-5xl mx-auto flex items-center justify-between py-2 mb-2 select-none">
         {/* Brand */}
         <div 
-          onClick={() => { setActiveRole('landing'); setActiveTab('home'); }}
+          onClick={() => {
+            if (typeof setActiveRole === 'function') setActiveRole('landing');
+            if (typeof setActiveTab === 'function') setActiveTab('home');
+            navigate('/');
+          }}
           className="flex items-center gap-2.5 cursor-pointer group"
         >
           <img 
@@ -268,14 +303,21 @@ export default function RegisterPage({ setActiveRole, setActiveTab }) {
         {/* Back and Sign In links */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => { setActiveRole('landing'); setActiveTab('home'); }}
+            onClick={() => {
+              if (typeof setActiveRole === 'function') setActiveRole('landing');
+              if (typeof setActiveTab === 'function') setActiveTab('home');
+              navigate('/');
+            }}
             className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white/90 hover:bg-white px-3 py-1.5 rounded-full border border-slate-200/80 shadow-2xs transition cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Home</span>
           </button>
           <button
-            onClick={() => setActiveRole('login')}
+            onClick={() => {
+              if (typeof setActiveRole === 'function') setActiveRole('login');
+              navigate('/login');
+            }}
             className="text-xs font-semibold text-sky-700 hover:text-sky-800 bg-sky-50 hover:bg-sky-100/70 px-3.5 py-1.5 rounded-full border border-sky-200 shadow-2xs transition cursor-pointer"
           >
             Sign In
@@ -782,7 +824,10 @@ export default function RegisterPage({ setActiveRole, setActiveTab }) {
                     Already have an account?{' '}
                     <button
                       type="button"
-                      onClick={() => setActiveRole('login')}
+                      onClick={() => {
+                        if (typeof setActiveRole === 'function') setActiveRole('login');
+                        navigate('/login');
+                      }}
                       className="text-sky-700 font-bold hover:underline cursor-pointer"
                     >
                       Sign In

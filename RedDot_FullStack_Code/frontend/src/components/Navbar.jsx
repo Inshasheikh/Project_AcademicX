@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Menu, 
   X, 
@@ -8,25 +9,123 @@ import {
   Compass, 
   ShieldCheck, 
   User, 
-  Sparkles,
-  ExternalLink,
-  LogOut
+  Sparkles, 
+  ExternalLink, 
+  LogOut,
+  Target,
+  FileCheck2
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { getCurrentUserApi, logoutUserApi } from '../services/api';
 
 export default function Navbar({ activeRole, setActiveRole, activeTab, setActiveTab }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
-  const currentUser = getCurrentUserApi();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, role, isAuthenticated, logout } = useAuth();
 
-  const navLinks = [
-    { name: 'Home', action: () => { setActiveRole('landing'); setActiveTab('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
-    { name: 'About', action: () => { setActiveRole('about'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
-    { name: 'For Students', action: () => { setActiveRole('student'); setActiveTab('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
-    { name: 'For Recruiters', action: () => { setActiveRole('recruiter'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
-    { name: 'For Faculty', action: () => { setActiveRole('faculty'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
-    { name: 'Institutions', action: () => { setActiveRole('admin'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
+  const storedUser = getCurrentUserApi();
+  const currentUser = user || storedUser;
+  const token = localStorage.getItem('access_token') || localStorage.getItem('reddot_token');
+  const isAuth = (isAuthenticated || !!token) && !!currentUser;
+  const currentRole = (role || currentUser?.role || currentUser?.profile?.role || '').toLowerCase();
+  const isStudent = isAuth && currentRole === 'student';
+
+  const handleNavigate = (path, roleName, tabName) => {
+    if (typeof setActiveRole === 'function' && roleName) {
+      setActiveRole(roleName);
+    }
+    if (typeof setActiveTab === 'function' && tabName) {
+      setActiveTab(tabName);
+    }
+    navigate(path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleLogout = async () => {
+    logoutUserApi();
+    if (typeof logout === 'function') {
+      await logout();
+    }
+    if (typeof setActiveRole === 'function') {
+      setActiveRole('landing');
+    }
+    if (typeof setActiveTab === 'function') {
+      setActiveTab('home');
+    }
+    navigate('/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // General portal navigation links (Public and other visitors)
+  const allPortalNavLinks = [
+    { 
+      name: 'Home', 
+      action: () => handleNavigate('/', 'landing', 'home'),
+      isActive: location.pathname === '/' || (!isAuth && activeRole === 'landing')
+    },
+    { 
+      name: 'For Students', 
+      action: () => handleNavigate('/student/dashboard', 'student', 'dashboard'),
+      isActive: location.pathname.startsWith('/student')
+    },
+    { 
+      name: 'For Faculty', 
+      action: () => handleNavigate('/faculty/dashboard', 'faculty', 'faculty'),
+      isActive: location.pathname.startsWith('/faculty') || activeRole === 'faculty'
+    },
+    { 
+      name: 'For Recruiters', 
+      action: () => handleNavigate('/recruiter/dashboard', 'recruiter', 'recruiter'),
+      isActive: location.pathname.startsWith('/recruiter') || activeRole === 'recruiter'
+    },
+    { 
+      name: 'Institutions', 
+      action: () => handleNavigate('/admin/dashboard', 'admin', 'admin'),
+      isActive: location.pathname.startsWith('/admin') || activeRole === 'admin'
+    },
+    { 
+      name: 'About', 
+      action: () => handleNavigate('/about', 'about', 'about'),
+      isActive: location.pathname === '/about' || activeRole === 'about'
+    },
   ];
+
+  // Dedicated Student Portal Navigation (Includes Skill Analysis, Roadmap, Mock Interview)
+  const studentNavLinks = [
+    { 
+      name: 'Opportunities', 
+      action: () => handleNavigate('/student/dashboard', 'student', 'dashboard'),
+      isActive: location.pathname === '/student/dashboard' || location.pathname === '/student'
+    },
+    { 
+      name: 'Skill Analysis', 
+      action: () => handleNavigate('/student/skills', 'student', 'diagnostic'),
+      isActive: location.pathname === '/student/skills'
+    },
+    { 
+      name: 'Career Roadmap', 
+      action: () => handleNavigate('/student/roadmap', 'student', 'roadmap'),
+      isActive: location.pathname === '/student/roadmap'
+    },
+    { 
+      name: 'Mock Interview', 
+      action: () => handleNavigate('/student/interview', 'student', 'interview'),
+      isActive: location.pathname === '/student/interview' || location.pathname === '/student/coach'
+    },
+    { 
+      name: 'Resume Review', 
+      action: () => handleNavigate('/student/resume', 'student', 'resume'),
+      isActive: location.pathname === '/student/resume'
+    },
+    { 
+      name: 'Portfolio', 
+      action: () => handleNavigate('/student/profile', 'student', 'portfolio'),
+      isActive: location.pathname === '/student/profile'
+    },
+  ];
+
+  const activeNavLinks = isStudent ? studentNavLinks : allPortalNavLinks;
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-xs">
@@ -34,7 +133,13 @@ export default function Navbar({ activeRole, setActiveRole, activeTab, setActive
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Brand Logo: AcademicX */}
         <div 
-          onClick={() => { setActiveRole('landing'); setActiveTab('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          onClick={() => {
+            if (isStudent) {
+              handleNavigate('/student/dashboard', 'student', 'dashboard');
+            } else {
+              handleNavigate('/', 'landing', 'home');
+            }
+          }}
           className="flex items-center gap-3 cursor-pointer select-none group"
         >
           <img 
@@ -54,35 +159,25 @@ export default function Navbar({ activeRole, setActiveRole, activeTab, setActive
 
         {/* Center Desktop Navigation Links */}
         <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-slate-600">
-          {navLinks.map((link, idx) => {
-            const isActive = 
-              (link.name === 'Home' && activeRole === 'landing') ||
-              (link.name === 'About' && activeRole === 'about') ||
-              (link.name === 'For Students' && activeRole === 'student') ||
-              (link.name === 'For Recruiters' && activeRole === 'recruiter') ||
-              (link.name === 'For Faculty' && activeRole === 'faculty') ||
-              (link.name === 'Institutions' && activeRole === 'admin');
-
-            return (
-              <button
-                key={idx}
-                onClick={link.action}
-                className={`transition hover:text-sky-600 py-2 relative cursor-pointer ${
-                  isActive ? 'text-sky-700 font-semibold' : ''
-                }`}
-              >
-                {link.name}
-                {isActive && (
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-sky-600 rounded-full"></span>
-                )}
-              </button>
-            );
-          })}
+          {activeNavLinks.map((link, idx) => (
+            <button
+              key={idx}
+              onClick={link.action}
+              className={`transition hover:text-sky-600 py-2 relative cursor-pointer ${
+                link.isActive ? 'text-sky-700 font-semibold' : ''
+              }`}
+            >
+              {link.name}
+              {link.isActive && (
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-sky-600 rounded-full"></span>
+              )}
+            </button>
+          ))}
         </nav>
 
         {/* Right Actions: Auth Status or Login/Register */}
         <div className="flex items-center gap-3">
-          {currentUser ? (
+          {isAuth ? (
             <div className="flex items-center gap-2.5 sm:gap-3">
               <div className="hidden sm:flex flex-col items-end">
                 <span className="text-xs font-bold text-slate-800 flex items-center gap-1">
@@ -90,39 +185,39 @@ export default function Navbar({ activeRole, setActiveRole, activeTab, setActive
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                 </span>
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
-                  {currentUser.role || 'Member'}
+                  {currentUser.role || (isStudent ? 'STUDENT' : 'Member')}
                 </span>
               </div>
+
+              {!isStudent && (
+                <button
+                  onClick={() => {
+                    const targetRole = currentRole || 'student';
+                    handleNavigate(`/${targetRole}/dashboard`, targetRole, 'dashboard');
+                  }}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-white bg-sky-600 hover:bg-sky-700 px-3.5 py-1.5 rounded-full shadow-2xs transition cursor-pointer"
+                  title="Go to your portal dashboard"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Dashboard</span>
+                </button>
+              )}
+
+              {/* Sign Out / Logout Button */}
               <button
-                onClick={() => {
-                  const targetRole = currentUser.role || 'student';
-                  setActiveRole(targetRole);
-                  if (targetRole === 'student') setActiveTab('dashboard');
-                }}
-                className="flex items-center gap-1.5 text-xs font-semibold text-white bg-sky-600 hover:bg-sky-700 px-3.5 py-1.5 rounded-full shadow-2xs transition cursor-pointer"
-                title="Go to your portal dashboard"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Dashboard</span>
-              </button>
-              <button
-                onClick={() => {
-                  logoutUserApi();
-                  setActiveRole('landing');
-                  setActiveTab('home');
-                }}
-                className="flex items-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50/70 hover:bg-red-100/70 px-3 py-1.5 rounded-full border border-red-200 transition cursor-pointer"
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50/70 hover:bg-red-100/70 px-3.5 py-1.5 rounded-full border border-red-200 transition cursor-pointer"
                 title="Sign out of account"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Sign Out</span>
+                <span>Logout</span>
               </button>
             </div>
           ) : (
             <>
               {/* Login Link */}
               <button
-                onClick={() => setActiveRole('login')}
+                onClick={() => handleNavigate('/login', 'login', 'login')}
                 className="hidden sm:block text-sm font-semibold text-slate-700 hover:text-sky-600 transition px-2 cursor-pointer"
               >
                 Login
@@ -130,7 +225,7 @@ export default function Navbar({ activeRole, setActiveRole, activeTab, setActive
 
               {/* Sky Blue Register Button */}
               <button
-                onClick={() => setActiveRole('register')}
+                onClick={() => handleNavigate('/register', 'register', 'register')}
                 className="bg-sky-600 hover:bg-sky-700 text-white font-semibold text-sm px-6 py-2.5 rounded-full shadow-xs hover:shadow-md transition-all active:scale-98 cursor-pointer"
               >
                 Register
@@ -151,43 +246,55 @@ export default function Navbar({ activeRole, setActiveRole, activeTab, setActive
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-slate-100 bg-white px-4 pt-3 pb-6 space-y-2 shadow-lg">
-          {navLinks.map((link, idx) => {
-            const isActive = 
-              (link.name === 'Home' && activeRole === 'landing') ||
-              (link.name === 'About' && activeRole === 'about') ||
-              (link.name === 'For Students' && activeRole === 'student') ||
-              (link.name === 'For Recruiters' && activeRole === 'recruiter') ||
-              (link.name === 'For Faculty' && activeRole === 'faculty') ||
-              (link.name === 'Institutions' && activeRole === 'admin');
+          {activeNavLinks.map((link, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                link.action();
+                setMobileMenuOpen(false);
+              }}
+              className={`block w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+                link.isActive ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-700 hover:bg-sky-50 hover:text-sky-700'
+              }`}
+            >
+              {link.name}
+            </button>
+          ))}
 
-            return (
+          <div className="pt-3 border-t border-slate-100 flex gap-2">
+            {isAuth ? (
               <button
-                key={idx}
                 onClick={() => {
-                  link.action();
+                  handleLogout();
                   setMobileMenuOpen(false);
                 }}
-                className={`block w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition cursor-pointer ${
-                  isActive ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-700 hover:bg-sky-50 hover:text-sky-700'
-                }`}
+                className="w-full py-2.5 text-center text-sm font-semibold bg-red-50 text-red-600 border border-red-200 rounded-xl flex items-center justify-center gap-2"
               >
-                {link.name}
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
               </button>
-            );
-          })}
-          <div className="pt-3 border-t border-slate-100 flex gap-2">
-            <button
-              onClick={() => { setActiveRole('login'); setMobileMenuOpen(false); }}
-              className="w-1/2 py-2.5 text-center text-sm font-semibold border border-slate-200 rounded-xl text-slate-700"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => { setActiveRole('register'); setMobileMenuOpen(false); }}
-              className="w-1/2 py-2.5 text-center text-sm font-semibold bg-sky-600 text-white rounded-xl"
-            >
-              Register
-            </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => { 
+                    handleNavigate('/login', 'login', 'login'); 
+                    setMobileMenuOpen(false); 
+                  }}
+                  className="w-1/2 py-2.5 text-center text-sm font-semibold border border-slate-200 rounded-xl text-slate-700"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => { 
+                    handleNavigate('/register', 'register', 'register'); 
+                    setMobileMenuOpen(false); 
+                  }}
+                  className="w-1/2 py-2.5 text-center text-sm font-semibold bg-sky-600 text-white rounded-xl"
+                >
+                  Register
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
