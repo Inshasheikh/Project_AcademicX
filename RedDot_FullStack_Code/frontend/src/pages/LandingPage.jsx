@@ -205,7 +205,7 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span>DigiLocker & APAAR ID Integration</span>
+                  <span>Verified Academic Credentials</span>
                 </li>
               </ul>
             </div>
@@ -329,7 +329,7 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
               </div>
               <h4 className="text-base font-bold text-slate-900 mb-1.5 font-['Outfit']">Fraud-Proof Credentials</h4>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Verifies university transcripts, DigiLocker marks, and hackathon certificates directly at the institutional source.
+                Verifies university transcripts, semester grades, and academic certificates directly at the institutional source.
               </p>
             </div>
 
@@ -383,7 +383,7 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
                 Connect Verified Identity
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Connect university roll number and government APAAR/DigiLocker IDs for immediate verified standing.
+                Connect university roll number and institutional academic records for immediate verified standing.
               </p>
             </div>
 

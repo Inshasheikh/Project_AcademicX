@@ -25,7 +25,6 @@ import {
   CheckSquare,
   ChevronRight,
   User,
-  ShieldCheck,
   Info,
   FileText,
   BrainCircuit,
@@ -39,10 +38,10 @@ import html2canvas from 'html2canvas';
 import { fetchDiagnosticQuestions, submitDiagnostic } from '../services/api';
 
 const AVAILABLE_DOMAINS = [
-  { id: 'cs_ai', name: 'Computer Science & AI', icon: '💻', desc: 'Algorithms, Discrete Math, AI/ML Theory & System Architecture' },
-  { id: 'data_science', name: 'Data Science & Analytics', icon: '📊', desc: 'Statistics, Probability, ML Modeling & Deep Learning' },
-  { id: 'fullstack_cloud', name: 'Full-Stack Web & Cloud', icon: '☁️', desc: 'React, Node, REST/GraphQL APIs, Containerization & SQL' },
-  { id: 'electronics_iot', name: 'Electronics & Embedded IoT', icon: '⚡', desc: 'Digital Logic, Microcontrollers, Embedded C & Concurrency' }
+  { id: 'cs_ai', name: 'Computer Science & AI', desc: 'Algorithms, Discrete Math, AI/ML Theory & System Architecture' },
+  { id: 'data_science', name: 'Data Science & Analytics', desc: 'Statistics, Probability, ML Modeling & Deep Learning' },
+  { id: 'fullstack_cloud', name: 'Full-Stack Web & Cloud', desc: 'React, Node, REST/GraphQL APIs, Containerization & SQL' },
+  { id: 'electronics_iot', name: 'Electronics & Embedded IoT', desc: 'Digital Logic, Microcontrollers, Embedded C & Concurrency' }
 ];
 
 export default function SkillDiagnosticPage({ setActiveTab }) {
@@ -80,7 +79,7 @@ export default function SkillDiagnosticPage({ setActiveTab }) {
   const candidateInitials = candidateName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'ST';
   const candidateInstitution = currentUser?.college || currentUser?.institution || 'Registered Institute';
   const candidateDept = currentUser?.branch || currentUser?.department || 'Engineering & Technology';
-  const candidateApaar = currentUser?.apaar_id || 'APAAR-VERIFIED';
+  const candidateApaar = currentUser?.apaar_id || 'ACADEMIC-VERIFIED';
 
   // Load questions whenever domain changes
   useEffect(() => {
@@ -255,12 +254,7 @@ export default function SkillDiagnosticPage({ setActiveTab }) {
                 {candidateInitials}
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-bold text-slate-900 text-base font-['Outfit']">{candidateName}</h2>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                    <ShieldCheck className="w-3 h-3" /> APAAR Verified
-                  </span>
-                </div>
+                <h2 className="font-bold text-slate-900 text-base font-['Outfit']">{candidateName}</h2>
                 <p className="text-xs text-slate-500">
                   {candidateInstitution} • {candidateDept}
                 </p>
@@ -298,13 +292,12 @@ export default function SkillDiagnosticPage({ setActiveTab }) {
                         setSelectedDomain(d.id);
                       }
                     }}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center ${
                       isActive
                         ? 'bg-sky-600 text-white shadow-xs'
                         : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
                     }`}
                   >
-                    <span>{d.icon}</span>
                     <span>{d.name}</span>
                   </button>
                 );
@@ -664,7 +657,7 @@ export default function SkillDiagnosticPage({ setActiveTab }) {
               Your Competency & Growth Diagnosis
             </h1>
             <p className="text-xs text-slate-500">
-              Candidate: <strong className="text-slate-800">{candidateName}</strong> • {candidateInstitution} • APAAR ID: <span className="font-mono font-semibold text-slate-700">{candidateApaar}</span>
+              Candidate: <strong className="text-slate-800">{candidateName}</strong> • {candidateInstitution}
             </p>
           </div>
 

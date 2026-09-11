@@ -14,7 +14,7 @@ export default function RoleSelection() {
     {
       id: 'student',
       title: 'Student / Candidate',
-      subtitle: 'Skill diagnostics, placement roadmaps, APAAR / DigiLocker integration & verified jobs.',
+      subtitle: 'Skill diagnostics, placement roadmaps, institutional verification & verified jobs.',
       icon: GraduationCap,
       color: 'blue',
       badge: 'Job Seeker',

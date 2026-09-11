@@ -653,8 +653,8 @@ export const getDeepResumeRecommendations = (targetRole = 'Software Engineer', s
           organizer: "Ministry of Education & AICTE",
           portal_url: "https://www.sih.gov.in/",
           type: "National Innovation Grand Challenge",
-          hiring_impact: "Finalist citation is officially verified on APAAR and recognized by national tech recruiters for direct placement talks.",
-          recommended_project_angle: "Automated document OCR & APAAR semantic verification pipeline with local offline LLM inference.",
+          hiring_impact: "Finalist citation is officially verified and recognized by national tech recruiters for direct placement talks.",
+          recommended_project_angle: "Automated document OCR & semantic verification pipeline with local offline LLM inference.",
           badge: "Govt Recognized"
         },
         {
@@ -788,7 +788,7 @@ export const getDeepResumeRecommendations = (targetRole = 'Software Engineer', s
         organizer: "Ministry of Education & AICTE",
         portal_url: "https://www.sih.gov.in/",
         type: "National Innovation Grand Challenge",
-        hiring_impact: "Winners receive immediate corporate internship interviews, institutional grants, and high-visibility APAAR badges.",
+        hiring_impact: "Winners receive immediate corporate internship interviews, institutional grants, and high-visibility academic badges.",
         recommended_project_angle: "Institutional placement grid or automated credential verification with tamper-proof audit trails.",
         badge: "Top National Event"
       },
@@ -809,7 +809,7 @@ export const getDeepResumeRecommendations = (targetRole = 'Software Engineer', s
         portal_url: "https://developers.google.com/community/dsc-solution-challenge",
         type: "Global Student Tech Challenge",
         hiring_impact: "Top finalists get direct visibility with Google engineering managers and international mentorship.",
-        recommended_project_angle: "Cloud-native educational equity platform integrated with DigiLocker and open educational standards.",
+        recommended_project_angle: "Cloud-native educational equity platform integrated with open educational standards.",
         badge: "Global Prestige"
       }
     ],
@@ -863,10 +863,10 @@ export const getDeepResumeRecommendations = (targetRole = 'Software Engineer', s
         title: "REDDOT: National Higher Education & Verifiable Placement Grid",
         domain: "Full-Stack Enterprise & Institutional Infrastructure",
         tech_stack: ["React 19", "Django REST Framework", "Docker", "PostgreSQL", "SHA-256 Hashes"],
-        why_boosts_resume: "Proves real-world execution handling APAAR/DigiLocker verification, role-based dashboards, and responsive modern UX.",
+        why_boosts_resume: "Proves real-world execution handling academic credential verification, role-based dashboards, and responsive modern UX.",
         github_url: "https://github.com/django/django",
         resume_bullet_points: [
-          "Constructed an authenticated higher education credential verification pipeline compliant with national APAAR & DigiLocker protocols.",
+          "Constructed an authenticated higher education credential verification pipeline compliant with national academic protocols.",
           "Optimized database indexing and ORM query serialization, cutting average dashboard loading time by 48%."
         ]
       }

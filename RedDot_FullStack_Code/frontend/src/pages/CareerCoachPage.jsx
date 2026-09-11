@@ -197,7 +197,7 @@ export default function CareerCoachPage({ initialTab = 'interview', setActiveTab
       role: "Full Stack Developer",
       text: `Candidate Full Name
 B.Tech Computer Science & Engineering
-Verified Digilocker Credentials | CGPA: 8.8 / 10.0
+Verified Academic Credentials | CGPA: 8.8 / 10.0
 
 Technical Skills:
 Python, Django REST Framework, React 19, JavaScript, TypeScript, PostgreSQL, Docker, Redis, SQL, Git, REST APIs
@@ -211,7 +211,7 @@ Projects & Experience:
       role: "AI/ML Engineer",
       text: `Candidate Full Name
 B.Tech Computer Science & Artificial Intelligence
-Verified Digilocker Credentials | CGPA: 8.9 / 10.0
+Verified Academic Credentials | CGPA: 8.9 / 10.0
 
 Technical Skills:
 Python, PyTorch, Hugging Face Transformers, Scikit-Learn, NumPy, Pandas, FastAPI, Docker, Git, Machine Learning
@@ -225,7 +225,7 @@ Projects & Research:
       role: "Cloud/DevOps Engineer",
       text: `Candidate Full Name
 B.Tech Information Technology
-Verified Digilocker Credentials | CGPA: 8.7 / 10.0
+Verified Academic Credentials | CGPA: 8.7 / 10.0
 
 Technical Skills:
 Docker, Kubernetes, AWS, CI/CD Pipelines, Linux, Python, FastAPI, PostgreSQL, Redis, Git, Prometheus, Grafana
@@ -372,48 +372,7 @@ Projects:
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       
-      {/* Main Studio Navigation Header */}
-      <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 text-sky-700 text-xs font-bold uppercase tracking-wider mb-1">
-            <Award className="w-4 h-4 text-sky-600" /> Career Readiness & Placement Studio
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 font-['Outfit']">
-            Company-Calibrated Technical Mock Interview
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Step-by-Step Company Hiring Rounds (Easy to Hard), Realistic Interviewer Prompts & Deep Loophole Detection
-          </p>
-        </div>
 
-        {/* Studio Tabs */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200 self-stretch sm:self-auto">
-          <button
-            onClick={() => setActiveTab('interview')}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-              activeTab === 'interview' ? 'bg-white text-slate-900 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Briefcase className="w-3.5 h-3.5 text-sky-600" /> Company Mock Interview
-          </button>
-          <button
-            onClick={() => setActiveTab('resume')}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-              activeTab === 'resume' ? 'bg-white text-slate-900 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <FileText className="w-3.5 h-3.5" /> Resume Review
-          </button>
-          <button
-            onClick={() => setActiveTab('roadmap')}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-              activeTab === 'roadmap' ? 'bg-white text-slate-900 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Compass className="w-3.5 h-3.5" /> Career Roadmap
-          </button>
-        </div>
-      </div>
 
       {/* ========================================================= */}
       {/* TAB 1: COMPANY-CALIBRATED MOCK INTERVIEW & LOOPHOLE STUDIO */}
@@ -431,9 +390,6 @@ Projects:
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-['Outfit']">
                   Simulate How Leading Tech Companies Evaluate Candidates
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                  Select your target role and hiring bar. The interview progresses question-by-question from basic fundamentals to deep system architecture and behavioral STAR evaluation.
-                </p>
               </div>
 
               {/* Target Role Selector */}
@@ -504,34 +460,7 @@ Projects:
                 </div>
               </div>
 
-              {/* 4 Rounds Preview */}
-              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Step-by-Step Round Progression Preview (Easy $\rightarrow$ Hard)
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                  <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <span className="text-[10px] font-bold text-emerald-600 uppercase block">Round 1 (Easy)</span>
-                    <strong className="text-slate-900 block mt-0.5">Core Fundamentals & Warm-up</strong>
-                    <span className="text-slate-500 text-[11px]">Browser internals, protocols & syntax basics</span>
-                  </div>
-                  <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <span className="text-[10px] font-bold text-amber-600 uppercase block">Round 2 (Medium)</span>
-                    <strong className="text-slate-900 block mt-0.5">Problem Solving & Logic</strong>
-                    <span className="text-slate-500 text-[11px]">Data structures, LRU cache & algorithmic logic</span>
-                  </div>
-                  <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <span className="text-[10px] font-bold text-rose-600 uppercase block">Round 3 (Hard)</span>
-                    <strong className="text-slate-900 block mt-0.5">System Architecture</strong>
-                    <span className="text-slate-500 text-[11px]">High concurrency flash-sales & race conditions</span>
-                  </div>
-                  <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <span className="text-[10px] font-bold text-sky-600 uppercase block">Round 4 (HR)</span>
-                    <strong className="text-slate-900 block mt-0.5">Behavioral STAR Framework</strong>
-                    <span className="text-slate-500 text-[11px]">Handling outages, deadlines & team conflict</span>
-                  </div>
-                </div>
-              </div>
+
 
               {/* Start Button */}
               <div className="flex items-center justify-end gap-3 pt-2">
@@ -1163,9 +1092,6 @@ Projects:
                   <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                     <FileText className="w-4 h-4 text-sky-600" /> Academic Resume Document
                   </h3>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                    ● APAAR Connected
-                  </span>
                 </div>
 
                 {/* Hidden File Input */}
@@ -1391,9 +1317,6 @@ Projects:
             {/* Header & Filter Pills */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
               <div>
-                <div className="flex items-center gap-2 text-sky-700 text-xs font-bold uppercase tracking-wider mb-1">
-                  <Target className="w-4 h-4 text-sky-600" /> Targeted Remediation & Profile Boost
-                </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-['Outfit']">
                   Personalized Roadmap to Boost Your Resume
                 </h3>
@@ -1414,35 +1337,35 @@ Projects:
                 </button>
                 <button
                   onClick={() => setRecommendationFilter('courses')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                     recommendationFilter === 'courses' ? 'bg-white text-sky-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <GraduationCap className="w-3.5 h-3.5 text-sky-600" /> Courses & Videos
+                  Courses & Videos
                 </button>
                 <button
                   onClick={() => setRecommendationFilter('competitions')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                     recommendationFilter === 'competitions' ? 'bg-white text-amber-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Trophy className="w-3.5 h-3.5 text-amber-600" /> Competitions
+                  Competitions
                 </button>
                 <button
                   onClick={() => setRecommendationFilter('certifications')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                     recommendationFilter === 'certifications' ? 'bg-white text-emerald-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Award className="w-3.5 h-3.5 text-emerald-600" /> Certifications
+                  Certifications
                 </button>
                 <button
                   onClick={() => setRecommendationFilter('projects')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                     recommendationFilter === 'projects' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Code2 className="w-3.5 h-3.5 text-indigo-600" /> Boost Projects
+                  Boost Projects
                 </button>
               </div>
             </div>
@@ -1702,7 +1625,7 @@ Projects:
                             {proj.domain}
                           </span>
                           <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                            ★ High Recruiter Interest
+                            High Recruiter Interest
                           </span>
                         </div>
 
@@ -1787,198 +1710,108 @@ Projects:
       {/* ========================================================= */}
       {activeTab === 'roadmap' && (
         <div className="space-y-8">
-          
-          {/* Top Banner: Diagnostic Exam Assessment Integration */}
-          <div className="bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-md space-y-5">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30 inline-flex items-center gap-1.5 mb-2">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Exam-Calibrated Learning Trajectory
-                </span>
-                <h2 className="text-xl sm:text-2xl font-bold font-['Outfit']">
-                  Your Personalized Step-by-Step Career Roadmap
-                </h2>
-                <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                  Generated by analyzing your latest diagnostic assessment results. Follow this 5-step curriculum to systematically eliminate your technical loopholes and achieve Tier-1 placement readiness.
-                </p>
-              </div>
-
-              {/* Target Pathway Selector */}
-              <div className="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10 flex flex-col gap-1.5 self-start md:self-auto min-w-[240px]">
-                <span className="text-[10px] uppercase font-bold text-slate-300">Target Career Goal:</span>
-                <select
-                  value={roadmapRole}
-                  onChange={(e) => setRoadmapRole(e.target.value)}
-                  className="bg-slate-800 border border-slate-700 text-white text-xs font-semibold rounded-xl px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-sky-400 cursor-pointer"
-                >
-                  <option value="Full Stack Developer">Full Stack Engineering Architect</option>
-                  <option value="AI/ML Engineer">AI/ML Research & Production Engineer</option>
-                  <option value="Cloud/DevOps Engineer">Cloud Infrastructure & DevOps Lead</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Analyzed Exam Performance Banner */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-white/10 text-xs">
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
-                <div>
-                  <span className="text-slate-400 text-[10px] uppercase font-bold block">
-                    {examResult ? 'Analyzed Diagnostic Exam' : 'Diagnostic Exam Baseline'}
-                  </span>
-                  <div className="flex items-baseline gap-2 mt-0.5">
-                    <span className="text-xl font-black text-sky-400 font-['Outfit']">
-                      {examResult ? `${examResult.overall_score}%` : '82%'} Overall
-                    </span>
-                    <span className="text-[10px] text-emerald-400 font-bold">
-                      {examResult?.percentile || 88}th Percentile
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-slate-300 block truncate mt-0.5">
-                    {examResult ? (examResult.domain_name || 'Assessed Domain') : 'Tier-1 Engineering Calibrated'}
-                  </span>
-                </div>
-                {setParentTab && (
-                  <button
-                    onClick={() => setParentTab('diagnostic')}
-                    className="mt-2 text-[10px] text-sky-300 hover:text-sky-200 underline font-semibold flex items-center gap-1 cursor-pointer"
-                  >
-                    <RotateCcw className="w-3 h-3" /> {examResult ? 'Retake Exam to Re-calibrate' : 'Take Diagnostic Exam (15m)'}
-                  </button>
-                )}
-              </div>
-
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
-                <div>
-                  <span className="text-slate-400 text-[10px] uppercase font-bold block">Exam Loopholes Identified</span>
-                  <span className="text-xs font-bold text-rose-300 block truncate mt-0.5">
-                    {examResult?.dimensions?.math_analytical?.score < 80 
-                      ? 'Recurrence Relations & Asymptotic Math' 
-                      : 'High-Concurrency Distributed Locks'}
-                  </span>
-                  <span className="text-[10px] text-slate-300 block mt-0.5">
-                    Targeted in Steps 2 & 3 below
-                  </span>
-                </div>
-                <div className="text-[10px] text-emerald-300 flex items-center gap-1 mt-2">
-                  <CheckCircle2 className="w-3 h-3" /> Step-by-step remediation mapped
-                </div>
-              </div>
-
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
-                <div>
-                  <span className="text-slate-400 text-[10px] uppercase font-bold block">Roadmap Completion</span>
-                  <div className="flex items-center justify-between text-xs font-bold text-slate-200 mt-1">
-                    <span>{Object.values(completedChecklist).filter(Boolean).length} / 15 Milestones</span>
-                    <span>{Math.round((Object.values(completedChecklist).filter(Boolean).length / 15) * 100)}%</span>
-                  </div>
-                </div>
-                <div className="w-full bg-white/20 h-1.5 rounded-full overflow-hidden mt-1.5">
-                  <div
-                    className="h-full bg-sky-400 rounded-full transition-all duration-500"
-                    style={{ width: `${(Object.values(completedChecklist).filter(Boolean).length / 15) * 100}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* ========================================================= */}
           {/* SECTION: "HOW TO IMPROVE YOURSELF" (Aap Kaise Improve Karein) */}
           {/* ========================================================= */}
-          <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-3xl shadow-xs space-y-6">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-                <Lightbulb className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-slate-900 font-['Outfit']">
-                  How to Improve Yourself: Daily Blueprint & Mistake Rectification
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Exact tactical methods to raise your diagnostic scores, eliminate loopholes, and pass tech interviews
-                </p>
-              </div>
+          {/* ========================================================= */}
+          {/* DAILY BLUEPRINT & MISTAKE RECTIFICATION */}
+          {/* ========================================================= */}
+          <div className="bg-white border border-slate-200/80 p-6 sm:p-8 rounded-2xl shadow-xs space-y-6">
+            <div>
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900 font-['Outfit'] tracking-tight">
+                How to Improve Yourself: Daily Blueprint & Mistake Rectification
+              </h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Exact tactical methods to raise your diagnostic scores, eliminate loopholes, and pass tech interviews
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               
               {/* Daily 2-Hour Schedule */}
-              <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-3">
-                <span className="text-[10px] font-bold text-sky-800 bg-sky-100 px-2.5 py-0.5 rounded-full uppercase">
-                  Daily 2-Hour Routine
-                </span>
-                <h4 className="text-sm font-bold text-slate-900">
-                  Structured Preparation Routine
-                </h4>
-                <div className="space-y-2 text-xs">
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <strong className="text-slate-900 block text-[11px]">☀️ Morning (45 Mins): Algorithmic Rigor</strong>
-                    <span className="text-slate-600 text-[11px]">Solve 1 LeetCode Medium problem on recursion or trees with zero hints.</span>
+              <div className="p-5 rounded-xl border border-slate-200/90 bg-slate-50/50 space-y-3.5">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                    Daily 2-Hour Routine
+                  </span>
+                  <h4 className="text-sm font-bold text-slate-900 mt-0.5">
+                    Structured Preparation Routine
+                  </h4>
+                </div>
+                <div className="space-y-2.5 text-xs">
+                  <div className="p-3 rounded-lg bg-white border border-slate-200/80 space-y-1">
+                    <strong className="text-slate-900 block text-[12px] font-semibold">Morning (45 Mins): Algorithmic Rigor</strong>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">Solve 1 LeetCode Medium problem on recursion or trees with zero hints.</p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <strong className="text-slate-900 block text-[11px]">💻 Evening (45 Mins): Architecture Building</strong>
-                    <span className="text-slate-600 text-[11px]">Work on Redis Lua caching or Kafka message ingestion with git commits.</span>
+                  <div className="p-3 rounded-lg bg-white border border-slate-200/80 space-y-1">
+                    <strong className="text-slate-900 block text-[12px] font-semibold">Evening (45 Mins): Architecture Building</strong>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">Work on Redis Lua caching or Kafka message ingestion with git commits.</p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <strong className="text-slate-900 block text-[11px]">🌙 Night (30 Mins): STAR Drill & Revision</strong>
-                    <span className="text-slate-600 text-[11px]">Practice behavioral STAR answers and review diagnostic questions.</span>
+                  <div className="p-3 rounded-lg bg-white border border-slate-200/80 space-y-1">
+                    <strong className="text-slate-900 block text-[12px] font-semibold">Night (30 Mins): STAR Drill & Revision</strong>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">Practice behavioral STAR answers and review diagnostic questions.</p>
                   </div>
                 </div>
               </div>
 
               {/* Loopholes to Avoid */}
-              <div className="p-5 rounded-2xl border border-slate-200 bg-rose-50/20 space-y-3">
-                <span className="text-[10px] font-bold text-rose-800 bg-rose-100 px-2.5 py-0.5 rounded-full uppercase">
-                  Mistakes to Avoid
-                </span>
-                <h4 className="text-sm font-bold text-slate-900">
-                  Critical Technical Traps
-                </h4>
-                <div className="space-y-2 text-xs">
-                  <div className="p-2.5 rounded-xl bg-white border border-rose-200 text-rose-950">
-                    <strong className="text-rose-900 block text-[11px]">❌ Avoid Direct Database Locks</strong>
-                    <span className="text-slate-600 text-[11px]">Never lock database rows during flash-sales. Use Redis atomic Lua scripts.</span>
+              <div className="p-5 rounded-xl border border-slate-200/90 bg-slate-50/50 space-y-3.5">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                    Mistakes to Avoid
+                  </span>
+                  <h4 className="text-sm font-bold text-slate-900 mt-0.5">
+                    Critical Technical Traps
+                  </h4>
+                </div>
+                <div className="space-y-2.5 text-xs">
+                  <div className="p-3 rounded-lg bg-white border border-slate-200/80 space-y-1">
+                    <strong className="text-slate-900 block text-[12px] font-semibold">Avoid Direct Database Locks</strong>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">Never lock database rows during flash-sales. Use Redis atomic Lua scripts.</p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-rose-200 text-rose-950">
-                    <strong className="text-rose-900 block text-[11px]">❌ Avoid Vague Project Bullets</strong>
-                    <span className="text-slate-600 text-[11px]">Always quantify: state "reduced latency from 320ms to 42ms" rather than "fast API".</span>
+                  <div className="p-3 rounded-lg bg-white border border-slate-200/80 space-y-1">
+                    <strong className="text-slate-900 block text-[12px] font-semibold">Avoid Vague Project Bullets</strong>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">Always quantify: state "reduced latency from 320ms to 42ms" rather than "fast API".</p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-rose-200 text-rose-950">
-                    <strong className="text-rose-900 block text-[11px]">❌ Don't Neglect Base-Rate Priors</strong>
-                    <span className="text-slate-600 text-[11px]">In ML classification, accuracy is useless when rare fraud is 0.2%. Use PR-AUC.</span>
+                  <div className="p-3 rounded-lg bg-white border border-slate-200/80 space-y-1">
+                    <strong className="text-slate-900 block text-[12px] font-semibold">Don't Neglect Base-Rate Priors</strong>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">In ML classification, accuracy is useless when rare fraud is 0.2%. Use PR-AUC.</p>
                   </div>
                 </div>
               </div>
 
               {/* Salary & Career Progression */}
-              <div className="p-5 rounded-2xl border border-slate-200 bg-emerald-50/20 space-y-3">
-                <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full uppercase">
-                  Career Trajectory
-                </span>
-                <h4 className="text-sm font-bold text-slate-900">
-                  Expected Salary Progression
-                </h4>
-                <div className="space-y-2 text-xs">
-                  <div className="p-2.5 rounded-xl bg-white border border-emerald-200">
+              <div className="p-5 rounded-xl border border-slate-200/90 bg-slate-50/50 space-y-3.5">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                    Career Trajectory
+                  </span>
+                  <h4 className="text-sm font-bold text-slate-900 mt-0.5">
+                    Expected Salary Progression
+                  </h4>
+                </div>
+                <div className="space-y-2.5 text-xs">
+                  <div className="p-3 rounded-lg bg-white border border-slate-200/80 space-y-1">
                     <div className="flex justify-between items-center">
-                      <strong className="text-slate-900 text-[11px]">Level 1: Campus Placement</strong>
-                      <span className="text-emerald-700 font-bold">₹10 - 18 LPA</span>
+                      <strong className="text-slate-900 text-[12px] font-semibold">Level 1: Campus Placement</strong>
+                      <span className="text-slate-900 font-bold font-mono text-[12px]">₹10 - 18 LPA</span>
                     </div>
-                    <span className="text-slate-500 text-[10px]">Graduate SDE-1 / Associate Engineer</span>
+                    <p className="text-slate-500 text-[11px]">Graduate SDE-1 / Associate Engineer</p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-emerald-200">
+                  <div className="p-3 rounded-lg bg-white border border-slate-200/80 space-y-1">
                     <div className="flex justify-between items-center">
-                      <strong className="text-slate-900 text-[11px]">Level 2: 2-3 Years Growth</strong>
-                      <span className="text-emerald-700 font-bold">₹22 - 32 LPA</span>
+                      <strong className="text-slate-900 text-[12px] font-semibold">Level 2: 2-3 Years Growth</strong>
+                      <span className="text-slate-900 font-bold font-mono text-[12px]">₹22 - 32 LPA</span>
                     </div>
-                    <span className="text-slate-500 text-[10px]">SDE-2 / Systems & Backend Engineer</span>
+                    <p className="text-slate-500 text-[11px]">SDE-2 / Systems & Backend Engineer</p>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-emerald-200">
+                  <div className="p-3 rounded-lg bg-white border border-slate-200/80 space-y-1">
                     <div className="flex justify-between items-center">
-                      <strong className="text-slate-900 text-[11px]">Level 3: 5+ Years Architect</strong>
-                      <span className="text-emerald-700 font-bold">₹40 - 65+ LPA</span>
+                      <strong className="text-slate-900 text-[12px] font-semibold">Level 3: 5+ Years Architect</strong>
+                      <span className="text-slate-900 font-bold font-mono text-[12px]">₹40 - 65+ LPA</span>
                     </div>
-                    <span className="text-slate-500 text-[10px]">Staff Engineer / Solutions Architect</span>
+                    <p className="text-slate-500 text-[11px]">Staff Engineer / Solutions Architect</p>
                   </div>
                 </div>
               </div>
@@ -2407,19 +2240,16 @@ Projects:
                   <div>
                     <span className="text-[10px] font-bold text-sky-700 uppercase tracking-wider block">Phase 5: Weeks 11 - 12</span>
                     <h4 className="text-base font-bold text-slate-900">
-                      Placement Conversion, APAAR Ingestion & Offer Letter
+                      Placement Conversion, Credential Verification & Offer Letter
                     </h4>
                   </div>
                 </div>
-                <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 self-start sm:self-auto">
-                  🎯 Placement Ready
-                </span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                 <div className="md:col-span-2 space-y-3">
                   <p className="text-slate-600 leading-relaxed text-xs">
-                    <strong className="text-slate-900">Final Outcome:</strong> Authenticate degree credentials on DigiLocker / APAAR, connect with partner tech talent recruiters, and convert offers.
+                    <strong className="text-slate-900">Final Outcome:</strong> Authenticate degree credentials with institutional verification, connect with partner tech talent recruiters, and convert offers.
                   </p>
                   
                   {/* Action Checklist */}
@@ -2434,7 +2264,7 @@ Projects:
                         className="mt-0.5 rounded text-sky-600 focus:ring-sky-500 w-4 h-4 cursor-pointer"
                       />
                       <span className={`text-xs ${completedChecklist["step5_1"] ? 'line-through text-slate-400' : 'text-slate-800 font-medium'}`}>
-                        Ingest authenticated marksheet transcript via DigiLocker with cryptographic SHA-256 hash.
+                        Ingest authenticated marksheet transcript with institutional cryptographic SHA-256 hash.
                       </span>
                     </label>
 
@@ -2465,23 +2295,27 @@ Projects:
                 </div>
 
                 {/* Final Goal Card */}
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-sky-950 text-white flex flex-col justify-between space-y-3">
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-sky-50/80 via-white to-emerald-50/50 border border-sky-200/80 shadow-2xs flex flex-col justify-between space-y-4">
                   <div>
-                    <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block mb-1">
+                    <span className="text-[10px] font-bold text-sky-700 bg-sky-100/90 px-2.5 py-0.5 rounded-full border border-sky-200 uppercase tracking-wider inline-block mb-1.5">
                       Placement Benchmark
                     </span>
-                    <h5 className="text-sm font-bold leading-snug font-['Outfit']">
+                    <h5 className="text-sm font-bold text-slate-900 leading-snug font-['Outfit']">
                       Tier-1 Product Tech Engineer Offer
                     </h5>
-                    <p className="text-[11px] text-slate-300 mt-1">
-                      Expected Compensation: <strong className="text-emerald-400">₹14 - 22 LPA</strong>
-                    </p>
+                    <div className="mt-2.5 flex items-center gap-1.5 text-xs text-slate-600 flex-wrap">
+                      <span>Expected Compensation:</span>
+                      <span className="font-extrabold text-emerald-700 bg-emerald-100/70 border border-emerald-200 px-2 py-0.5 rounded-md text-xs">
+                        ₹14 - 22 LPA
+                      </span>
+                    </div>
                   </div>
                   <button
                     onClick={() => window.print()}
-                    className="w-full py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition border border-white/20 cursor-pointer"
+                    className="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-xs hover:shadow transition cursor-pointer"
                   >
-                    <Download className="w-3.5 h-3.5" /> Download Full Roadmap
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Download Full Roadmap</span>
                   </button>
                 </div>
               </div>

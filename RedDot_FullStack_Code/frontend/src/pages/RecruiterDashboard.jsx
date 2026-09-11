@@ -41,7 +41,7 @@ export const createCandidateDossier = (candidate = {}) => ({
   name: candidate.name || candidate.student_name || "Candidate",
   role_title: candidate.role || candidate.role_title || "Engineering Candidate",
   college: candidate.college || "Higher Education Institution",
-  apaar_id: candidate.apaar_id || "APAAR-VERIFIED",
+  apaar_id: candidate.apaar_id || "VERIFIED",
   cgpa: candidate.cgpa || "N/A",
   class_rank: "Verified Candidate",
   bio: "Candidate profile registered on the National Higher Education & Campus Placement Grid.",
@@ -217,7 +217,7 @@ const INITIAL_RECRUITER_DATA = {
       id: "hire-1",
       student_name: "Rahul Verma",
       college: "National Institute of Technology (NIT) Raipur",
-      apaar_id: "APAAR-8821-4902-1190",
+      apaar_id: "STU-8821-4902-1190",
       offered_ctc: "₹14.5 LPA",
       joining_date: "July 1, 2026",
       role_selected: "AI Systems Engineer",
@@ -226,7 +226,7 @@ const INITIAL_RECRUITER_DATA = {
         moa_number: "MOA-NITR-2026-089",
         placement_cell: "NIT Raipur Corporate Career Center",
         officer: "Dr. S. K. Gupta (Head of Placements)",
-        verification_status: "DigiLocker Cryptographically Verified",
+        verification_status: "Institutionally Cryptographically Verified",
         sha256_hash: "0x8f2a74c19b882e30d12ac491901fa9b882e30d12ac491901fa9"
       }
     },
@@ -234,7 +234,7 @@ const INITIAL_RECRUITER_DATA = {
       id: "hire-2",
       student_name: "Ananya Sharma",
       college: "BITS Pilani (Goa Campus)",
-      apaar_id: "APAAR-9104-5829-3341",
+      apaar_id: "STU-9104-5829-3341",
       offered_ctc: "₹16.0 LPA",
       joining_date: "July 15, 2026",
       role_selected: "Distributed Cloud Engineer",
@@ -243,7 +243,7 @@ const INITIAL_RECRUITER_DATA = {
         moa_number: "MOA-BITS-2026-114",
         placement_cell: "BITS Career & Internship Directorate",
         officer: "Prof. M. Roy (Placement Chair)",
-        verification_status: "DigiLocker Cryptographically Verified",
+        verification_status: "Institutionally Cryptographically Verified",
         sha256_hash: "0x4e21a8f93010baec9381a18274a9840291baec9381a18274a9"
       }
     },
@@ -251,7 +251,7 @@ const INITIAL_RECRUITER_DATA = {
       id: "hire-3",
       student_name: "Siddharth Nair",
       college: "IIT Bombay • M.Tech Computer Science",
-      apaar_id: "APAAR-7712-9903-8821",
+      apaar_id: "STU-7712-9903-8821",
       offered_ctc: "₹22.0 LPA",
       joining_date: "August 1, 2026",
       role_selected: "Senior AI Research Fellow",
@@ -260,7 +260,7 @@ const INITIAL_RECRUITER_DATA = {
         moa_number: "MOA-IITB-2026-042",
         placement_cell: "IIT Bombay Placement Office",
         officer: "Dr. K. Raman (Director, Industry Relations)",
-        verification_status: "DigiLocker Cryptographically Verified",
+        verification_status: "Institutionally Cryptographically Verified",
         sha256_hash: "0x9183ab92841029cba8371904a8b7263541029cba8371904a8b"
       }
     }
@@ -731,7 +731,7 @@ export default function RecruiterDashboard() {
             <div className="flex items-center gap-1.5 mt-1.5">
               <Check className="w-3.5 h-3.5 text-emerald-600" />
               <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                Verified credentials (APAAR)
+                Verified credentials
               </span>
             </div>
           </div>
@@ -1187,7 +1187,7 @@ export default function RecruiterDashboard() {
             {/* Modal Footer */}
             <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
               <span className="text-xs text-slate-400">
-                Automatic closing triggers 24h reminders to student applicants on APAAR
+                Automatic closing triggers 24h reminders to student applicants
               </span>
               <button
                 onClick={() => setActiveModal(null)}
@@ -1218,7 +1218,7 @@ export default function RecruiterDashboard() {
                   Total Student Applications (48 Candidates)
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Verified degree records with DigiLocker transcript validation and ATS competency match
+                  Verified degree records with institutional transcript validation and ATS competency match
                 </p>
               </div>
               <button 
@@ -1260,7 +1260,7 @@ export default function RecruiterDashboard() {
                     applicantFilter === 'VERIFIED' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Check className="w-3.5 h-3.5 text-emerald-600" /> APAAR Verified (42)
+                  <Check className="w-3.5 h-3.5 text-emerald-600" /> Verified Credentials (42)
                 </button>
                 <button
                   onClick={() => setApplicantFilter('PENDING')}
@@ -1281,7 +1281,7 @@ export default function RecruiterDashboard() {
                     <tr>
                       <th className="py-3 px-4">Candidate & College</th>
                       <th className="py-3 px-4">Role Applied</th>
-                      <th className="py-3 px-4">APAAR & CGPA</th>
+                      <th className="py-3 px-4">Verification & CGPA</th>
                       <th className="py-3 px-4">Match Score</th>
                       <th className="py-3 px-4">Status</th>
                       <th className="py-3 px-4 text-right">Actions</th>
@@ -1314,9 +1314,9 @@ export default function RecruiterDashboard() {
                           {app.verified ? (
                             <div>
                               <span className="inline-flex items-center gap-1 text-emerald-700 font-bold text-[10px] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> APAAR Verified
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Verified
                               </span>
-                              <span className="text-[10px] text-slate-400 block mt-0.5">CGPA: {app.cgpa} • {app.apaar_id}</span>
+                              <span className="text-[10px] text-slate-400 block mt-0.5">CGPA: {app.cgpa}</span>
                             </div>
                           ) : (
                             <div>
@@ -1436,7 +1436,7 @@ export default function RecruiterDashboard() {
                     Exceptional Benchmark Pool Match (91% Average)
                   </h3>
                   <p className="text-xs text-slate-600 mt-0.5">
-                    12 candidates selected out of 48 applications. 100% verified academic credentials via APAAR.
+                    12 candidates selected out of 48 applications. 100% verified academic credentials.
                   </p>
                 </div>
               </div>
@@ -1587,7 +1587,7 @@ export default function RecruiterDashboard() {
                 </div>
                 <div>
                   <strong className="block text-slate-900 font-bold">100% University Placement Linkage Completed</strong>
-                  <span className="text-slate-600 text-[11px]">All 3 hires backed by authorized MoA and DigiLocker cryptographic validation</span>
+                  <span className="text-slate-600 text-[11px]">All 3 hires backed by authorized MoA and institutional cryptographic validation</span>
                 </div>
               </div>
 
@@ -1613,7 +1613,7 @@ export default function RecruiterDashboard() {
                           </span>
                         </div>
                         <p className="text-xs text-slate-500 mt-0.5">
-                          {hire.college} • <span className="font-mono text-slate-700 font-semibold">APAAR: {hire.apaar_id}</span>
+                          {hire.college} • <span className="font-mono text-slate-700 font-semibold">ID: {hire.apaar_id}</span>
                         </p>
                       </div>
                     </div>
@@ -1649,7 +1649,7 @@ export default function RecruiterDashboard() {
 
                     <div className="pt-2 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px]">
                       <span className="text-emerald-800 font-semibold flex items-center gap-1">
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> {hire.university_linkage?.verification_status || "DigiLocker Cryptographically Verified"}
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> {hire.university_linkage?.verification_status || "Institutionally Cryptographically Verified"}
                       </span>
                       <span className="font-mono text-slate-400 text-[10px]">
                         Cryptographic Seal: {hire.university_linkage?.sha256_hash || "0x8f2a74c19b882e30d12ac491901fa9"}
@@ -1689,7 +1689,7 @@ export default function RecruiterDashboard() {
             {/* Modal Footer */}
             <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
               <span className="text-xs text-slate-400">
-                Official placement linkage letters are stored permanently on DigiLocker
+                Official placement linkage letters are stored permanently on institutional registry
               </span>
               <button
                 onClick={() => setActiveModal(null)}
@@ -1876,7 +1876,7 @@ export default function RecruiterDashboard() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-500">
-                      {data.ai_recommended_candidates[0].college} • <span className="font-mono text-slate-700">APAAR: {data.ai_recommended_candidates[0].apaar_id || 'VERIFIED'}</span> • CGPA: {data.ai_recommended_candidates[0].cgpa || 'N/A'}
+                      {data.ai_recommended_candidates[0].college} • <span className="font-mono text-slate-700">ID: {data.ai_recommended_candidates[0].apaar_id || 'VERIFIED'}</span> • CGPA: {data.ai_recommended_candidates[0].cgpa || 'N/A'}
                     </p>
                     <div className="flex items-center gap-1.5 mt-1 text-[11px] text-slate-600">
                       <span className="font-bold text-sky-700">Verified Skills</span>: {(data.ai_recommended_candidates[0].skills || []).slice(0, 4).join(', ')}
@@ -1985,7 +1985,7 @@ export default function RecruiterDashboard() {
                   {data?.ai_recommended_candidates?.[0] && (
                     <p>🌟 <strong className="text-emerald-300">Top Candidate:</strong> {data.ai_recommended_candidates[0].name} ({data.ai_recommended_candidates[0].college}) — {data.ai_recommended_candidates[0].match_score}% Match</p>
                   )}
-                  <p>🔒 <strong className="text-sky-300">Security:</strong> 100% transcripts verified via DigiLocker SHA-256 seal</p>
+                  <p>🔒 <strong className="text-sky-300">Security:</strong> 100% transcripts verified via institutional SHA-256 seal</p>
                 </div>
               </div>
             </div>
@@ -2052,7 +2052,7 @@ export default function RecruiterDashboard() {
                       {selectedStudentProfile.name}
                     </h2>
                     <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> DigiLocker Verified
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Institutionally Verified
                     </span>
                     <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200 text-xs font-extrabold font-mono">
                       {selectedStudentProfile.match_score}% Match
@@ -2062,7 +2062,7 @@ export default function RecruiterDashboard() {
                     {selectedStudentProfile.role_title || selectedStudentProfile.college}
                   </p>
                   <p className="text-[11px] text-slate-500 mt-0.5">
-                    {selectedStudentProfile.college} • <span className="font-mono text-slate-700 font-bold">APAAR: {selectedStudentProfile.apaar_id || '9938-4821-2026'}</span> • <strong className="text-emerald-700">CGPA: {selectedStudentProfile.cgpa || '8.84'}</strong> ({selectedStudentProfile.class_rank || 'Top 3%'})
+                    {selectedStudentProfile.college} • <span className="font-mono text-slate-700 font-bold">ID: {selectedStudentProfile.apaar_id || '9938-4821-2026'}</span> • <strong className="text-emerald-700">CGPA: {selectedStudentProfile.cgpa || '8.84'}</strong> ({selectedStudentProfile.class_rank || 'Top 3%'})
                   </p>
                 </div>
               </div>
@@ -2110,7 +2110,7 @@ export default function RecruiterDashboard() {
                 }`}
               >
                 <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Academic Transcripts (APAAR)</span>
+                <span>Academic Transcripts</span>
               </button>
               <button
                 onClick={() => setProfileTab('certifications')}
@@ -2266,12 +2266,12 @@ export default function RecruiterDashboard() {
               </div>
             )}
 
-            {/* TAB 3: ACADEMIC TRANSCRIPTS (APAAR) */}
+            {/* TAB 3: ACADEMIC TRANSCRIPTS */}
             {profileTab === 'academics' && (
               <div className="space-y-4">
                 <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                   <div>
-                    <strong className="block text-slate-900 font-bold">Official National Academic Depository (APAAR / DigiLocker)</strong>
+                    <strong className="block text-slate-900 font-bold">Official National Academic Depository</strong>
                     <span className="text-slate-600 text-[11px]">Degree transcript cryptographically hashed: {selectedStudentProfile.verified_hash || '0x8f2a74c19b882e30d12ac491901fa9'}</span>
                   </div>
                   <span className="px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold text-xs self-start sm:self-auto">

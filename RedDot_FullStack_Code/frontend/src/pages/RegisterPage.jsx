@@ -762,7 +762,7 @@ export default function RegisterPage({ setActiveRole, setActiveTab }) {
                       {isVerifiedOtp && (
                         <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] flex items-center gap-1.5 font-medium">
                           <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                          <span>Credentials Authenticated & Verified with DigiLocker / APAAR Depository</span>
+                          <span>Credentials Authenticated & Verified with Institutional Academic Registry</span>
                         </div>
                       )}
                     </div>

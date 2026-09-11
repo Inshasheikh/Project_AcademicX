@@ -200,9 +200,9 @@ const INITIAL_RECOMMENDED_PROJECTS = [
     target_year: "Final Year Capstone / SIH Flagship",
     difficulty: "Advanced",
     tech_stack: ["React 19", "Django REST", "PostgreSQL", "Redis", "Docker", "PyTorch Vector Search"],
-    problem_statement: "Campus placement processes suffer from unverified resume claims and slow candidate discovery. Build an end-to-end grid connecting student APAAR IDs to cryptographically verified DigiLocker transcripts with vector-based semantic ATS matching in <25ms.",
+    problem_statement: "Campus placement processes suffer from unverified resume claims and slow candidate discovery. Build an end-to-end grid connecting student profiles to cryptographically verified academic transcripts with vector-based semantic ATS matching in <25ms.",
     expected_deliverables: [
-      "SHA-256 cryptographic transcript hashing linked to DigiLocker",
+      "SHA-256 cryptographic transcript hashing linked to institutional registry",
       "Sub-25ms vector retrieval for candidate-role qualification match",
       "Automated loophole diagnostic engine with technical interview simulator"
     ],
@@ -272,7 +272,7 @@ export default function FacultyDashboard() {
     total_registered_students: 0,
     department_breakdown: {},
     avg_placement_readiness: 0.0,
-    verified_apaar_rate: "0%",
+    verified_academic_rate: "0%",
     active_events_count: 4,
     free_courses_count: 4
   });
@@ -482,18 +482,7 @@ export default function FacultyDashboard() {
       {/* ========================================================= */}
       <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-3xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-xs">
         <div>
-          <div className="flex items-center gap-2 text-sky-700 text-xs font-bold uppercase tracking-wider mb-1.5 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200">
-              <Building2 className="w-3.5 h-3.5 text-sky-600" />
-              <span>{overview.institution_name}</span>
-            </span>
-            <span className="text-slate-400">•</span>
-            <span className="text-slate-500 font-mono text-[11px]">AISHE Code: {overview.aishe_code}</span>
-            <span className="text-slate-400">•</span>
-            <span className="text-emerald-700 font-semibold flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> AICTE &amp; NEP-2020 Aligned
-            </span>
-          </div>
+
 
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Outfit']">
             {overview.institution_name} Academic &amp; Placement Hub
@@ -554,7 +543,7 @@ export default function FacultyDashboard() {
               {overview.total_registered_students || 142}
             </div>
             <p className="text-[11px] text-emerald-700 font-semibold mt-1 flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 100% Verified DigiLocker APAAR
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 100% Verified Academic Depository
             </p>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-sky-700">
@@ -707,7 +696,7 @@ export default function FacultyDashboard() {
                 </span>
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Students from {overview.institution_name} registered on REDDOT with verified APAAR academic credentials
+                Students from {overview.institution_name} registered on REDDOT with verified academic credentials
               </p>
             </div>
 
@@ -734,7 +723,7 @@ export default function FacultyDashboard() {
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
               <input
                 type="text"
-                placeholder="Search by student name, roll number, or APAAR ID..."
+                placeholder="Search by student name, roll number, or department..."
                 value={studentSearch}
                 onChange={(e) => setStudentSearch(e.target.value)}
                 className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
@@ -791,7 +780,7 @@ export default function FacultyDashboard() {
                   <tr>
                     <th className="py-3.5 px-4">Student &amp; College Roll</th>
                     <th className="py-3.5 px-4">Branch &amp; Year</th>
-                    <th className="py-3.5 px-4">APAAR &amp; CGPA</th>
+                    <th className="py-3.5 px-4">Academic ID &amp; CGPA</th>
                     <th className="py-3.5 px-4">Diagnostic Assessment</th>
                     <th className="py-3.5 px-4">Placement Status</th>
                     <th className="py-3.5 px-4 text-right">Student Dossier</th>
@@ -842,7 +831,7 @@ export default function FacultyDashboard() {
                         <span className="text-[11px] text-slate-500">{student.year}</span>
                       </td>
 
-                      {/* APAAR ID & CGPA */}
+                      {/* Academic ID & CGPA */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-1.5">
                           <span className="font-mono text-slate-700 font-bold">{student.apaar_id}</span>
@@ -1311,7 +1300,7 @@ export default function FacultyDashboard() {
                       {selectedStudent.name}
                     </h2>
                     <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> DigiLocker Verified
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Institutionally Verified
                     </span>
                     <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200 text-xs font-mono font-bold">
                       {selectedStudent.diagnostic_score}% Diagnostic
@@ -1322,7 +1311,7 @@ export default function FacultyDashboard() {
                     {selectedStudent.degree} • {selectedStudent.year} • Roll No: <strong className="font-mono text-slate-900">{selectedStudent.roll_no}</strong>
                   </p>
                   <p className="text-[11px] text-slate-500 mt-0.5">
-                    APAAR ID: <span className="font-mono text-slate-700 font-bold">{selectedStudent.apaar_id}</span> • <strong className="text-emerald-700">CGPA: {selectedStudent.cgpa}</strong> ({selectedStudent.class_rank}) • {selectedStudent.email}
+                    Academic ID: <span className="font-mono text-slate-700 font-bold">{selectedStudent.apaar_id || selectedStudent.roll_no}</span> • <strong className="text-emerald-700">CGPA: {selectedStudent.cgpa}</strong> ({selectedStudent.class_rank}) • {selectedStudent.email}
                   </p>
                 </div>
               </div>
@@ -1512,7 +1501,7 @@ export default function FacultyDashboard() {
                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-slate-700 leading-relaxed font-mono text-[11px]">
                   <p className="text-slate-900 font-bold">OFFICIAL FACULTY RECOMMENDATION LETTER</p>
                   <p>Institution: {overview.institution_name} • Department of CSE</p>
-                  <p>Candidate: {selectedStudent.name} (Roll: {selectedStudent.roll_no}, APAAR: {selectedStudent.apaar_id})</p>
+                  <p>Candidate: {selectedStudent.name} (Roll: {selectedStudent.roll_no})</p>
                   <div className="border-t border-slate-200 pt-2 text-slate-600">
                     "I am pleased to endorse {selectedStudent.name}, who currently ranks in the {selectedStudent.class_rank} with a verified CGPA of {selectedStudent.cgpa}. Their technical rigor across distributed computing, software architecture, and problem solving has been validated on our university laboratory grid. Highly recommended for technical fellowships and senior campus hiring."
                   </div>

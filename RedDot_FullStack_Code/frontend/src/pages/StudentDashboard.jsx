@@ -40,12 +40,91 @@ import {
   Tag,
   Target,
   Compass,
-  Mic
+  Mic,
+  Search
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../services/api';
 import SkillDiagnosticPage from './SkillDiagnosticPage';
 import CareerCoachPage from './CareerCoachPage';
+
+const PREDEFINED_SKILLS_LIBRARY = [
+  { name: 'Python', category: 'Technical' },
+  { name: 'PyTorch', category: 'Technical' },
+  { name: 'PySpark', category: 'Technical' },
+  { name: 'PyTest', category: 'Technical' },
+  { name: 'JavaScript', category: 'Technical' },
+  { name: 'TypeScript', category: 'Technical' },
+  { name: 'Java', category: 'Technical' },
+  { name: 'C++', category: 'Technical' },
+  { name: 'C#', category: 'Technical' },
+  { name: 'Go (Golang)', category: 'Technical' },
+  { name: 'Rust', category: 'Technical' },
+  { name: 'PHP', category: 'Technical' },
+  { name: 'Ruby', category: 'Technical' },
+  { name: 'Swift', category: 'Technical' },
+  { name: 'Kotlin', category: 'Technical' },
+  { name: 'SQL', category: 'Technical' },
+  { name: 'HTML5', category: 'Technical' },
+  { name: 'CSS3 / Tailwind', category: 'Technical' },
+  { name: 'R', category: 'Technical' },
+  { name: 'Scala', category: 'Technical' },
+  { name: 'React', category: 'Technical' },
+  { name: 'React Native', category: 'Technical' },
+  { name: 'Next.js', category: 'Technical' },
+  { name: 'Node.js', category: 'Technical' },
+  { name: 'Express.js', category: 'Technical' },
+  { name: 'Django', category: 'Technical' },
+  { name: 'FastAPI', category: 'Technical' },
+  { name: 'Flask', category: 'Technical' },
+  { name: 'Spring Boot', category: 'Technical' },
+  { name: 'Vue.js', category: 'Technical' },
+  { name: 'Angular', category: 'Technical' },
+  { name: 'GraphQL', category: 'Technical' },
+  { name: 'REST APIs', category: 'Technical' },
+  { name: 'WebSockets', category: 'Technical' },
+  { name: 'Microservices', category: 'Technical' },
+  { name: 'Docker', category: 'Technical' },
+  { name: 'Kubernetes', category: 'Technical' },
+  { name: 'AWS (Amazon Web Services)', category: 'Technical' },
+  { name: 'Microsoft Azure', category: 'Technical' },
+  { name: 'Google Cloud Platform (GCP)', category: 'Technical' },
+  { name: 'CI/CD Pipelines', category: 'Technical' },
+  { name: 'Git & GitHub', category: 'Technical' },
+  { name: 'Linux / Bash', category: 'Technical' },
+  { name: 'Terraform', category: 'Technical' },
+  { name: 'Kafka', category: 'Technical' },
+  { name: 'RabbitMQ', category: 'Technical' },
+  { name: 'Nginx', category: 'Technical' },
+  { name: 'PostgreSQL', category: 'Technical' },
+  { name: 'MongoDB', category: 'Technical' },
+  { name: 'MySQL', category: 'Technical' },
+  { name: 'Redis', category: 'Technical' },
+  { name: 'Elasticsearch', category: 'Technical' },
+  { name: 'Cassandra', category: 'Technical' },
+  { name: 'Firebase', category: 'Technical' },
+  { name: 'Supabase', category: 'Technical' },
+  { name: 'Machine Learning', category: 'Technical' },
+  { name: 'Deep Learning', category: 'Technical' },
+  { name: 'TensorFlow', category: 'Technical' },
+  { name: 'Scikit-Learn', category: 'Technical' },
+  { name: 'Computer Vision', category: 'Technical' },
+  { name: 'Natural Language Processing (NLP)', category: 'Technical' },
+  { name: 'Hugging Face', category: 'Technical' },
+  { name: 'OpenCV', category: 'Technical' },
+  { name: 'Large Language Models (LLMs)', category: 'Technical' },
+  { name: 'Pandas & NumPy', category: 'Technical' },
+  { name: 'Data Structures & Algorithms (DSA)', category: 'Technical' },
+  { name: 'System Design', category: 'Technical' },
+  { name: 'Problem Solving', category: 'Soft Skill' },
+  { name: 'Critical Thinking', category: 'Soft Skill' },
+  { name: 'Team Leadership', category: 'Soft Skill' },
+  { name: 'Agile & Scrum', category: 'Soft Skill' },
+  { name: 'Technical Communication', category: 'Soft Skill' },
+  { name: 'Project Management', category: 'Soft Skill' },
+  { name: 'Time Management', category: 'Soft Skill' },
+  { name: 'Code Review & Mentorship', category: 'Soft Skill' }
+];
 
 export default function StudentDashboard({ setActiveTab, initialSection = 'jobs' }) {
   const navigate = useNavigate();
@@ -115,7 +194,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
     }
   })();
   const studentName = currentUser?.full_name || 'Student';
-  const studentRollNo = currentUser?.student_roll_no || currentUser?.apaar_id || 'Verified Student';
+  const studentRollNo = currentUser?.student_roll_no || currentUser?.apaar_id || '';
 
   // Social & Professional Profiles
   const [portfolioLinks, setPortfolioLinks] = useState(() => {
@@ -156,6 +235,18 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
     }
   });
   const [newSkillInput, setNewSkillInput] = useState('');
+  const [showSkillDropdown, setShowSkillDropdown] = useState(false);
+  const skillDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (skillDropdownRef.current && !skillDropdownRef.current.contains(e.target)) {
+        setShowSkillDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Projects Showcase
   const [projectsList, setProjectsList] = useState(() => {
@@ -663,22 +754,27 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleAddSkill = (category = 'Technical') => {
-    if (!newSkillInput.trim()) return;
-    if (skillTags.some(s => s.name.toLowerCase() === newSkillInput.trim().toLowerCase())) {
+  const handleAddSkill = (skillOrName, category = 'Technical') => {
+    const nameToAdd = typeof skillOrName === 'string' ? skillOrName.trim() : (skillOrName?.name || newSkillInput).trim();
+    const catToAdd = typeof skillOrName === 'object' && skillOrName?.category ? skillOrName.category : category;
+    if (!nameToAdd) return;
+    if (skillTags.some(s => s.name.toLowerCase() === nameToAdd.toLowerCase())) {
       setToast("Skill already exists in matrix!");
       setTimeout(() => setToast(null), 2500);
+      setNewSkillInput('');
+      setShowSkillDropdown(false);
       return;
     }
-    const updated = [...skillTags, { name: newSkillInput.trim(), category }];
+    const updated = [...skillTags, { name: nameToAdd, category: catToAdd }];
     setSkillTags(updated);
     setNewSkillInput('');
+    setShowSkillDropdown(false);
     try {
       localStorage.setItem('academicx_skill_tags', JSON.stringify(updated));
     } catch (e) {
       console.warn(e);
     }
-    setToast(`Added "${newSkillInput.trim()}" to your Skills Matrix!`);
+    setToast(`Added "${nameToAdd}" to your Skills Matrix!`);
     setTimeout(() => setToast(null), 2500);
   };
 
@@ -828,36 +924,22 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
             <div className="space-y-1.5 flex-1">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Outfit'] flex items-center gap-2">
                 <span>Welcome back, {studentName}</span>
-                {isProfileVerified && (
-                  <span 
-                    className="inline-flex items-center transition-transform hover:scale-110 cursor-help" 
-                    title="Verified Student Profile • All institutional academic documents verified by Registrar"
-                  >
-                    <svg className="w-6 h-6 text-sky-500 fill-sky-500 shrink-0 drop-shadow-xs" viewBox="0 0 24 24">
-                      <path fillRule="evenodd" d="M8.6 2.25A3.375 3.375 0 0 0 5.36 4.39 3.375 3.375 0 0 0 3.25 7.6a3.375 3.375 0 0 0 .96 3.19 3.375 3.375 0 0 0-.96 3.2 3.375 3.375 0 0 0 2.11 3.2 3.375 3.375 0 0 0 3.24 2.14 3.375 3.375 0 0 0 3.2 1.42 3.375 3.375 0 0 0 3.2-1.42 3.375 3.375 0 0 0 3.24-2.13 3.375 3.375 0 0 0 2.11-3.21 3.375 3.375 0 0 0-.96-3.2 3.375 3.375 0 0 0 .96-3.19 3.375 3.375 0 0 0-2.11-3.21 3.375 3.375 0 0 0-3.24-2.14 3.375 3.375 0 0 0-3.2-1.42 3.375 3.375 0 0 0-3.2 1.42Z" clipRule="evenodd" />
-                      <path fill="#ffffff" d="m10.25 14.5-2.25-2.25 1.06-1.06 1.19 1.19 4.44-4.44 1.06 1.06-5.5 5.5Z" />
-                    </svg>
-                  </span>
-                )}
               </h1>
 
               <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                {currentUser?.branch || 'Academic Track'}{currentUser?.college ? ` • ${currentUser.college}` : ''} • ID: {studentRollNo}
+                {currentUser?.branch || 'Academic Track'}{currentUser?.college ? ` • ${currentUser.college}` : ''}{studentRollNo ? ` • ID: ${studentRollNo}` : ''}
               </p>
             </div>
           </div>
 
-          {/* Attractive View Academic Transcripts Button */}
+          {/* Simple View Academic Transcripts Button */}
           <div className="w-full sm:w-auto shrink-0 pt-2 lg:pt-0">
             <button
               type="button"
               onClick={() => setShowDocModal(true)}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white font-semibold text-xs shadow-sm hover:shadow-md flex items-center justify-center gap-2.5 transition-all duration-200 cursor-pointer group"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
             >
-              <div className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-3.5 h-3.5 text-white group-hover:scale-110 transition-transform" />
-              </div>
-              <span className="tracking-tight">View Academic Transcripts</span>
+              <span>View Academic Transcripts</span>
               <span className="px-2 py-0.5 rounded-full bg-white/25 text-white text-[11px] font-bold">
                 {academicDocuments.length}
               </span>
@@ -867,44 +949,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
       </div>
 
       {/* Stats Cards Row - Interactive & Clickable */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Placement Readiness / Diagnostic Benchmark Score Card */}
-        <div 
-          onClick={() => {
-            setActiveMainSection('diagnostic');
-            navigate('/student/skills');
-          }}
-          className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs hover:border-sky-400 hover:shadow-md transition-all cursor-pointer group relative overflow-hidden"
-          title="Click to take or view AI Skill Diagnostic Benchmark Test"
-        >
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-semibold text-slate-500">Placement Readiness</span>
-            <span className="text-[10px] text-sky-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
-              Take Test &rarr;
-            </span>
-          </div>
-          <div className="text-3xl font-extrabold text-slate-900 font-['Outfit'] group-hover:text-sky-600 transition-colors">
-            {diagnosticScore}%
-          </div>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-[11px] text-emerald-600 font-medium flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Diagnostic Benchmark Score
-            </span>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveStatsModal('readiness');
-              }}
-              className="text-[10px] text-slate-400 hover:text-sky-600 font-semibold underline cursor-pointer"
-              title="View full competency report"
-            >
-              Breakdown
-            </button>
-          </div>
-        </div>
-
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Active Applications Card */}
         <div 
           onClick={() => setActiveStatsModal('applications')}
@@ -980,7 +1025,6 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
             >
-              <Briefcase className={`w-4 h-4 transition-colors ${activeMainSection === 'jobs' ? 'text-sky-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
               <span>Opportunities</span>
               {jobs.length > 0 && (
                 <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold transition-colors ${
@@ -1006,7 +1050,6 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
             >
-              <Target className={`w-4 h-4 transition-colors ${activeMainSection === 'diagnostic' ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
               <span>Skill Analysis</span>
             </button>
 
@@ -1023,7 +1066,6 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
             >
-              <Compass className={`w-4 h-4 transition-colors ${activeMainSection === 'roadmap' ? 'text-amber-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
               <span>Learning Roadmap</span>
             </button>
 
@@ -1040,7 +1082,6 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
             >
-              <Mic className={`w-4 h-4 transition-colors ${activeMainSection === 'interview' ? 'text-rose-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
               <span>Mock Interview</span>
             </button>
 
@@ -1057,7 +1098,6 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
             >
-              <FileText className={`w-4 h-4 transition-colors ${activeMainSection === 'resume' ? 'text-purple-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
               <span>Resume Review</span>
             </button>
 
@@ -1074,46 +1114,24 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
             >
-              <Sparkles className={`w-4 h-4 transition-colors ${activeMainSection === 'portfolio' ? 'text-emerald-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
               <span>Portfolio</span>
             </button>
           </div>
         </div>
 
-        {/* Recruiter Visibility Toggle Badge */}
-        <div className="flex items-center justify-between xl:justify-start gap-3 px-3 py-1.5 rounded-xl bg-slate-50/80 border border-slate-200/80 text-xs shrink-0 self-stretch xl:self-auto">
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              {recruiterVisibility && (
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              )}
-              <span className={`relative inline-flex rounded-full h-2 w-2 ${recruiterVisibility ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
-            </span>
-            <span className="text-slate-500 font-medium text-[11px] whitespace-nowrap">Recruiter Discovery:</span>
-          </div>
-
+        {/* Recruiter Visibility Toggle Button */}
+        <div className="flex items-center shrink-0 self-stretch xl:self-auto">
           <button
             type="button"
             onClick={handleToggleRecruiterVisibility}
-            className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer ${
+            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer ${
               recruiterVisibility
                 ? 'bg-emerald-100/80 text-emerald-800 hover:bg-emerald-200/70 border border-emerald-300/60'
                 : 'bg-slate-200/80 text-slate-700 hover:bg-slate-300/70 border border-slate-300/70'
             }`}
             title={recruiterVisibility ? 'Visible to recruiters. Click to toggle private.' : 'Hidden from recruiters. Click to toggle public.'}
           >
-            <span className="text-[11px]">{recruiterVisibility ? 'Public' : 'Private'}</span>
-            <span 
-              className={`w-6 h-3.5 flex items-center rounded-full p-0.5 transition-colors duration-200 ${
-                recruiterVisibility ? 'bg-emerald-600' : 'bg-slate-400'
-              }`}
-            >
-              <span 
-                className={`bg-white w-2.5 h-2.5 rounded-full shadow-xs transform transition-transform duration-200 ${
-                  recruiterVisibility ? 'translate-x-2.5' : 'translate-x-0'
-                }`} 
-              />
-            </span>
+            {recruiterVisibility ? 'Public' : 'Private'}
           </button>
         </div>
       </div>
@@ -1165,7 +1183,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                       : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
                   }`}
                 >
-                  💼 Placement Drives ({jobs.filter(j => !j.isFree).length})
+                  Placement Drives ({jobs.filter(j => !j.isFree).length})
                 </button>
 
                 <button
@@ -1177,7 +1195,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                       : 'bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100'
                   }`}
                 >
-                  🎁 Free Tracks & Externships ({jobs.filter(j => j.isFree).length})
+                  Free Tracks & Externships ({jobs.filter(j => j.isFree).length})
                 </button>
               </div>
             )}
@@ -1256,9 +1274,6 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                       <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-slate-500">
                         <span className="bg-slate-100 px-2 py-0.5 rounded font-medium text-slate-700">
                           🎓 Criteria: {job.requirements?.minGpa}
-                        </span>
-                        <span className="bg-slate-100 px-2 py-0.5 rounded font-medium text-slate-700">
-                          📅 {job.requirements?.graduatingYears}
                         </span>
                       </div>
 
@@ -1398,40 +1413,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
       {/* VIEW 2: ACADEMIC & PROFESSIONAL PORTFOLIO (PROFILE ENHANCEMENT) */}
       {activeMainSection === 'portfolio' && (
         <div className="space-y-6 animate-fade-in">
-          {/* Recruiter Visibility Banner */}
-          <div className={`p-5 rounded-2xl border transition-all ${
-            recruiterVisibility 
-              ? 'bg-gradient-to-r from-emerald-900 via-slate-900 to-sky-900 text-white border-emerald-500/40 shadow-sm'
-              : 'bg-slate-100 text-slate-800 border-slate-300'
-          }`}>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className={`w-2.5 h-2.5 rounded-full ${recruiterVisibility ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'}`}></span>
-                  <h3 className="text-base font-bold font-['Outfit']">
-                    Corporate Recruiter Visibility Status: {recruiterVisibility ? 'Active & Visible' : 'Private'}
-                  </h3>
-                </div>
-                <p className={`text-xs ${recruiterVisibility ? 'text-emerald-100' : 'text-slate-600'} max-w-2xl`}>
-                  {recruiterVisibility 
-                    ? 'Your verified academic credentials, projects showcase, and verified skill diagnostics are visible to campus recruiters and enterprise talent acquisition teams.'
-                    : 'Your portfolio is currently hidden from corporate searches. Only companies you directly apply to can view your credentials.'}
-                </p>
-              </div>
 
-              <button
-                type="button"
-                onClick={handleToggleRecruiterVisibility}
-                className={`px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-sm cursor-pointer shrink-0 ${
-                  recruiterVisibility 
-                    ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                    : 'bg-slate-900 hover:bg-slate-800 text-white'
-                }`}
-              >
-                {recruiterVisibility ? '✓ Visible to Recruiters' : 'Make Profile Public'}
-              </button>
-            </div>
-          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column: Social Links & Skills Matrix */}
@@ -1512,24 +1494,119 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                   <span className="text-[11px] font-bold text-sky-600">{skillTags.length} Tags</span>
                 </div>
 
-                {/* Add Skill Input */}
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={newSkillInput}
-                    onChange={(e) => setNewSkillInput(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') handleAddSkill('Technical'); }}
-                    placeholder="Type skill & press Enter..."
-                    className="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleAddSkill('Technical')}
-                    className="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold shrink-0 cursor-pointer flex items-center gap-1"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Add</span>
-                  </button>
+                {/* Add Skill Input with Instant Search & Suggestions */}
+                <div className="relative" ref={skillDropdownRef}>
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+                      <input
+                        type="text"
+                        value={newSkillInput}
+                        onChange={(e) => {
+                          setNewSkillInput(e.target.value);
+                          setShowSkillDropdown(true);
+                        }}
+                        onFocus={() => setShowSkillDropdown(true)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const query = newSkillInput.trim().toLowerCase();
+                            const matches = PREDEFINED_SKILLS_LIBRARY.filter(
+                              item => item.name.toLowerCase().includes(query) &&
+                                      !skillTags.some(s => s.name.toLowerCase() === item.name.toLowerCase())
+                            );
+                            if (matches.length > 0) {
+                              handleAddSkill(matches[0]);
+                            } else {
+                              handleAddSkill(newSkillInput, 'Technical');
+                            }
+                          } else if (e.key === 'Escape') {
+                            setShowSkillDropdown(false);
+                          }
+                        }}
+                        placeholder="Search skill (e.g. Python, React, Docker)..."
+                        className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-slate-50/50"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleAddSkill(newSkillInput, 'Technical')}
+                      className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold shrink-0 cursor-pointer flex items-center gap-1 transition shadow-xs"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add</span>
+                    </button>
+                  </div>
+
+                  {/* Autocomplete Dropdown */}
+                  {showSkillDropdown && (
+                    <div className="absolute left-0 right-0 top-full mt-1.5 z-30 bg-white border border-slate-200 rounded-xl shadow-xl max-h-56 overflow-y-auto divide-y divide-slate-100 animate-in fade-in duration-150">
+                      {(() => {
+                        const query = newSkillInput.trim().toLowerCase();
+                        const matching = PREDEFINED_SKILLS_LIBRARY.filter(
+                          item => (query === '' || item.name.toLowerCase().includes(query)) &&
+                                  !skillTags.some(s => s.name.toLowerCase() === item.name.toLowerCase())
+                        ).slice(0, 8);
+
+                        if (matching.length === 0 && query.length === 0) {
+                          return (
+                            <div className="p-3 text-center text-xs text-slate-400">
+                              Type to search or browse skills...
+                            </div>
+                          );
+                        }
+
+                        if (matching.length === 0 && query.length > 0) {
+                          return (
+                            <div 
+                              onClick={() => handleAddSkill(newSkillInput, 'Technical')}
+                              className="p-3 hover:bg-sky-50 cursor-pointer text-xs text-sky-800 flex items-center justify-between transition"
+                            >
+                              <span>Add custom skill <strong>"{newSkillInput.trim()}"</strong></span>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-700">+ Add</span>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <>
+                            {matching.map((skill, sIdx) => (
+                              <div
+                                key={sIdx}
+                                onClick={() => handleAddSkill(skill)}
+                                className="px-3 py-2 hover:bg-sky-50 cursor-pointer text-xs flex items-center justify-between transition group"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-slate-800 group-hover:text-sky-900">
+                                    {skill.name}
+                                  </span>
+                                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                                    skill.category === 'Soft Skill'
+                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                                      : 'bg-sky-50 text-sky-700 border border-sky-200/60'
+                                  }`}>
+                                    {skill.category}
+                                  </span>
+                                </div>
+                                <span className="text-[11px] font-bold text-sky-600 opacity-0 group-hover:opacity-100 transition flex items-center gap-0.5">
+                                  <Plus className="w-3 h-3" /> Select
+                                </span>
+                              </div>
+                            ))}
+                            {query && !matching.some(m => m.name.toLowerCase() === query) && (
+                              <div
+                                onClick={() => handleAddSkill(newSkillInput, 'Technical')}
+                                className="px-3 py-2 bg-slate-50 hover:bg-sky-50 cursor-pointer text-xs text-sky-800 flex items-center justify-between transition border-t border-slate-100"
+                              >
+                                <span>Add custom <strong>"{newSkillInput.trim()}"</strong></span>
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-700">+ Add</span>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </div>
 
                 {/* Technical Skills Tags */}
@@ -2763,7 +2840,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                       <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                       <div>
                         <span className="font-bold text-slate-800 block text-[11px]">NIT Academic Transcripts (CGPA: 8.84)</span>
-                        <span className="text-[10px] text-slate-400">Registrar Sealed • DigiLocker Verified</span>
+                        <span className="text-[10px] text-slate-400">Registrar Sealed • Institutionally Verified</span>
                       </div>
                     </div>
                     <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-semibold border border-emerald-100">

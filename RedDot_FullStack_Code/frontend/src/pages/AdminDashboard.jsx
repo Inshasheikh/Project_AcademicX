@@ -51,7 +51,7 @@ const BACKEND_MICROSERVICES = [
   },
   {
     endpoint: "GET /api/student/dashboard/",
-    service: "Student Profile & DigiLocker APAAR Aggregator",
+    service: "Student Profile & Academic Depository Aggregator",
     latency: "24ms",
     success_rate: "99.95%",
     daily_calls: "128,400",
@@ -78,7 +78,7 @@ const BACKEND_MICROSERVICES = [
   },
   {
     endpoint: "POST /api/verification/initiate/",
-    service: "DigiLocker NAD Sandbox & Cryptographic Root CA Validator",
+    service: "Academic Depository Sandbox & Cryptographic Root CA Validator",
     latency: "62ms",
     success_rate: "99.92%",
     daily_calls: "14,800",
@@ -99,7 +99,7 @@ const BACKEND_MICROSERVICES = [
 const RECENT_APP_LOGS = [
   { timestamp: "04:38:12", level: "INFO", source: "AuthGateway", message: "User session token authenticated with cryptographic proof" },
   { timestamp: "04:35:44", level: "INFO", source: "AIEngine", message: "Vector similarity search executed in 16.4ms across 1,240 candidate embeddings" },
-  { timestamp: "04:31:02", level: "INFO", source: "DigiLockerAPI", message: "Cryptographic SHA-256 certificate verified against NAD Root CA" },
+  { timestamp: "04:31:02", level: "INFO", source: "AcademicRegistryAPI", message: "Cryptographic SHA-256 certificate verified against Institutional Root CA" },
   { timestamp: "04:28:19", level: "WARN", source: "RateLimiter", message: "High volume of candidate filter queries from Recruiter IP (192.168.1.42) - Throttle OK" },
   { timestamp: "04:22:50", level: "INFO", source: "PostgreSQL", message: "Database connection pool healthy (14 active, 86 idle, 0 waiting)" }
 ];
@@ -124,7 +124,7 @@ export default function AdminDashboard() {
   // Live Feature Flags (Developer Controls)
   const [featureFlags, setFeatureFlags] = useState({
     ai_coach_active: true,
-    digilocker_live_sandbox: true,
+    depository_live_sandbox: true,
     vector_search_caching: true,
     telemetry_logging: true,
     maintenance_mode: false
@@ -316,7 +316,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Metric 4: DigiLocker Verified DB Records */}
+        {/* Metric 4: Academic Verified DB Records */}
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Verified Transcripts in DB</span>
@@ -327,7 +327,7 @@ export default function AdminDashboard() {
           <div>
             <div className="text-3xl font-black text-slate-900 font-['Outfit']">84,200</div>
             <p className="text-[11px] text-slate-500 mt-1">
-              DigiLocker &amp; National Academic Depository
+              National Academic Depository
             </p>
           </div>
           <div className="mt-3 pt-2 border-t border-slate-100 text-[11px] text-amber-800 font-semibold flex items-center gap-1">
@@ -508,7 +508,7 @@ export default function AdminDashboard() {
                 Showing {filteredRecords.length} records • PostgreSQL Table: <code>public.core_user</code>
               </span>
               <span className="text-slate-400 text-[11px]">
-                Indexes: B-Tree on <code>id</code>, <code>email</code>, <code>apaar_id</code>
+                Indexes: B-Tree on <code>id</code>, <code>email</code>, <code>student_roll_no</code>
               </span>
             </div>
           </div>
@@ -646,7 +646,7 @@ export default function AdminDashboard() {
                 Candidate-to-Job Semantic Matcher
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Uses 384-dimensional sentence transformer embeddings to match student skills, verified DigiLocker courseworks, and GitHub projects against recruiter job requirements.
+                Uses 384-dimensional sentence transformer embeddings to match student skills, verified courseworks, and GitHub projects against recruiter job requirements.
               </p>
 
               <div className="space-y-2 text-xs pt-2">
@@ -733,19 +733,19 @@ export default function AdminDashboard() {
 
               <div className="py-3.5 flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-slate-900">DigiLocker NAD Live Gateway Sandbox</div>
-                  <div className="text-slate-500 text-[11px]">Allows instant cryptographic transcript pulling and APAAR ID validation</div>
+                  <div className="font-bold text-slate-900">Academic Depository Live Sandbox</div>
+                  <div className="text-slate-500 text-[11px]">Allows instant cryptographic transcript pulling and credential validation</div>
                 </div>
                 <button
                   onClick={() => {
-                    setFeatureFlags(f => ({ ...f, digilocker_live_sandbox: !f.digilocker_live_sandbox }));
-                    showNotification("DigiLocker Sandbox flag updated.");
+                    setFeatureFlags(f => ({ ...f, depository_live_sandbox: !f.depository_live_sandbox }));
+                    showNotification("Academic Depository Sandbox flag updated.");
                   }}
                   className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${
-                    featureFlags.digilocker_live_sandbox ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500'
+                    featureFlags.depository_live_sandbox ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500'
                   }`}
                 >
-                  {featureFlags.digilocker_live_sandbox ? 'ENABLED' : 'DISABLED'}
+                  {featureFlags.depository_live_sandbox ? 'ENABLED' : 'DISABLED'}
                 </button>
               </div>
 
