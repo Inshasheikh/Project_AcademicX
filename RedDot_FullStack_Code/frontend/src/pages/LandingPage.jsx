@@ -434,52 +434,6 @@ export default function LandingPage({ setActiveRole, setActiveTab }) {
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 6. BOTTOM CONVERSION CTA BANNER */}
-      {/* ========================================================================= */}
-      <section className="py-14 bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 text-white border-t border-slate-800">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5">
-          <h2 className="text-2xl sm:text-4xl font-black font-['Outfit'] tracking-tight">
-            Ready to Accelerate Your Career or Campus Hiring?
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
-            Empowering students, academic faculties, and corporate recruiters with verified skill intelligence and streamlined hiring.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
-            {currentUser ? (
-              <button
-                onClick={handleGoToWorkspace}
-                className="px-8 py-3.5 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm shadow-md transition cursor-pointer flex items-center gap-2"
-              >
-                <span>Enter Workspace</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            ) : (
-              <>
-                <button
-                  onClick={() => {
-                    if (typeof setActiveRole === 'function') setActiveRole('register');
-                    navigate('/register');
-                  }}
-                  className="px-8 py-3.5 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm shadow-md transition cursor-pointer"
-                >
-                  Create Free Account
-                </button>
-                <button
-                  onClick={() => {
-                    if (typeof setActiveRole === 'function') setActiveRole('login');
-                    navigate('/login');
-                  }}
-                  className="px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-sm transition cursor-pointer"
-                >
-                  Sign In
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
     </div>
   );
 }
