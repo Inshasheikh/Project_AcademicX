@@ -472,8 +472,8 @@ export const fetchAdminVerificationQueue = async () => {
 };
 
 // ==============================================================================
-// DigiLocker & APAAR Verification Gateway Service (SIH 2026 Problem 26044)
-// Uses Backend Adapter Pattern: Mock in Sandbox, Production DigiLocker in Live
+// Institutional & APAAR Verification Gateway Service (SIH 2026 Problem 26044)
+// Uses Backend Adapter Pattern: Mock in Sandbox, Production Gateway in Live
 // ==============================================================================
 export const initiateDigiLockerVerification = async (apaarId, studentName, institution) => {
   try {
@@ -513,7 +513,7 @@ export const verifyDigiLockerOtp = async (transactionId, otp) => {
     }
     return await res.json();
   } catch (err) {
-    console.error('DigiLocker OTP verification error:', err);
+    console.error('OTP verification error:', err);
     throw err;
   }
 };
@@ -529,7 +529,7 @@ export const fetchVerifiedDigiLockerCredentials = async (apaarId) => {
     return {
       apaar_id: apaarId || '9845-2104-7731',
       verification_status: "VERIFIED",
-      is_digilocker_authenticated: true,
+      is_authenticated: true,
       nad_depository_connected: true,
       total_documents: 3,
       documents: [
@@ -544,7 +544,7 @@ export const fetchVerifiedDigiLockerCredentials = async (apaarId) => {
           batch: "2022 - 2026",
           cgpa: "8.84 / 10.0",
           status: "DIGITALLY_SIGNED",
-          digilocker_uri: `in.gov.nad.transcript:2026:${(apaarId || '9845-2104-7731').replace(/-/g, '')}`,
+          credential_uri: `in.gov.nad.transcript:2026:${(apaarId || '9845-2104-7731').replace(/-/g, '')}`,
           cryptographic_hash: "SHA256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
           digital_signature: "CN=National Academic Depository CA, O=MeitY, C=IN",
           verified_date: "2026-08-15"
@@ -557,9 +557,9 @@ export const fetchVerifiedDigiLockerCredentials = async (apaarId) => {
           apaar_id: apaarId || '9845-2104-7731',
           marks_percentage: "94.2%",
           status: "DIGITALLY_SIGNED",
-          digilocker_uri: `in.gov.cbse.class12:2022:${(apaarId || '9845-2104-7731').replace(/-/g, '')}`,
+          credential_uri: `in.gov.cbse.class12:2022:${(apaarId || '9845-2104-7731').replace(/-/g, '')}`,
           cryptographic_hash: "SHA256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
-          digital_signature: "CN=DigiLocker Document Signer CA, O=MeitY, C=IN",
+          digital_signature: "CN=Board Document Signer CA, O=MeitY, C=IN",
           verified_date: "2022-06-20"
         },
         {
@@ -570,13 +570,13 @@ export const fetchVerifiedDigiLockerCredentials = async (apaarId) => {
           apaar_id: apaarId || '9845-2104-7731',
           current_semester: "Semester 7 (Final Year)",
           status: "DIGITALLY_SIGNED",
-          digilocker_uri: `in.gov.academic.bonafide:2026:${(apaarId || '9845-2104-7731').replace(/-/g, '')}`,
+          credential_uri: `in.gov.academic.bonafide:2026:${(apaarId || '9845-2104-7731').replace(/-/g, '')}`,
           cryptographic_hash: "SHA256:3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b",
           digital_signature: "CN=NIT Academic Dean Signing Authority, C=IN",
           verified_date: "2026-07-28"
         }
       ],
-      adapter_type: "MockDigiLockerVerificationService (SIH Sandbox)"
+      adapter_type: "MockInstitutionalVerificationService (SIH Sandbox)"
     };
   }
 };

@@ -334,13 +334,13 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
       title: "Higher Secondary Examination Marksheet",
       issuer: "Central Board of Secondary Education (CBSE)",
       grade: "Class XII: 94.2% (Distinction • 471/500)",
-      status: "DigiLocker Authenticated Board Record",
+      status: "Authenticated Board Record",
       date: "Senior School Examination 2024",
       docId: `DOC-${studentRollNo ? String(studentRollNo).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) : 'CBSE24'}-02`,
       image: marksheet12thImg,
       authority: "Controller of Examinations, CBSE",
-      badge: "DigiLocker Verified Authenticity",
-      description: "Class XII Senior School Marks Statement with distinctions across Mathematics (94), Physics (97), Chemistry (96), Computer Science (94), DigiLocker verified QR code, and official board seal."
+      badge: "Board Verified Authenticity",
+      description: "Class XII Senior School Marks Statement with distinctions across Mathematics (94), Physics (97), Chemistry (96), Computer Science (94), verified QR code, and official board seal."
     },
     {
       id: 3,
@@ -1990,10 +1990,6 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-bold text-base font-['Outfit']">Academic Credential Vault</h3>
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-extrabold flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      DigiLocker & Registrar Verified
-                    </span>
                   </div>
                   <p className="text-xs text-sky-200/80">
                     National Institute of Technology • Cryptographically Ingested Academic Transcripts & Marksheets

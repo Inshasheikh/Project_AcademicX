@@ -502,9 +502,6 @@ export default function FacultyDashboard() {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Outfit']">
             {overview.institution_name} Academic &amp; Placement Hub
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Faculty In-Charge: <strong className="text-slate-800">{overview.faculty_name}</strong> ({overview.faculty_role}) • <span className="text-slate-600">{overview.department}</span>
-          </p>
         </div>
 
         {/* Action Buttons to Add Events & Free Courses */}

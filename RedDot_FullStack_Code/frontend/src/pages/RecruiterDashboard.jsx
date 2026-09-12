@@ -531,7 +531,7 @@ export default function RecruiterDashboard() {
         shortlisted_pool: data?.shortlisted_count || 12,
         direct_hires: data?.hired_count || 3,
         active_roles: data?.active_jobs_count || 5,
-        verification_status: "100% Cryptographically Verified via DigiLocker / APAAR"
+        verification_status: "100% Cryptographically Verified Institutional Record"
       },
       recruiter_notes: digestOptionalNote.trim() || "Regular weekly talent pipeline dispatch.",
       destinations: [
@@ -662,9 +662,6 @@ export default function RecruiterDashboard() {
       {/* Header Banner */}
       <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xs">
         <div>
-          <div className="flex items-center gap-2 text-sky-700 text-xs font-bold uppercase tracking-wider mb-1">
-            <Building className="w-4 h-4 text-sky-600" /> Industry & Startup Operations
-          </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Outfit']">
             {data.company_name} Campus Talent Desk
           </h1>
