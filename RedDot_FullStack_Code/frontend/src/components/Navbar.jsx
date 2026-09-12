@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getCurrentUserApi, logoutUserApi } from '../services/api';
-import { getStoredUserAvatar, fetchUserAvatarFromCloud } from '../utils/avatarSync';
 
 export default function Navbar({ activeRole, setActiveRole, activeTab, setActiveTab }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -31,37 +30,6 @@ export default function Navbar({ activeRole, setActiveRole, activeTab, setActive
   const isAuth = (isAuthenticated || !!token) && !!currentUser;
   const currentRole = (role || currentUser?.role || currentUser?.profile?.role || '').toLowerCase();
   const isStudent = isAuth && currentRole === 'student';
-
-  const [navAvatar, setNavAvatar] = useState(() => getStoredUserAvatar(currentUser));
-
-  useEffect(() => {
-    if (!currentUser) {
-      setNavAvatar(null);
-      return;
-    }
-    setNavAvatar(getStoredUserAvatar(currentUser));
-
-    let isSubscribed = true;
-    const syncNav = async () => {
-      const cloudPhoto = await fetchUserAvatarFromCloud(currentUser);
-      if (cloudPhoto && isSubscribed) {
-        setNavAvatar(cloudPhoto);
-      }
-    };
-    syncNav();
-
-    const handleAvatarUpdate = (e) => {
-      if (e.detail?.avatar_url && isSubscribed) {
-        setNavAvatar(e.detail.avatar_url);
-      }
-    };
-    window.addEventListener('academicx_avatar_updated', handleAvatarUpdate);
-
-    return () => {
-      isSubscribed = false;
-      window.removeEventListener('academicx_avatar_updated', handleAvatarUpdate);
-    };
-  }, [currentUser?.email, currentUser?.phone, currentUser?.id]);
 
   const handleNavigate = (path, roleName, tabName) => {
     if (typeof setActiveRole === 'function' && roleName) {
@@ -221,27 +189,6 @@ export default function Navbar({ activeRole, setActiveRole, activeTab, setActive
                 </span>
               </div>
 
-              {/* User Avatar Badge */}
-              <div 
-                onClick={() => {
-                  if (isStudent) handleNavigate('/student/dashboard', 'student', 'dashboard');
-                }}
-                className="w-9 h-9 rounded-full overflow-hidden border-2 border-sky-200 ring-2 ring-sky-50 shadow-2xs shrink-0 flex items-center justify-center bg-gradient-to-br from-sky-100 to-indigo-100 cursor-pointer transition-transform hover:scale-105"
-                title={currentUser.full_name || currentUser.email}
-              >
-                {navAvatar ? (
-                  <img 
-                    src={navAvatar} 
-                    alt={currentUser.full_name || 'User'} 
-                    className="w-full h-full object-cover" 
-                  />
-                ) : (
-                  <span className="text-xs font-extrabold text-sky-700 font-['Outfit']">
-                    {(currentUser.full_name || currentUser.email || 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'ST'}
-                  </span>
-                )}
-              </div>
-
               {!isStudent && (
                 <button
                   onClick={() => {
@@ -299,23 +246,6 @@ export default function Navbar({ activeRole, setActiveRole, activeTab, setActive
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-slate-100 bg-white px-4 pt-3 pb-6 space-y-2 shadow-lg">
-          {isAuth && (
-            <div className="flex items-center gap-3 p-2.5 mb-3 bg-slate-50 rounded-xl border border-slate-200/80">
-              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-sky-200 ring-2 ring-sky-50 shadow-2xs shrink-0 flex items-center justify-center bg-gradient-to-br from-sky-100 to-indigo-100">
-                {navAvatar ? (
-                  <img src={navAvatar} alt={currentUser.full_name || 'User'} className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-xs font-extrabold text-sky-700 font-['Outfit']">
-                    {(currentUser.full_name || currentUser.email || 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'ST'}
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-sm font-bold text-slate-800 truncate">{currentUser.full_name || currentUser.email}</span>
-                <span className="text-[10px] font-semibold text-sky-600 uppercase">{currentUser.role || (isStudent ? 'STUDENT' : 'Member')}</span>
-              </div>
-            </div>
-          )}
           {activeNavLinks.map((link, idx) => (
             <button
               key={idx}

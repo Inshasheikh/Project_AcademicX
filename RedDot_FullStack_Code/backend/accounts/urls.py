@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     SendOTPView, VerifyOTPView, RegisterView, LoginView,
-    ResetPasswordView, LogoutView, MeView, RoleSelectionView, UpdateAvatarView
+    ResetPasswordView, LogoutView, MeView, RoleSelectionView
 )
 
 urlpatterns = [
@@ -13,5 +13,4 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('me/', MeView.as_view(), name='me'),
     path('role/', RoleSelectionView.as_view(), name='role-selection'),
-    path('avatar/', UpdateAvatarView.as_view(), name='update-avatar'),
 ]
