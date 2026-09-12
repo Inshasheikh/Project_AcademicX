@@ -35,6 +35,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { fetchFacultyOverview } from '../services/api';
+import { downloadEnrolledCSV, downloadEndorsementLetter, downloadBlob } from '../utils/downloadUtils';
+
 
 // Complete dataset of registered students from National Institute of Technology
 const INITIAL_REGISTERED_STUDENTS = [];
@@ -1013,7 +1015,10 @@ export default function FacultyDashboard() {
 
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => showToast(`Enrolled participant list for "${evt.title}" exported.`)}
+                      onClick={() => {
+                        downloadEnrolledCSV(evt.title, evt.participants || 45);
+                        showToast(`Enrolled participant CSV for "${evt.title}" downloaded.`);
+                      }}
                       className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition cursor-pointer flex items-center gap-1"
                     >
                       <Download className="w-3 h-3" /> Enrolled CSV
@@ -1140,7 +1145,28 @@ export default function FacultyDashboard() {
 
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => showToast(`Syllabus dossier downloaded for "${course.title}".`)}
+                      onClick={() => {
+                        const syllabusContent = `================================================================================
+                    COURSE SYLLABUS DOSSIER
+================================================================================
+Course: ${course.title}
+Code: ${course.code || 'CS-401'}
+Semester: ${course.semester || '6th Semester'}
+Department: Computer Science & Engineering
+Credits: ${course.credits || 4}
+
+COURSE DESCRIPTION:
+${course.description || 'Advanced foundational curriculum in modern distributed computing, algorithms, and system engineering.'}
+
+WEEKLY MODULE BREAKDOWN:
+• Weeks 1-3: Core Foundations & Theoretical Modeling
+• Weeks 4-6: System Architecture, Database Internals & Concurrency
+• Weeks 7-9: Production Deployment, CI/CD, Containerization
+• Weeks 10-12: Capstone Project Evaluation & Industry Review
+================================================================================`;
+                        downloadBlob(syllabusContent, `Syllabus_${(course.title || 'Course').replace(/[^a-zA-Z0-9]/g, '_')}.txt`, 'text/plain;charset=utf-8');
+                        showToast(`Syllabus dossier downloaded for "${course.title}".`);
+                      }}
                       className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition cursor-pointer"
                     >
                       Syllabus PDF
@@ -1507,7 +1533,10 @@ export default function FacultyDashboard() {
 
                 <div className="flex items-center justify-end gap-2">
                   <button
-                    onClick={() => showToast(`Recommendation letter downloaded for ${selectedStudent.name}.`)}
+                    onClick={() => {
+                      downloadEndorsementLetter(selectedStudent, overview.institution_name);
+                      showToast(`Recommendation letter downloaded for ${selectedStudent.name}.`);
+                    }}
                     className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5" /> Download Endorsement PDF

@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { downloadElementAsPdf } from '../utils/downloadUtils';
 import { fetchDiagnosticQuestions, submitDiagnostic } from '../services/api';
 
 const AVAILABLE_DOMAINS = [
@@ -168,39 +169,13 @@ export default function SkillDiagnosticPage({ setActiveTab }) {
     if (!reportRef.current) return;
     setDownloading(true);
     try {
-      const element = reportRef.current;
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pdfHeight;
-
-      while (heightLeft > 0) {
-        position = heightLeft - pdfHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pdfHeight;
-      }
-
-      pdf.save('REDDOT_Skill_Diagnostic_Report.pdf');
+      await downloadElementAsPdf(
+        reportRef.current,
+        'REDDOT_Skill_Diagnostic_Report.pdf',
+        'Official Diagnostic & Placement Benchmark Report'
+      );
     } catch (err) {
       console.error('Error generating PDF:', err);
-      window.print();
     } finally {
       setDownloading(false);
     }

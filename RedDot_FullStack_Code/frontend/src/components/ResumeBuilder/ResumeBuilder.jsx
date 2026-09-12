@@ -38,6 +38,8 @@ import {
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { downloadElementAsPdf } from '../../utils/downloadUtils';
+
 
 const LinkedInIcon = ({ className = "w-3 h-3" }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -795,45 +797,23 @@ export default function ResumeBuilder({ onSendToReview, initialPreset = 'fullsta
     }
   };
 
-  // Export as High-Res PDF using html2canvas & jspdf
+  // Export as High-Res PDF using downloadElementAsPdf (Guaranteed local download, never window.print)
   const handleDownloadPdf = async () => {
     if (!resumeSheetRef.current) return;
     setIsGeneratingPdf(true);
     showToast("Generating crisp A4 PDF document...");
 
+    const fileName = `${(resumeData.personalInfo.fullName || 'Candidate').replace(/\s+/g, '_')}_Resume.pdf`;
     try {
-      const element = resumeSheetRef.current;
-      
-      const canvas = await html2canvas(element, {
-        scale: 2, // High resolution
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff',
-        windowWidth: 1200
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      
-      // Standard A4 dimensions in mm: 210 x 297
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const pdfWidth = 210;
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
-      
-      const fileName = `${(resumeData.personalInfo.fullName || 'Candidate').replace(/\s+/g, '_')}_Resume.pdf`;
-      pdf.save(fileName);
+      await downloadElementAsPdf(
+        resumeSheetRef.current,
+        fileName,
+        `${resumeData.personalInfo.fullName || 'Candidate'} - Curriculum Vitae`
+      );
       showToast(`Downloaded ${fileName} successfully!`);
     } catch (err) {
       console.error('Failed to generate PDF:', err);
-      // Fallback to window.print()
-      showToast("Direct download encountered an issue, launching browser print...");
-      window.print();
+      showToast("Direct download failed. Please try again.");
     } finally {
       setIsGeneratingPdf(false);
     }

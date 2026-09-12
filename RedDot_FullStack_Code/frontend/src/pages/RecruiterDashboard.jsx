@@ -35,6 +35,8 @@ import {
   Star
 } from 'lucide-react';
 import { fetchRecruiterStats } from '../services/api';
+import { downloadOfferLetter, downloadStudentDossier } from '../utils/downloadUtils';
+
 
 // Clean production candidate dossier builder
 export const createCandidateDossier = (candidate = {}) => ({
@@ -1675,7 +1677,10 @@ export default function RecruiterDashboard() {
                         <Sparkles className="w-3.5 h-3.5 text-sky-600" /> View Projects &amp; Portfolio
                       </button>
                       <button
-                        onClick={() => triggerAutomationToast(hire.student_name, "OFFER_LETTER_DOWNLOADED")}
+                        onClick={() => {
+                          downloadOfferLetter(hire.student_name, hire.role || 'Software Development Engineer', hire.package_lpa ? `${hire.package_lpa} LPA` : '18.5 LPA');
+                          triggerAutomationToast(hire.student_name, "OFFER_LETTER_DOWNLOADED");
+                        }}
                         className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white font-semibold text-xs transition cursor-pointer flex items-center gap-1.5"
                       >
                         <Download className="w-3.5 h-3.5" /> Download Offer Letter
@@ -2498,7 +2503,10 @@ export default function RecruiterDashboard() {
                   Schedule Technical Interview
                 </button>
                 <button
-                  onClick={() => triggerAutomationToast(selectedStudentProfile.name, "VERIFIED_DOSSIER_DOWNLOADED")}
+                  onClick={() => {
+                    downloadStudentDossier(selectedStudentProfile);
+                    triggerAutomationToast(selectedStudentProfile.name, "VERIFIED_DOSSIER_DOWNLOADED");
+                  }}
                   className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs transition cursor-pointer flex items-center gap-1.5"
                 >
                   <Download className="w-3.5 h-3.5" /> PDF Dossier

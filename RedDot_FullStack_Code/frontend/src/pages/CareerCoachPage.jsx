@@ -51,6 +51,8 @@ import {
   getDeepResumeRecommendations
 } from '../services/api';
 import ResumeBuilder from '../components/ResumeBuilder/ResumeBuilder';
+import { downloadDiagnosticActionPlan, downloadCareerRoadmap } from '../utils/downloadUtils';
+
 
 const COMPANY_STYLES = [
   {
@@ -1362,10 +1364,11 @@ Projects:
 
               <div className="pt-2 border-t border-slate-100 flex flex-wrap gap-2">
                 <button 
-                  onClick={() => window.print()}
+                  onClick={() => downloadDiagnosticActionPlan(atsResult)}
                   className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                  title="Download Diagnostic Action Plan file"
                 >
-                  <Download className="w-3.5 h-3.5" /> Print / Save Diagnostic Action Plan
+                  <Download className="w-3.5 h-3.5 text-sky-600" /> Download Diagnostic Action Plan
                 </button>
                 <button
                   onClick={() => setActiveTab('interview')}
@@ -2382,8 +2385,9 @@ Projects:
                     </div>
                   </div>
                   <button
-                    onClick={() => window.print()}
+                    onClick={() => downloadCareerRoadmap(resumeTargetRole || 'Tier-1 Product Tech Engineer')}
                     className="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-xs hover:shadow transition cursor-pointer"
+                    title="Download Full Career Roadmap file"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Download Full Roadmap</span>
