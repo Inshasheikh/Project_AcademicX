@@ -152,6 +152,37 @@ export const loginUserApi = async (credentials) => {
   });
   const data = await res.json();
   if (data.user) {
+    const email = (data.user.email || '').toLowerCase().trim();
+    const phone = (data.user.phone || data.user.phone_number || '').trim();
+    try {
+      let avatar = data.user.avatar_url || null;
+      if (!avatar && (email || phone)) {
+        let query = supabase.from('profiles').select('avatar_url');
+        if (email) {
+          query = query.eq('email', email);
+        } else {
+          query = query.eq('phone_number', phone);
+        }
+        const { data: prof } = await query.maybeSingle();
+        if (prof?.avatar_url) {
+          avatar = prof.avatar_url;
+        }
+      }
+      if (avatar) {
+        data.user.avatar_url = avatar;
+        if (email) {
+          localStorage.setItem(`academicx_avatar_${email}`, avatar);
+          localStorage.setItem(`academicx_student_photo_${email}`, avatar);
+        }
+        if (phone) {
+          localStorage.setItem(`academicx_avatar_${phone}`, avatar);
+        }
+        localStorage.setItem('academicx_student_photo', avatar);
+      }
+    } catch (err) {
+      console.warn('[Avatar prefetch on login error]', err);
+    }
+
     localStorage.setItem('reddot_user', JSON.stringify(data.user));
     localStorage.setItem('reddot_token', data.token || 'jwt_token');
     localStorage.setItem('user', JSON.stringify(data.user));

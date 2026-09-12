@@ -21,7 +21,13 @@ import {
   Download,
   Fingerprint,
   Camera,
+  Loader2,
   User,
+  Edit3,
+  Mail,
+  Phone,
+  Hash,
+  Save,
   CheckCircle2,
   TrendingUp,
   MapPin,
@@ -49,6 +55,8 @@ import bonafideCertImg from '../assets/documents/bonafide_certificate.jpg';
 import marksheet12thImg from '../assets/documents/marksheet_12th.jpg';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../services/api';
+import { compressAndResizeAvatar, getStoredUserAvatar, fetchUserAvatarFromCloud, saveUserAvatarToCloud } from '../utils/avatarSync';
+import { getStudentBasicInfo, fetchStudentBasicInfoFromCloud, saveStudentBasicInfo } from '../utils/studentInfoSync';
 import SkillDiagnosticPage from './SkillDiagnosticPage';
 import CareerCoachPage from './CareerCoachPage';
 
@@ -198,8 +206,63 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
       return null;
     }
   })();
-  const studentName = currentUser?.full_name || 'Student';
-  const studentRollNo = currentUser?.student_roll_no || currentUser?.apaar_id || '';
+
+  // Central Student Basic Information Profile
+  const [studentInfo, setStudentInfo] = useState(() => getStudentBasicInfo(currentUser));
+  const [showEditInfoModal, setShowEditInfoModal] = useState(false);
+  const [editInfoForm, setEditInfoForm] = useState(() => getStudentBasicInfo(currentUser));
+  const [isSavingInfo, setIsSavingInfo] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const syncCloudInfo = async () => {
+      const cloudData = await fetchStudentBasicInfoFromCloud(currentUser);
+      if (cloudData && isMounted) {
+        setStudentInfo(cloudData);
+        setEditInfoForm(cloudData);
+      }
+    };
+    syncCloudInfo();
+
+    const handleInfoUpdate = (e) => {
+      if (e.detail && isMounted) {
+        setStudentInfo(e.detail);
+        setEditInfoForm(e.detail);
+      }
+    };
+    window.addEventListener('academicx_basic_info_updated', handleInfoUpdate);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('academicx_basic_info_updated', handleInfoUpdate);
+    };
+  }, [currentUser?.email, currentUser?.phone]);
+
+  const handleSaveBasicInfo = async (e) => {
+    e.preventDefault();
+    setIsSavingInfo(true);
+    try {
+      const res = await saveStudentBasicInfo(editInfoForm, currentUser);
+      if (res.success) {
+        setStudentInfo(res.data);
+        setShowEditInfoModal(false);
+        setToast("Student basic information updated & synchronized across all modules!");
+        setTimeout(() => setToast(null), 3500);
+      } else {
+        setToast("Failed to save details: " + (res.error || "Please retry"));
+        setTimeout(() => setToast(null), 3000);
+      }
+    } catch (err) {
+      console.error('[Save student info error]', err);
+      setToast("Failed to save information. Please try again.");
+      setTimeout(() => setToast(null), 3000);
+    } finally {
+      setIsSavingInfo(false);
+    }
+  };
+
+  const studentName = studentInfo.fullName || currentUser?.full_name || 'Student';
+  const studentRollNo = studentInfo.rollNo || currentUser?.student_roll_no || '';
 
   // Social & Professional Profiles
   const [portfolioLinks, setPortfolioLinks] = useState(() => {
@@ -279,38 +342,70 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
   const [showAddCertForm, setShowAddCertForm] = useState(false);
   const [newCert, setNewCert] = useState({ title: '', issuer: '', issueDate: '', credentialUrl: '' });
 
-  const STORAGE_KEY = 'academicx_student_photo';
-
   const [studentPhoto, setStudentPhoto] = useState(() => {
-    try {
-      return localStorage.getItem(STORAGE_KEY) || null;
-    } catch {
-      return null;
-    }
+    return getStoredUserAvatar(currentUser);
   });
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const fileInputRef = useRef(null);
 
-  const handlePhotoUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setToast("Photo size should be less than 5MB");
-        setTimeout(() => setToast(null), 3000);
-        return;
+  // Synchronize photo across all user devices via Supabase cloud
+  useEffect(() => {
+    let isSubscribed = true;
+
+    const syncAvatar = async () => {
+      if (!currentUser) return;
+      const cloudPhoto = await fetchUserAvatarFromCloud(currentUser);
+      if (cloudPhoto && isSubscribed) {
+        setStudentPhoto(cloudPhoto);
       }
-      const reader = new FileReader();
-      reader.onload = (uploadEvent) => {
-        const base64Photo = uploadEvent.target.result;
-        setStudentPhoto(base64Photo);
-        try {
-          localStorage.setItem(STORAGE_KEY, base64Photo);
-        } catch (err) {
-          console.warn("Storage quota or localStorage error:", err);
-        }
-        setToast("Profile photo updated & saved successfully!");
-        setTimeout(() => setToast(null), 3000);
-      };
-      reader.readAsDataURL(file);
+    };
+
+    syncAvatar();
+
+    // Listen for avatar updates from other tabs or components
+    const handleAvatarUpdate = (e) => {
+      if (e.detail?.avatar_url && isSubscribed) {
+        setStudentPhoto(e.detail.avatar_url);
+      }
+    };
+    window.addEventListener('academicx_avatar_updated', handleAvatarUpdate);
+
+    return () => {
+      isSubscribed = false;
+      window.removeEventListener('academicx_avatar_updated', handleAvatarUpdate);
+    };
+  }, [currentUser?.email, currentUser?.phone, currentUser?.id]);
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      setToast("Photo size should be less than 10MB");
+      setTimeout(() => setToast(null), 3000);
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+    try {
+      // 1. Compress & scale client-side to clean ~30KB avatar
+      const optimizedPhoto = await compressAndResizeAvatar(file, 320, 320, 0.85);
+
+      // 2. Set UI state immediately for responsive feel
+      setStudentPhoto(optimizedPhoto);
+
+      // 3. Persist to Cloud Database (Supabase) and local caches
+      await saveUserAvatarToCloud(optimizedPhoto, currentUser);
+
+      setToast("Profile photo synchronized across all your devices!");
+      setTimeout(() => setToast(null), 3500);
+    } catch (err) {
+      console.error('[Avatar upload failed]', err);
+      setToast("Failed to upload photo. Please try again.");
+      setTimeout(() => setToast(null), 3000);
+    } finally {
+      setIsUploadingPhoto(false);
+      if (e.target) e.target.value = '';
     }
   };
 
@@ -319,15 +414,15 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
     {
       id: 1,
       title: "University Degree Academic Transcript",
-      issuer: currentUser?.college || "National Institute of Technology",
-      grade: "SGPA: 9.20 • CGPA: 8.94 (Honors)",
+      issuer: studentInfo.college || "National Institute of Technology",
+      grade: `SGPA: 9.20 • CGPA: ${studentInfo.cgpa || "8.94"} (Honors)`,
       status: "Verified by Registrar (Cryptographic SHA-256)",
-      date: "Semester III • Academic Session 2023-24",
+      date: `${studentInfo.semester || "Semester VI"} • Academic Session 2024-25`,
       docId: `DOC-${studentRollNo ? String(studentRollNo).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) : 'NIT2021'}-01`,
       image: marksheetDegreeImg,
-      authority: "Office of the Registrar, NIT",
+      authority: `Office of the Registrar, ${studentInfo.college || "NIT"}`,
       badge: "Institutional Cryptographic Seal",
-      description: "Official B.Tech Academic Transcript featuring courses CSE201, CSE203, CSE205, CSE207, CSE209 with SGPA 9.20 and CGPA 8.94, official registrar seal, signature, and verification QR code."
+      description: `Official ${studentInfo.degree || "B.Tech"} Academic Transcript featuring courses in ${studentInfo.branch} with CGPA ${studentInfo.cgpa || "8.84"}, official registrar seal, signature, and verification QR code.`
     },
     {
       id: 2,
@@ -345,15 +440,15 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
     {
       id: 3,
       title: "Institutional Bona Fide Student Certificate",
-      issuer: currentUser?.college ? `Dean of Academic Affairs, ${currentUser.college}` : "National Institute of Technology",
-      grade: "Active Full-Time B.Tech Student (6th Sem)",
+      issuer: studentInfo.college ? `Dean of Academic Affairs, ${studentInfo.college}` : "National Institute of Technology",
+      grade: `Active Full-Time ${studentInfo.degree || "B.Tech"} Student (${studentInfo.yearOfStudy || "3rd Year"})`,
       status: "Direct University Record",
-      date: "Academic Session 2023-2024",
+      date: "Academic Session 2024-2025",
       docId: `DOC-${studentRollNo ? String(studentRollNo).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) : 'NIT2021'}-03`,
       image: bonafideCertImg,
-      authority: "Dean of Academic Affairs, NIT",
+      authority: `Dean of Academic Affairs, ${studentInfo.college || "NIT"}`,
       badge: "Dean Academic Affairs Certified",
-      description: "Official institutional bona fide certificate authenticating enrollment in 4-year B.Tech in Computer Science and Engineering with genuine university gold seal, Dean signature, and security hologram."
+      description: `Official institutional bona fide certificate authenticating enrollment in 4-year ${studentInfo.degree || "B.Tech"} in ${studentInfo.branch} with genuine university gold seal, Dean signature, and security hologram.`
     }
   ];
 
@@ -919,10 +1014,15 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
               />
               <div 
                 onClick={() => fileInputRef.current?.click()}
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-sky-300 ring-4 ring-sky-50 shadow-md bg-gradient-to-br from-sky-100 to-indigo-100 flex items-center justify-center cursor-pointer transition-all hover:ring-sky-200"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-sky-300 ring-4 ring-sky-50 shadow-md bg-gradient-to-br from-sky-100 to-indigo-100 flex items-center justify-center cursor-pointer transition-all hover:ring-sky-200 relative"
                 title="Click to upload/change profile photo"
               >
-                {studentPhoto ? (
+                {isUploadingPhoto ? (
+                  <div className="flex flex-col items-center justify-center text-sky-600">
+                    <Loader2 className="w-7 h-7 animate-spin" />
+                    <span className="text-[9px] font-bold mt-1">Saving...</span>
+                  </div>
+                ) : studentPhoto ? (
                   <img 
                     src={studentPhoto} 
                     alt={studentName} 
@@ -949,20 +1049,71 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
               </button>
             </div>
 
-            {/* Student Info */}
-            <div className="space-y-1.5 flex-1">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Outfit'] flex items-center gap-2">
-                <span>Welcome back, {studentName}</span>
-              </h1>
+            {/* Student Info with Verified Badges */}
+            <div className="space-y-2 flex-1">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Outfit']">
+                  Welcome back, {studentName}
+                </h1>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditInfoForm(studentInfo);
+                    setShowEditInfoModal(true);
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold text-xs border border-sky-200/80 flex items-center gap-1.5 transition cursor-pointer"
+                  title="View & Edit Student Basic Details"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-sky-600" />
+                  <span>Edit Basic Info</span>
+                </button>
+              </div>
 
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                {currentUser?.branch || 'Academic Track'}{currentUser?.college ? ` • ${currentUser.college}` : ''}{studentRollNo ? ` • ID: ${studentRollNo}` : ''}
-              </p>
+              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 font-medium">
+                <span className="flex items-center gap-1 text-slate-700 font-semibold">
+                  <GraduationCap className="w-3.5 h-3.5 text-sky-600" />
+                  {studentInfo.degree || 'B.Tech'} in {studentInfo.branch}
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1 text-slate-600">
+                  <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                  {studentInfo.college}
+                </span>
+              </div>
+
+              {/* Verified Identity Tags */}
+              <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                  {studentInfo.apaarId || 'APAAR Verified'}
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-sky-800 text-[11px] font-bold">
+                  Roll: {studentInfo.rollNo}
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 text-[11px] font-bold">
+                  CGPA: {studentInfo.cgpa} / 10.0
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-semibold">
+                  {studentInfo.yearOfStudy} • Class of {studentInfo.graduationYear}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Simple View Academic Transcripts Button */}
-          <div className="w-full sm:w-auto shrink-0 pt-2 lg:pt-0">
+          {/* Quick Action Buttons */}
+          <div className="w-full sm:w-auto shrink-0 flex flex-col sm:flex-row gap-2 pt-2 lg:pt-0">
+            <button
+              type="button"
+              onClick={() => {
+                setEditInfoForm(studentInfo);
+                setShowEditInfoModal(true);
+              }}
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs shadow-xs flex items-center justify-center gap-2 transition cursor-pointer"
+            >
+              <User className="w-3.5 h-3.5 text-sky-400" />
+              <span>Student Profile</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setShowDocModal(true)}
@@ -1429,6 +1580,106 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
       {activeMainSection === 'portfolio' && (
         <div className="space-y-6 animate-fade-in">
 
+          {/* 1. Primary Student Academic & Personal Identity Card */}
+          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-xs space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-sky-50 text-sky-600 border border-sky-100">
+                  <User className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-slate-900 font-['Outfit']">
+                      Academic & Personal Identity
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-extrabold border border-emerald-200 flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3" />
+                      Active Record
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Universal student profile details used across transcripts, resumes, and campus placement evaluations
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEditInfoForm(studentInfo);
+                  setShowEditInfoModal(true);
+                }}
+                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition flex items-center gap-2 shadow-xs cursor-pointer shrink-0"
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+                <span>Edit Basic Information</span>
+              </button>
+            </div>
+
+            {/* Information Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Full Name */}
+              <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-1">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Full Name</span>
+                <span className="text-sm font-bold text-slate-900 block truncate">{studentInfo.fullName}</span>
+                <span className="text-[10px] text-slate-400 block">{studentInfo.headline || 'Student Scholar'}</span>
+              </div>
+
+              {/* Institution / College */}
+              <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-1">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Institution</span>
+                <span className="text-sm font-bold text-slate-900 block truncate">{studentInfo.college}</span>
+                <span className="text-[10px] text-sky-600 font-semibold block">Affiliated & AICTE Approved</span>
+              </div>
+
+              {/* Degree & Branch */}
+              <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-1">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Degree & Program</span>
+                <span className="text-sm font-bold text-slate-900 block truncate">{studentInfo.degree}</span>
+                <span className="text-[10px] text-slate-600 font-medium block truncate">{studentInfo.branch}</span>
+              </div>
+
+              {/* Roll Number & APAAR */}
+              <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-1">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Roll No & APAAR ID</span>
+                <span className="text-sm font-bold text-slate-900 block font-mono">{studentInfo.rollNo}</span>
+                <span className="text-[10px] text-emerald-700 font-mono font-semibold block truncate">{studentInfo.apaarId}</span>
+              </div>
+
+              {/* CGPA & Academic Standing */}
+              <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-1">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Academic CGPA</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-base font-extrabold text-indigo-700 font-['Outfit']">{studentInfo.cgpa}</span>
+                  <span className="text-xs text-slate-400">/ 10.0</span>
+                </div>
+                <span className="text-[10px] text-emerald-600 font-semibold block">First Class Distinction</span>
+              </div>
+
+              {/* Year & Semester */}
+              <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-1">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Current Year</span>
+                <span className="text-sm font-bold text-slate-900 block">{studentInfo.yearOfStudy}</span>
+                <span className="text-[10px] text-slate-500 block">Class of {studentInfo.graduationYear}</span>
+              </div>
+
+              {/* Email Address */}
+              <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-1">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Official Email</span>
+                <span className="text-xs font-semibold text-slate-900 block truncate font-mono">{studentInfo.email}</span>
+                <span className="text-[10px] text-emerald-600 font-semibold block flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" /> Verified Student ID
+                </span>
+              </div>
+
+              {/* Contact Phone & Location */}
+              <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-1">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Phone & City</span>
+                <span className="text-xs font-semibold text-slate-900 block truncate">{studentInfo.phone || 'Not provided'}</span>
+                <span className="text-[10px] text-slate-500 block truncate">{studentInfo.location || 'India'}</span>
+              </div>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column: Social Links & Skills Matrix */}
@@ -1970,6 +2221,247 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
               </div>
 
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* EDIT STUDENT BASIC INFORMATION MODAL (UNIVERSALLY SYNCHRONIZED PROFILE) */}
+      {/* ========================================================================= */}
+      {showEditInfoModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-3xl w-full overflow-hidden animate-fade-in my-auto max-h-[92vh] flex flex-col">
+            
+            {/* Header */}
+            <div className="bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 text-white px-6 py-4 flex items-center justify-between border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-xl shadow-inner">
+                  👤
+                </div>
+                <div>
+                  <h3 className="font-bold text-base font-['Outfit']">Student Basic Information</h3>
+                  <p className="text-xs text-sky-200/80">
+                    Synchronized across Resume Builder, Job Applications, Transcripts & Faculty records
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEditInfoModal(false)}
+                className="p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Form Body */}
+            <form onSubmit={handleSaveBasicInfo} className="p-6 space-y-6 overflow-y-auto flex-1 text-xs">
+              
+              {/* Personal Details Section */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+                  <User className="w-4 h-4 text-sky-600" />
+                  <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider">Personal Details</h4>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editInfoForm.fullName || ''}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, fullName: e.target.value })}
+                      placeholder="e.g. Insha Sheikh"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">Professional Headline</label>
+                    <input
+                      type="text"
+                      value={editInfoForm.headline || ''}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, headline: e.target.value })}
+                      placeholder="e.g. Aspiring Full Stack & Cloud Developer"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">Email Address *</label>
+                    <input
+                      type="email"
+                      required
+                      value={editInfoForm.email || ''}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, email: e.target.value })}
+                      placeholder="student@nitrr.ac.in"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">Mobile Phone Number</label>
+                    <input
+                      type="tel"
+                      value={editInfoForm.phone || ''}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, phone: e.target.value })}
+                      placeholder="+91 98765 43210"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">Location / City & State</label>
+                    <input
+                      type="text"
+                      value={editInfoForm.location || ''}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, location: e.target.value })}
+                      placeholder="e.g. Raipur, Chhattisgarh, India"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Academic Details Section */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+                  <GraduationCap className="w-4 h-4 text-emerald-600" />
+                  <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider">Academic Records & Identifiers</h4>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">College / Institution *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editInfoForm.college || ''}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, college: e.target.value })}
+                      placeholder="e.g. National Institute of Technology (NIT), Raipur"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">Degree Program *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editInfoForm.degree || ''}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, degree: e.target.value })}
+                      placeholder="e.g. Bachelor of Technology (B.Tech)"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">Branch / Department *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editInfoForm.branch || ''}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, branch: e.target.value })}
+                      placeholder="e.g. Computer Science & Engineering"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">Current Year of Study</label>
+                    <select
+                      value={editInfoForm.yearOfStudy || '3rd Year'}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, yearOfStudy: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50"
+                    >
+                      <option value="1st Year">1st Year</option>
+                      <option value="2nd Year">2nd Year</option>
+                      <option value="3rd Year">3rd Year</option>
+                      <option value="4th Year">4th Year</option>
+                      <option value="Postgraduate">Postgraduate</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">Expected Graduation Year</label>
+                    <input
+                      type="text"
+                      value={editInfoForm.graduationYear || '2026'}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, graduationYear: e.target.value })}
+                      placeholder="e.g. 2026"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">College Roll Number / Enrollment No *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editInfoForm.rollNo || ''}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, rollNo: e.target.value })}
+                      placeholder="e.g. 21BCSE044"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">APAAR / ABC ID (Govt. Academic ID)</label>
+                    <input
+                      type="text"
+                      value={editInfoForm.apaarId || ''}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, apaarId: e.target.value })}
+                      placeholder="e.g. APAAR-9821-4402-8819"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50 font-mono"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">Cumulative CGPA (out of 10.0)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="10"
+                      value={editInfoForm.cgpa || ''}
+                      onChange={(e) => setEditInfoForm({ ...editInfoForm, cgpa: e.target.value })}
+                      placeholder="e.g. 8.84"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-sky-500 bg-slate-50/50"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setShowEditInfoModal(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs cursor-pointer transition"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isSavingInfo}
+                  className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs cursor-pointer transition disabled:opacity-50"
+                >
+                  {isSavingInfo ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving & Syncing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Save & Sync Everywhere</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

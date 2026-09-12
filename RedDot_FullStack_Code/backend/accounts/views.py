@@ -20,6 +20,23 @@ from .utils import (
     normalize_phone, check_rate_limit, find_user_by_identifier
 )
 
+def get_user_avatar_from_supabase(identifier):
+    if not identifier:
+        return None
+    try:
+        from api.supabase_client import get_supabase_client
+        client = get_supabase_client()
+        clean = str(identifier).strip()
+        if '@' in clean:
+            res = client.table("profiles").select("avatar_url").eq("email", clean.lower()).execute()
+        else:
+            res = client.table("profiles").select("avatar_url").eq("phone_number", clean).execute()
+        if res.data and len(res.data) > 0:
+            return res.data[0].get("avatar_url")
+    except Exception as e:
+        pass
+    return None
+
 class SendOTPView(APIView):
     permission_classes = [AllowAny]
 
@@ -254,6 +271,8 @@ class VerifyOTPView(APIView):
 
             full_name = f"{user.first_name} {user.last_name}".strip() or user.username
 
+            user_avatar = get_user_avatar_from_supabase(user.email or profile.phone)
+
             return Response({
                 "success": True,
                 "message": "Login successful via OTP.",
@@ -266,6 +285,7 @@ class VerifyOTPView(APIView):
                     "email": user.email,
                     "full_name": full_name,
                     "role": profile.role,
+                    "avatar_url": user_avatar,
                     "profile": UserProfileSerializer(profile).data
                 },
                 "role": profile.role
@@ -381,6 +401,8 @@ class LoginView(APIView):
             access_token = str(refresh.access_token)
             full_name = f"{user.first_name} {user.last_name}".strip() or user.username
 
+            user_avatar = get_user_avatar_from_supabase(user.email or profile.phone)
+
             return Response({
                 "success": True,
                 "message": "OTP Login successful.",
@@ -393,6 +415,7 @@ class LoginView(APIView):
                     "email": user.email,
                     "full_name": full_name,
                     "role": profile.role,
+                    "avatar_url": user_avatar,
                     "profile": UserProfileSerializer(profile).data
                 },
                 "role": profile.role
@@ -422,6 +445,8 @@ class LoginView(APIView):
         access_token = str(refresh.access_token)
         full_name = f"{user.first_name} {user.last_name}".strip() or user.username
 
+        user_avatar = get_user_avatar_from_supabase(user.email or profile.phone)
+
         return Response({
             "success": True,
             "message": "Login successful.",
@@ -434,6 +459,7 @@ class LoginView(APIView):
                 "email": user.email,
                 "full_name": full_name,
                 "role": profile.role,
+                "avatar_url": user_avatar,
                 "profile": UserProfileSerializer(profile).data
             },
             "role": profile.role
@@ -579,9 +605,11 @@ class MeView(APIView):
 
     def get(self, request):
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        user_data = UserSerializer(request.user).data
+        user_data["avatar_url"] = get_user_avatar_from_supabase(request.user.email or profile.phone)
         return Response({
             "success": True,
-            "user": UserSerializer(request.user).data,
+            "user": user_data,
             "role": profile.role
         }, status=status.HTTP_200_OK)
 
@@ -610,3 +638,28 @@ class RoleSelectionView(APIView):
             "user": UserSerializer(request.user).data,
             "role": profile.role
         }, status=status.HTTP_200_OK)
+
+
+class UpdateAvatarView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email', '').strip().lower()
+        phone = request.data.get('phone', '').strip()
+        avatar_url = request.data.get('avatar_url', '')
+
+        if not avatar_url:
+            return Response({"success": False, "error": "avatar_url is required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not email and not phone:
+            return Response({"success": False, "error": "Email or phone identifier is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            from api.supabase_client import get_supabase_client
+            client = get_supabase_client()
+            if email:
+                client.table("profiles").update({"avatar_url": avatar_url, "updated_at": timezone.now().isoformat()}).eq("email", email).execute()
+            elif phone:
+                client.table("profiles").update({"avatar_url": avatar_url, "updated_at": timezone.now().isoformat()}).eq("phone_number", phone).execute()
+            return Response({"success": True, "message": "Avatar updated successfully in Supabase."}, status=status.HTTP_200_OK)
+        except Exception as exc:
+            return Response({"success": False, "error": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

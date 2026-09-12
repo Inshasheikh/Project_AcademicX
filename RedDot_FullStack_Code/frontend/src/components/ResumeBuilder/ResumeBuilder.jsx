@@ -39,6 +39,7 @@ import {
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { downloadElementAsPdf } from '../../utils/downloadUtils';
+import { getStudentBasicInfo } from '../../utils/studentInfoSync';
 
 
 const LinkedInIcon = ({ className = "w-3 h-3" }) => (
@@ -405,8 +406,59 @@ export default function ResumeBuilder({ onSendToReview, initialPreset = 'fullsta
     } catch (e) {
       console.warn('Could not load saved resume builder state:', e);
     }
-    return PRESET_PROFILES[initialPreset] || PRESET_PROFILES.fullstack;
+    const base = JSON.parse(JSON.stringify(PRESET_PROFILES[initialPreset] || PRESET_PROFILES.fullstack));
+    try {
+      const basic = getStudentBasicInfo();
+      if (basic) {
+        if (basic.fullName) base.personalInfo.fullName = basic.fullName;
+        if (basic.email) base.personalInfo.email = basic.email;
+        if (basic.phone) base.personalInfo.phone = basic.phone;
+        if (basic.headline) base.personalInfo.headline = basic.headline;
+        if (basic.location) base.personalInfo.location = basic.location;
+        if (base.education && base.education[0]) {
+          if (basic.college) base.education[0].institution = basic.college;
+          if (basic.degree) base.education[0].degree = basic.degree;
+          if (basic.branch) base.education[0].field = basic.branch;
+          if (basic.cgpa) base.education[0].cgpa = `${basic.cgpa} / 10.0`;
+          if (basic.graduationYear) base.education[0].year = `Class of ${basic.graduationYear}`;
+        }
+      }
+    } catch (err) {}
+    return base;
   });
+
+  // Listen for real-time basic info updates from StudentDashboard
+  useEffect(() => {
+    const handleBasicInfoUpdate = (e) => {
+      const basic = e.detail;
+      if (!basic) return;
+      setResumeData(prev => {
+        const next = { ...prev };
+        next.personalInfo = {
+          ...next.personalInfo,
+          fullName: basic.fullName || next.personalInfo.fullName,
+          email: basic.email || next.personalInfo.email,
+          phone: basic.phone || next.personalInfo.phone,
+          headline: basic.headline || next.personalInfo.headline,
+          location: basic.location || next.personalInfo.location
+        };
+        if (next.education && next.education[0]) {
+          next.education[0] = {
+            ...next.education[0],
+            institution: basic.college || next.education[0].institution,
+            degree: basic.degree || next.education[0].degree,
+            field: basic.branch || next.education[0].field,
+            cgpa: basic.cgpa ? `${basic.cgpa} / 10.0` : next.education[0].cgpa,
+            year: basic.graduationYear ? `Class of ${basic.graduationYear}` : next.education[0].year
+          };
+        }
+        return next;
+      });
+    };
+
+    window.addEventListener('academicx_basic_info_updated', handleBasicInfoUpdate);
+    return () => window.removeEventListener('academicx_basic_info_updated', handleBasicInfoUpdate);
+  }, []);
 
   const [activeTab, setActiveTab] = useState('personal'); // 'personal' | 'education' | 'skills' | 'experience' | 'projects' | 'certifications'
   const [selectedTemplate, setSelectedTemplate] = useState('modern'); // 'modern' | 'classic' | 'academic'
@@ -491,7 +543,28 @@ export default function ResumeBuilder({ onSendToReview, initialPreset = 'fullsta
       setResumeData(prev => {
         const next = { ...prev };
 
-        if (cachedUser) {
+        const basicInfo = getStudentBasicInfo(cachedUser);
+        if (basicInfo) {
+          next.personalInfo = {
+            ...next.personalInfo,
+            fullName: basicInfo.fullName || next.personalInfo.fullName,
+            email: basicInfo.email || next.personalInfo.email,
+            phone: basicInfo.phone || next.personalInfo.phone,
+            location: basicInfo.location || next.personalInfo.location || "India",
+            headline: basicInfo.headline || next.personalInfo.headline
+          };
+
+          if (next.education && next.education.length > 0) {
+            next.education[0] = {
+              ...next.education[0],
+              institution: basicInfo.college || next.education[0].institution,
+              degree: basicInfo.degree || next.education[0].degree,
+              field: basicInfo.branch || next.education[0].field,
+              cgpa: basicInfo.cgpa ? `${basicInfo.cgpa} / 10.0` : next.education[0].cgpa,
+              year: basicInfo.graduationYear ? `Class of ${basicInfo.graduationYear}` : next.education[0].year,
+            };
+          }
+        } else if (cachedUser) {
           next.personalInfo = {
             ...next.personalInfo,
             fullName: cachedUser.full_name || cachedUser.name || next.personalInfo.fullName,
