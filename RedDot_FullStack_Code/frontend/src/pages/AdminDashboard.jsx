@@ -96,13 +96,6 @@ const BACKEND_MICROSERVICES = [
   }
 ];
 
-const RECENT_APP_LOGS = [
-  { timestamp: "04:38:12", level: "INFO", source: "AuthGateway", message: "User session token authenticated with cryptographic proof" },
-  { timestamp: "04:35:44", level: "INFO", source: "AIEngine", message: "Vector similarity search executed in 16.4ms across 1,240 candidate embeddings" },
-  { timestamp: "04:31:02", level: "INFO", source: "AcademicRegistryAPI", message: "Cryptographic SHA-256 certificate verified against Institutional Root CA" },
-  { timestamp: "04:28:19", level: "WARN", source: "RateLimiter", message: "High volume of candidate filter queries from Recruiter IP (192.168.1.42) - Throttle OK" },
-  { timestamp: "04:22:50", level: "INFO", source: "PostgreSQL", message: "Database connection pool healthy (14 active, 86 idle, 0 waiting)" }
-];
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('database'); // 'database' | 'services' | 'ai_engine' | 'config'
@@ -579,31 +572,6 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Recent App Logs */}
-          <div className="bg-slate-900 rounded-2xl p-5 text-slate-300 font-mono text-xs shadow-md space-y-3">
-            <div className="flex items-center justify-between text-slate-400 border-b border-slate-800 pb-2">
-              <div className="flex items-center gap-2 text-white font-bold">
-                <Terminal className="w-4 h-4 text-emerald-400" />
-                Live Application Telemetry Stream (stdout)
-              </div>
-              <span className="text-[10px] text-emerald-400">● Streaming</span>
-            </div>
-
-            <div className="space-y-1.5 text-[11px]">
-              {RECENT_APP_LOGS.map((log, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <span className="text-slate-500 shrink-0">[{log.timestamp}]</span>
-                  <span className={`px-1.5 rounded font-bold shrink-0 text-[10px] ${
-                    log.level === 'WARN' ? 'bg-amber-900/60 text-amber-300' : 'bg-sky-900/60 text-sky-300'
-                  }`}>
-                    {log.level}
-                  </span>
-                  <span className="text-slate-400 shrink-0">&lt;{log.source}&gt;</span>
-                  <span className="text-slate-200">{log.message}</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       )}
 
