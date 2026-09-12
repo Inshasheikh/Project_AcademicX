@@ -2091,19 +2091,6 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
                     })}
                   </div>
 
-                  {/* Security & Verification Callout */}
-                  <div className="p-3.5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-slate-300 text-xs space-y-2 border border-slate-700 shadow-xs">
-                    <div className="flex items-center justify-between text-white font-bold pb-1.5 border-b border-slate-700/80">
-                      <span className="flex items-center gap-1.5 text-xs">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                        Tamper-Proof Verification
-                      </span>
-                      <span className="text-[10px] text-emerald-400 font-mono">100% AUTHENTIC</span>
-                    </div>
-                    <p className="text-[11px] text-slate-300 leading-relaxed">
-                      All transcripts and certificates are cryptographically cross-verified with institutional registrar databases, ensuring zero credential forgery for recruiters and NAAC audits.
-                    </p>
-                  </div>
                 </div>
 
                 {/* Right Panel: High-Res Interactive Document Viewer (7 cols) */}
