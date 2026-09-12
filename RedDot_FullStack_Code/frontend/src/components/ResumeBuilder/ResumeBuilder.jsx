@@ -946,11 +946,6 @@ export default function ResumeBuilder({ onSendToReview, initialPreset = 'fullsta
             })}
           </div>
 
-          <div className="flex items-center gap-3 text-slate-400 text-[11px]">
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Auto-saved to browser
-            </span>
-          </div>
         </div>
       </div>
 

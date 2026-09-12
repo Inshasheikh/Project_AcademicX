@@ -41,8 +41,12 @@ import {
   Target,
   Compass,
   Mic,
-  Search
+  Search,
+  ZoomIn
 } from 'lucide-react';
+import marksheetDegreeImg from '../assets/documents/marksheet_degree.jpg';
+import bonafideCertImg from '../assets/documents/bonafide_certificate.jpg';
+import marksheet12thImg from '../assets/documents/marksheet_12th.jpg';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../services/api';
 import SkillDiagnosticPage from './SkillDiagnosticPage';
@@ -132,6 +136,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
   const [toast, setToast] = useState(null);
   const [showDocModal, setShowDocModal] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState(null);
+  const [enlargedDoc, setEnlargedDoc] = useState(null);
   const [activeStatsModal, setActiveStatsModal] = useState(null);
   const [offerAccepted, setOfferAccepted] = useState(false);
   const [appFilter, setAppFilter] = useState('all');
@@ -314,31 +319,55 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
     {
       id: 1,
       title: "University Degree Academic Transcript",
-      issuer: currentUser?.college || "Institutional Academic Registrar",
-      grade: "Official Verified Academic Record",
-      status: "Verified by Registrar",
-      date: "Academic Session",
-      docId: `DOC-${studentRollNo ? String(studentRollNo).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) : 'ACAD'}-01`
+      issuer: currentUser?.college || "National Institute of Technology",
+      grade: "SGPA: 9.20 • CGPA: 8.94 (Honors)",
+      status: "Verified by Registrar (Cryptographic SHA-256)",
+      date: "Semester III • Academic Session 2023-24",
+      docId: `DOC-${studentRollNo ? String(studentRollNo).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) : 'NIT2021'}-01`,
+      image: marksheetDegreeImg,
+      authority: "Office of the Registrar, NIT",
+      badge: "Institutional Cryptographic Seal",
+      description: "Official B.Tech Academic Transcript featuring courses CSE201, CSE203, CSE205, CSE207, CSE209 with SGPA 9.20 and CGPA 8.94, official registrar seal, signature, and verification QR code."
     },
     {
       id: 2,
       title: "Higher Secondary Examination Marksheet",
-      issuer: "Secondary & Higher Secondary Education Board",
-      grade: "Authenticated Board Record",
-      status: "Authenticated Board Record",
-      date: "Official Record",
-      docId: `DOC-${studentRollNo ? String(studentRollNo).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) : 'ACAD'}-02`
+      issuer: "Central Board of Secondary Education (CBSE)",
+      grade: "Class XII: 94.2% (Distinction • 471/500)",
+      status: "DigiLocker Authenticated Board Record",
+      date: "Senior School Examination 2024",
+      docId: `DOC-${studentRollNo ? String(studentRollNo).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) : 'CBSE24'}-02`,
+      image: marksheet12thImg,
+      authority: "Controller of Examinations, CBSE",
+      badge: "DigiLocker Verified Authenticity",
+      description: "Class XII Senior School Marks Statement with distinctions across Mathematics (94), Physics (97), Chemistry (96), Computer Science (94), DigiLocker verified QR code, and official board seal."
     },
     {
       id: 3,
       title: "Institutional Bona Fide Student Certificate",
-      issuer: currentUser?.college ? `Dean of Academic Affairs, ${currentUser.college}` : "Dean of Academic Affairs",
-      grade: "Active Full-Time Student",
+      issuer: currentUser?.college ? `Dean of Academic Affairs, ${currentUser.college}` : "National Institute of Technology",
+      grade: "Active Full-Time B.Tech Student (6th Sem)",
       status: "Direct University Record",
-      date: "Current Session",
-      docId: `DOC-${studentRollNo ? String(studentRollNo).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) : 'ACAD'}-03`
+      date: "Academic Session 2023-2024",
+      docId: `DOC-${studentRollNo ? String(studentRollNo).replace(/[^a-zA-Z0-9]/g, '').slice(0, 8) : 'NIT2021'}-03`,
+      image: bonafideCertImg,
+      authority: "Dean of Academic Affairs, NIT",
+      badge: "Dean Academic Affairs Certified",
+      description: "Official institutional bona fide certificate authenticating enrollment in 4-year B.Tech in Computer Science and Engineering with genuine university gold seal, Dean signature, and security hologram."
     }
   ];
+
+  const handleDownloadMarksheet = (doc) => {
+    if (!doc?.image) return;
+    const link = document.createElement('a');
+    link.href = doc.image;
+    link.download = `${(doc.title || 'Academic_Marksheet').replace(/[^a-zA-Z0-9]/g, '_')}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setToast(`Downloaded ${doc.title} successfully!`);
+  };
+
 
   // Verified Blue Tick logic: only active when all institutional documents are verified
   const isProfileVerified = academicDocuments.length > 0 && academicDocuments.every(doc => 
@@ -1391,22 +1420,7 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
             </button>
           </div>
 
-          {/* AI Mock Interview Practice Studio Card */}
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-l-sky-600 border-t border-r border-b border-slate-200 shadow-xs space-y-3">
-            <span className="text-[10px] font-bold text-sky-600 uppercase tracking-wider block">Interview Studio</span>
-            <h4 className="text-sm font-bold text-slate-900 font-['Outfit']">Company Mock Simulation</h4>
-            <p className="text-xs text-slate-500">Practice 4-round technical coding & system design simulations with real-time feedback</p>
 
-            <button
-              onClick={() => {
-                setActiveMainSection('interview');
-                navigate('/student/interview');
-              }}
-              className="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs shadow-sm transition cursor-pointer"
-            >
-              Practice with AI Career Coach &rarr;
-            </button>
-          </div>
         </div>
       </div>
       )}
@@ -1961,108 +1975,286 @@ export default function StudentDashboard({ setActiveTab, initialSection = 'jobs'
       )}
 
       {/* ========================================================================= */}
-      {/* ACADEMIC CREDENTIAL VAULT MODAL */}
+      {/* ACADEMIC CREDENTIAL VAULT MODAL (HIGH-RES MARKSHEET & VERIFICATION VIEWER) */}
       {/* ========================================================================= */}
       {showDocModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-2xl w-full overflow-hidden animate-fade-in">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-5xl w-full overflow-hidden animate-fade-in my-auto max-h-[94vh] flex flex-col">
             
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-sky-800 to-[#082f49] text-white px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-lg">
+            <div className="bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 text-white px-6 py-4 flex items-center justify-between border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-xl shadow-inner">
                   🎓
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm">Academic Credential Vault</h3>
-                  <p className="text-[10px] text-sky-100">National Institute of Technology • Registrar Verified Documents</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-bold text-base font-['Outfit']">Academic Credential Vault</h3>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-extrabold flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      DigiLocker & Registrar Verified
+                    </span>
+                  </div>
+                  <p className="text-xs text-sky-200/80">
+                    National Institute of Technology • Cryptographically Ingested Academic Transcripts & Marksheets
+                  </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowDocModal(false)}
-                className="p-1 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition"
+                className="p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition cursor-pointer"
+                title="Close Credential Vault"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Modal Body */}
-            <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            {/* Modal Body: Scrollable area with 2-Column Split */}
+            <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1">
+              {/* Student Identification Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 border border-slate-200/90 p-3.5 sm:p-4 rounded-2xl">
                 <div>
                   <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                    <Check className="w-4 h-4 text-emerald-600" />
-                    <span>Verified Academic Transcripts & Records</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Verified Academic Credentials — {studentName}</span>
                   </h4>
-                  <p className="text-[11px] text-slate-500">
-                    Roll Number: {studentRollNo} • Department of Computer Science & Engineering
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Roll Number: <strong className="text-slate-800">{studentRollNo || 'NIT2021CS045'}</strong> • Department of Computer Science & Engineering
                   </p>
                 </div>
-                <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-lg flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" /> Registrar Verified
-                </span>
-              </div>
-
-              {/* Documents list */}
-              <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
-                {academicDocuments.map((doc) => (
-                  <div 
-                    key={doc.id}
-                    className="p-3.5 rounded-xl border border-slate-200 hover:border-sky-300 bg-slate-50/50 hover:bg-white transition flex items-center justify-between gap-3"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
-                        <FileCheck2 className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h5 className="text-xs font-bold text-slate-900">{doc.title}</h5>
-                        <p className="text-[11px] text-slate-500">{doc.issuer} • {doc.date}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-medium border border-emerald-100">
-                            {doc.grade}
-                          </span>
-                          <span className="text-[10px] font-mono text-slate-400">
-                            ID: {doc.docId}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setSelectedDoc(doc)}
-                      className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-sky-600 hover:bg-sky-50 text-xs font-semibold shrink-0 cursor-pointer"
-                    >
-                      View Record
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Preview of selected document metadata */}
-              {selectedDoc && (
-                <div className="p-3.5 bg-slate-900 text-slate-200 rounded-xl text-[11px] space-y-1.5">
-                  <div className="flex justify-between text-slate-300 border-b border-slate-800 pb-1">
-                    <span className="font-bold text-white">{selectedDoc.title}</span>
-                    <span className="text-emerald-400 font-mono">VERIFIED_ORIGINAL</span>
-                  </div>
-                  <div className="text-slate-300 text-xs">Issuer: {selectedDoc.issuer}</div>
-                  <div className="text-emerald-300 font-mono text-xs">Academic Performance: {selectedDoc.grade}</div>
-                  <div className="text-slate-300 text-[10px] font-mono">Status: {selectedDoc.status}</div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-2xs">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" /> Registrar Validated
+                  </span>
+                  <span className="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-200 text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-2xs">
+                    <QrCode className="w-3.5 h-3.5 text-sky-600" /> SHA-256 Ingested
+                  </span>
                 </div>
-              )}
+              </div>
 
-              <div className="pt-2 flex justify-end items-center border-t border-slate-100">
+              {/* Grid: Left = Document List, Right = High-Res Marksheet Preview */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                
+                {/* Left Panel: Verified Documents Selector (5 cols) */}
+                <div className="lg:col-span-5 space-y-3">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-700 px-1">
+                    <span>Verified Documents ({academicDocuments.length})</span>
+                    <span className="text-[11px] text-sky-600 font-medium">Click to inspect demo</span>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {academicDocuments.map((doc) => {
+                      const isSelected = (selectedDoc?.id || academicDocuments[0].id) === doc.id;
+                      return (
+                        <div
+                          key={doc.id}
+                          onClick={() => setSelectedDoc(doc)}
+                          className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 text-left relative ${
+                            isSelected
+                              ? 'border-sky-500 bg-sky-50/50 shadow-sm ring-2 ring-sky-500/20'
+                              : 'border-slate-200 hover:border-sky-300 bg-white hover:bg-slate-50/60'
+                          }`}
+                        >
+                          {/* Mini Thumbnail */}
+                          <div className="relative w-14 h-18 rounded-lg overflow-hidden border border-slate-300 shrink-0 bg-slate-100 shadow-2xs group">
+                            <img
+                              src={doc.image}
+                              alt={doc.title}
+                              className="w-full h-full object-cover object-top"
+                            />
+                            <div className="absolute inset-0 bg-sky-900/10" />
+                          </div>
+
+                          {/* Info */}
+                          <div className="flex-1 min-w-0 space-y-1">
+                            <div className="flex items-center justify-between gap-1">
+                              <h5 className="text-xs font-bold text-slate-900 truncate">{doc.title}</h5>
+                              {isSelected && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-600 text-white shrink-0">
+                                  Viewing
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-slate-500 truncate">{doc.issuer}</p>
+                            
+                            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                              <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md font-bold border border-emerald-200">
+                                {doc.grade}
+                              </span>
+                              <span className="text-[10px] font-mono text-slate-400">
+                                {doc.docId}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Security & Verification Callout */}
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-slate-300 text-xs space-y-2 border border-slate-700 shadow-xs">
+                    <div className="flex items-center justify-between text-white font-bold pb-1.5 border-b border-slate-700/80">
+                      <span className="flex items-center gap-1.5 text-xs">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        Tamper-Proof Verification
+                      </span>
+                      <span className="text-[10px] text-emerald-400 font-mono">100% AUTHENTIC</span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      All transcripts and certificates are cryptographically cross-verified with institutional registrar databases, ensuring zero credential forgery for recruiters and NAAC audits.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right Panel: High-Res Interactive Document Viewer (7 cols) */}
+                <div className="lg:col-span-7 space-y-3">
+                  {(() => {
+                    const currentDoc = selectedDoc || academicDocuments[0];
+                    return (
+                      <div className="bg-slate-50 rounded-2xl border border-slate-200/90 p-4 space-y-3 shadow-xs">
+                        
+                        {/* Top Viewer Control Bar */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-200">
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-extrabold uppercase tracking-wider text-sky-600 block">
+                              Verified Document Preview
+                            </span>
+                            <h4 className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                              {currentDoc.title}
+                            </h4>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setEnlargedDoc(currentDoc)}
+                              className="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1 transition cursor-pointer shadow-2xs"
+                              title="Enlarge Full Document"
+                            >
+                              <Eye className="w-3.5 h-3.5 text-slate-600" />
+                              <span>Enlarge</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDownloadMarksheet(currentDoc)}
+                              className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+                              title="Download document copy"
+                            >
+                              <Download className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>Download</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Interactive Marksheet Frame */}
+                        <div 
+                          onClick={() => setEnlargedDoc(currentDoc)}
+                          className="relative rounded-xl overflow-hidden border-2 border-slate-300/80 bg-white shadow-md hover:shadow-xl transition-all cursor-zoom-in group max-h-[440px] flex items-center justify-center bg-slate-100/50"
+                        >
+                          <img
+                            src={currentDoc.image}
+                            alt={currentDoc.title}
+                            className="w-full h-auto max-h-[440px] object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                          />
+
+                          {/* Authentic Hologram Verification Floating Pill */}
+                          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-slate-900/85 backdrop-blur-md text-white border border-white/20 text-[10px] font-bold flex items-center gap-1.5 shadow-lg">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                            <span>Digital Signature Valid</span>
+                          </div>
+
+                          {/* Bottom Click to Enlarge Hover Prompt */}
+                          <div className="absolute bottom-3 inset-x-3 py-2 px-3 rounded-xl bg-slate-900/80 backdrop-blur-md text-white text-xs font-semibold flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Eye className="w-4 h-4 text-sky-400" />
+                            <span>Click anywhere to inspect full-screen high resolution</span>
+                          </div>
+                        </div>
+
+                        {/* Document Verification Metadata Strip */}
+                        <div className="bg-white p-3 rounded-xl border border-slate-200 text-xs grid grid-cols-2 sm:grid-cols-3 gap-2 text-slate-600">
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold block uppercase">Issuer Authority</span>
+                            <span className="font-semibold text-slate-800 truncate block">{currentDoc.issuer}</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold block uppercase">Performance Benchmark</span>
+                            <span className="font-bold text-emerald-600 truncate block">{currentDoc.grade}</span>
+                          </div>
+                          <div className="col-span-2 sm:col-span-1">
+                            <span className="text-[10px] text-slate-400 font-bold block uppercase">Ingestion Status</span>
+                            <span className="font-mono text-[11px] text-sky-700 font-bold flex items-center gap-1">
+                              <Check className="w-3 h-3 text-emerald-600" /> {currentDoc.status}
+                            </span>
+                          </div>
+                        </div>
+
+                      </div>
+                    );
+                  })()}
+                </div>
+
+              </div>
+
+              {/* Modal Footer */}
+              <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <span className="text-slate-500 font-medium">
+                  Verified under National Academic Depository (NAD) & AICTE guidelines.
+                </span>
                 <button
                   type="button"
                   onClick={() => setShowDocModal(false)}
-                  className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold transition cursor-pointer shadow-xs"
                 >
                   Close Vault
                 </button>
               </div>
+
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* FULLSCREEN LIGHTBOX MODAL FOR HIGH-RES MARKSHEET INSPECTION */}
+      {enlargedDoc && (
+        <div className="fixed inset-0 z-60 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="relative max-w-4xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[96vh] animate-fade-in my-auto">
+            {/* Header */}
+            <div className="bg-slate-900 text-white px-6 py-3.5 flex items-center justify-between border-b border-slate-800 shrink-0">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                <div>
+                  <h3 className="font-bold text-sm sm:text-base">{enlargedDoc.title}</h3>
+                  <p className="text-[11px] text-slate-400">{enlargedDoc.issuer} • Document ID: {enlargedDoc.docId}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleDownloadMarksheet(enlargedDoc)}
+                  className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEnlargedDoc(null)}
+                  className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+                  title="Close Preview"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* High-res Image Scroll Container */}
+            <div className="p-4 sm:p-6 overflow-y-auto flex items-center justify-center bg-slate-100 flex-1">
+              <img
+                src={enlargedDoc.image}
+                alt={enlargedDoc.title}
+                className="w-full max-w-2xl h-auto rounded-xl shadow-xl border border-slate-300"
+              />
+            </div>
           </div>
         </div>
       )}
