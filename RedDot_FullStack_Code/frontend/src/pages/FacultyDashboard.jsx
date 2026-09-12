@@ -367,23 +367,24 @@ export default function FacultyDashboard() {
     const created = {
       id: Date.now(),
       title: newEvent.title,
-      category: newEvent.category,
+      category: newEvent.category || "Hackathon",
       edition: "College Campus Edition",
       date: newEvent.date || "Upcoming Next Month",
-      duration: newEvent.duration,
-      mode: newEvent.mode,
-      venue: newEvent.venue,
+      duration: newEvent.duration || "24 Hours",
+      mode: newEvent.mode || "Campus Innovation Lab",
+      venue: newEvent.venue || "NIT Tech Complex",
       organizer: "Dept. of CSE & Placement Cell",
-      prize_pool: newEvent.prize_pool,
+      prize_pool: newEvent.prize_pool || "Certificate of Excellence",
       enrolled_count: 0,
       max_teams: Number(newEvent.max_teams) || 50,
-      eligibility: newEvent.eligibility,
+      eligibility: newEvent.eligibility || "All Engineering Students",
       status: "REGISTRATION_OPEN",
       sponsor: "NIT & REDDOT Academic Network",
       description: newEvent.description
     };
-    setEvents([created, ...events]);
+    setEvents(prev => [created, ...prev]);
     setShowAddEventModal(false);
+    setActiveTab('events');
     showToast(`Campus Event "${newEvent.title}" published successfully!`);
     setNewEvent({
       title: '',
@@ -402,25 +403,31 @@ export default function FacultyDashboard() {
   // Handle Free Course Creation
   const handleCreateCourse = (e) => {
     e.preventDefault();
+    const techStackArray = (newCourse.tech_stack || '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
     const created = {
       id: Date.now(),
       title: newCourse.title,
-      department: newCourse.department,
+      department: newCourse.department || "Computer Science & Engineering",
       is_free: true,
       free_badge: "100% Free Open Education",
-      instructor: newCourse.instructor,
-      schedule: newCourse.schedule,
+      instructor: newCourse.instructor || "Faculty Advisor",
+      schedule: newCourse.schedule || "Weekends (Flexible)",
       enrolled_students: 0,
-      tech_stack: newCourse.tech_stack.split(',').map(s => s.trim()),
-      perks: newCourse.perks,
+      tech_stack: techStackArray.length ? techStackArray : ["General Engineering", "Hands-on Lab"],
+      perks: newCourse.perks || "Free Certificate & Lab Access",
       syllabus_highlights: [
-        newCourse.syllabus,
+        newCourse.syllabus || "Comprehensive hands-on training",
         "Practical laboratory exercises and coding drills",
         "Final capstone project verification for placement credit"
       ]
     };
-    setCourses([created, ...courses]);
+    setCourses(prev => [created, ...prev]);
     setShowAddCourseModal(false);
+    setActiveTab('courses');
     showToast(`Free Educational Program "${newCourse.title}" published!`);
     setNewCourse({
       title: '',
@@ -436,22 +443,28 @@ export default function FacultyDashboard() {
   // Handle Project Blueprint Creation
   const handleCreateProject = (e) => {
     e.preventDefault();
+    const techStackArray = (newProject.tech_stack || '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
     const created = {
       id: Date.now(),
       title: newProject.title,
-      domain: newProject.domain,
-      target_year: newProject.target_year,
-      difficulty: newProject.difficulty,
-      tech_stack: newProject.tech_stack.split(',').map(s => s.trim()),
+      domain: newProject.domain || "Applied Artificial Intelligence & NLP",
+      target_year: newProject.target_year || "Final Year Capstone",
+      difficulty: newProject.difficulty || "Advanced",
+      tech_stack: techStackArray.length ? techStackArray : ["Full Stack", "System Design"],
       problem_statement: newProject.problem_statement,
       expected_deliverables: [
         newProject.deliverable1 || "Production-ready backend architecture and data flow",
         newProject.deliverable2 || "Comprehensive test coverage with CI/CD deployment configuration"
       ],
-      starter_repo: newProject.starter_repo
+      starter_repo: newProject.starter_repo || "https://github.com/nit-projects/new-project"
     };
-    setProjects([created, ...projects]);
+    setProjects(prev => [created, ...prev]);
     setShowAddProjectModal(false);
+    setActiveTab('projects');
     showToast(`Capstone Project Blueprint "${newProject.title}" added to guidance library!`);
     setNewProject({
       title: '',
@@ -495,7 +508,10 @@ export default function FacultyDashboard() {
         {/* Action Buttons to Add Events & Free Courses */}
         <div className="flex flex-wrap items-center gap-2.5">
           <button
-            onClick={() => setShowAddEventModal(true)}
+            onClick={() => {
+              setActiveTab('events');
+              setShowAddEventModal(true);
+            }}
             className="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
@@ -503,17 +519,24 @@ export default function FacultyDashboard() {
           </button>
 
           <button
-            onClick={() => setShowAddCourseModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition cursor-pointer"
+            onClick={() => {
+              setActiveTab('courses');
+              setShowAddCourseModal(true);
+            }}
+            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition cursor-pointer"
           >
-            Add Free Course / Workshop
+            <PlusCircle className="w-4 h-4" />
+            <span>Add Free Course / Workshop</span>
           </button>
 
           <button
-            onClick={() => setShowAddProjectModal(true)}
-            className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-2 transition cursor-pointer"
+            onClick={() => {
+              setActiveTab('projects');
+              setShowAddProjectModal(true);
+            }}
+            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition cursor-pointer"
           >
-            <Code2 className="w-4 h-4 text-slate-600" />
+            <Code2 className="w-4 h-4" />
             <span>Project Blueprint</span>
           </button>
         </div>
@@ -1254,8 +1277,11 @@ export default function FacultyDashboard() {
       {/* MODAL 1: STUDENT ACADEMIC & CAREER DOSSIER MODAL */}
       {/* ========================================================= */}
       {selectedStudent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-3xl border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-6">
+        <div 
+          onClick={(e) => { if (e.target === e.currentTarget) setSelectedStudent(null); }}
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto"
+        >
+          <div className="bg-white w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-3xl border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-6 my-auto">
             
             {/* Modal Top Header */}
             <div className="flex items-start justify-between border-b border-slate-100 pb-5">
@@ -1511,8 +1537,11 @@ export default function FacultyDashboard() {
       {/* MODAL 2: PUBLISH NEW CAMPUS EVENT / HACKATHON */}
       {/* ========================================================= */}
       {showAddEventModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-lg p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-2xl space-y-4">
+        <div 
+          onClick={(e) => { if (e.target === e.currentTarget) setShowAddEventModal(false); }}
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto"
+        >
+          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-2xl space-y-4 my-auto">
             
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-slate-900 font-['Outfit'] flex items-center gap-2">
@@ -1639,8 +1668,11 @@ export default function FacultyDashboard() {
       {/* MODAL 3: ADD FREE EDUCATIONAL PROGRAM / WORKSHOP */}
       {/* ========================================================= */}
       {showAddCourseModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-lg p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-2xl space-y-4">
+        <div 
+          onClick={(e) => { if (e.target === e.currentTarget) setShowAddCourseModal(false); }}
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto"
+        >
+          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-2xl space-y-4 my-auto">
             
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-slate-900 font-['Outfit'] flex items-center gap-2">
@@ -1766,8 +1798,11 @@ export default function FacultyDashboard() {
       {/* MODAL 4: ADD CAPSTONE PROJECT BLUEPRINT */}
       {/* ========================================================= */}
       {showAddProjectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-lg p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-2xl space-y-4">
+        <div 
+          onClick={(e) => { if (e.target === e.currentTarget) setShowAddProjectModal(false); }}
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto"
+        >
+          <div className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-2xl space-y-4 my-auto">
             
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-slate-900 font-['Outfit'] flex items-center gap-2">

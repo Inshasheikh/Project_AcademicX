@@ -119,11 +119,6 @@ export default function Navbar({ activeRole, setActiveRole, activeTab, setActive
       isActive: location.pathname === '/student/resume'
     },
     { 
-      name: 'CV Builder', 
-      action: () => handleNavigate('/student/builder', 'student', 'builder'),
-      isActive: location.pathname === '/student/builder' || location.pathname === '/student/resume-builder'
-    },
-    { 
       name: 'Portfolio', 
       action: () => handleNavigate('/student/profile', 'student', 'portfolio'),
       isActive: location.pathname === '/student/profile'
